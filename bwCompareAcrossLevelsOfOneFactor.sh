@@ -60,12 +60,42 @@
 
 fxnPrintUsage() {
 cat <<EOF
-$0 - a script to do something. Example of a usage note:"
-Usage: scriptname [-r|-n] -v file {file2 ...}"
-  -r   print data rows only (no column names)"
-  -n   pring column names ONLY (no data rows)"
-  -v   be verbose"
+$0 - a general tool for running an external script across multiple levels of a single factor
+Usage: $0 \ 
+  -f   [your factorName, which will just be used in output filenames.]
+  -l   [your levelNames for levels of the factor: a comma-separated list WITH NO SPACES]
+  -s   [your levelwise script, to be executed for each level of the factor]
+
+When executed, your levelwise script is called once for each of the levels you
+provided in the csv -l list. Each time through the loop, one of your levelNames
+is provided as an argument to your levelwise script.
+
+E.g., $0 -f mySystemFolders -l etc,var,tmp -s calculateFolderSize.sh 
+
+The output of this script is a single new output directory containing per-level
+subdirectories and a structured text file containing one row of data per factor
+level, and a header row at the top. 
+
+For this to work, your levelwise script (-s scriptName) needs to produce output
+in this loose format:
+
+1) All output files from a single run of your levelwise script should be in a
+   folder called "levelOutputRaw"
+2) The only thing outside of levelOutputRaw should be a sibling text file
+   called singleLevelOutputVectorForComparisonAcrossLevels.txt . This text file
+   contains a comma-separated list of summary values that you want analyzed across
+   levels. It will have two lines: a field header line containing comma-separated
+   field labels, and a data line containing the corresponding levelwise data that
+   you are passing into analysis acrosss all factor levels.
+
+This script catenates those level-wise text files to produce a single
+factor-wise textfile in the root called (TBD)
+
+Calling this script without any arguments will create a template levelwise
+script for you, as well calculat sample output from that script.
+
 EOF
+# TBD: will the exit value of the script be the filepath of the matrix?
 }
 
 
@@ -384,6 +414,8 @@ echo ""
 
 fxnSelftestBasic
 #...the script will exit after completing the self-test, ignoring all lines below.
+
+# turn csv levelNameList commas into spaces
 
 
 
