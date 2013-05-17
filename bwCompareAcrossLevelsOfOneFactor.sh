@@ -204,12 +204,14 @@ fxnSetTempDir() {
    #    remember to assign values before calling fxnSetTempDir !
    #    e.g., tempParent=${participantDirectory}/manyTempProcessingDirsForThisParticipant && fxnSetTempDir()
 
-   # Is $tempParent already defined as a writable directory? If not, try to define a reasonable one:
+   # Is $tempParent already defined as a writable directory? If not, try to define a reasonable one here:
    tempParentPrevouslySetToWritableDir=''
    hostname=`hostname -s`
    kernel=`uname -s`
-   if [ -n "${tempParent}"] && [ -d "${tempParent}" ] && [ -w "${tempParent}" ]; then
+   #echo "DEBUG: \$tempParent is currently set to ${tempParent}"
+   if [ ! -z ${tempParent} ] && [ -d ${tempParent} ] && [ -w ${tempParent} ]; then
       tempParentPreviouslySetToWritableDir=1
+      #echo "DEBUG: tempParentPreviouslySetToWritableDir=1"
    elif [ $hostname = "stowler-mba" ]; then
       tempParent="/Users/stowler/temp"
    elif [ $kernel = "Linux" ] && [ -d /tmp ] && [ -w /tmp ]; then
@@ -221,16 +223,17 @@ fxnSetTempDir() {
 	    create a new temporary directory. Edit script's $tempParent variable. Exiting."
       exit 1
    fi
-   # echo "DEBUG"
-   # echo "DEBUG: \${tempParent} is ${tempParent}"
-   # echo "DEBUG:"
+#   echo "DEBUG"
+#   echo "DEBUG: \${tempParent} is ${tempParent}"
+#   echo "DEBUG:"
 
    # Now that writable ${tempParent} has been confirmed, create ${tempDir}:
    # e.g., tempDir="${tempParent}/${startDateTime}-from_${scriptName}.${scriptPID}"
    tempDir="${tempParent}/${startDateTime}-from_${scriptName}.${scriptPID}"
    # does this $tempDir already exit? if so, don't try to make it again:
    if [ -d "${tempDir}" ] && [ -w "${tempDir}" ]; then
-      echo "DEBUG: ${tempDir} already exists as a writable directory. Exiting fxnSetTempDir"
+      echo ""
+      # echo "DEBUG: ${tempDir} already exists as a writable directory. Exiting fxnSetTempDir"
    else 
       mkdir ${tempDir}
       if [ $? -ne 0 ] ; then
