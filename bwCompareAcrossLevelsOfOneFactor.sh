@@ -27,7 +27,7 @@
 # - levelScript should accept as an argument a single factorLevel extracted
 #   from this script's vector of factorLevels and use it to perform internal
 #   functions
-# - output of levelScript should only be two objects:
+# - the output of levelScript should only be two objects:
 #	1) a subdirectory called levelOutputRaw
 #	2) a sibling text file called levelOutputVectorForComparisonAcrossLevels.txt
 # - TBD: would be helpful to have a template levelScript to aid consistancy 
@@ -67,8 +67,8 @@ Usage: $0 \
   -s   [your levelwise script, to be executed for each level of the factor]
 
 When executed, your levelwise script is called once for each of the levels you
-provided in the csv -l list. Each time through the loop, one of your levelNames
-is provided as an argument to your levelwise script.
+provided in the -l csv list. Each time through the loop, one of your levelNames
+is provided as an argument to execution of your levelwise script. 
 
 E.g., $0 -f mySystemFolders -l etc,var,tmp -s calculateFolderSize.sh 
 
@@ -91,8 +91,8 @@ in this loose format:
 This script catenates those level-wise text files to produce a single
 factor-wise textfile in the root called (TBD)
 
-Calling this script without any arguments will create a template levelwise
-script for you, as well calculat sample output from that script.
+Calling this script without any arguments will create a template
+scriptForOneLevel.sh, as well calculate sample output from that script.
 
 EOF
 # TBD: will the exit value of the script be the filepath of the matrix?
@@ -116,6 +116,7 @@ fxnProcessInvocation() {
 # (recalling it can't handle arguments with spaces in them)
 
 # STEP 1/3: initialize any variables that receive values during argument processing:
+launchSelftest=''
 factorName=''
 levelNameList=''
 levelScript=''
@@ -125,7 +126,7 @@ levelScript=''
 # echo "DEBUG getopt: \${@}=${@}"
 # echo "DEBUG getopt: \${scriptArgsCount}=${scriptArgsCount}"
 # echo "DEBUG getopt: \${#}=${#}"
-set -- `getopt f:l:s: "${scriptArgsVector}"`
+set -- `getopt tf:l:s: "${scriptArgsVector}"`
 # echo "DEBUG getopt: Values after set -- getopt ... :"
 # echo "DEBUG getopt: (notice that getopt changes \$@ and \$\, not \$script* :)"
 # echo "DEBUG getopt: \${scriptArgsVector}=${scriptArgsVector}"
@@ -138,6 +139,7 @@ while [ $# -gt 0 ]; do
     # echo "DEBUG getopt: \$\# == $# is still greater than 0"
     # echo "DEBUG getopt: \$\# == ${scriptArgsVector} "
     case "$1" in
+      -t)   launchSelftest=1; ;;
       -f)   factorName="${2}"; shift ;;
       -s)   levelScript="${2}"; shift ;;
       -l)   levelNameList="${2}"; shift ;;
@@ -211,7 +213,76 @@ fxnSelftestBasic() {
 fxnSelftestFull() {
   # Tests the full function of the script. Begins by calling fxnSelftestBaic() , and then...
   # <EDITME: description of tests and validating data>
+  echo ""
+  echo "Running fxnSelftestFull, starting with fxnSelftestBasic:"
+  echo ""
   fxnSelftestBasic
+  echo ""
+  echo "...done with fxnSelftestBasic."
+  echo ""
+
+  echo ""
+  echo "For fxnSelftestFull, creating sampleLevelwiseScript.sh and an output directory..."
+
+  # create a sample levelwiseScript:
+  cat >> ${tempDir}/sampleLevelwiseScript.sh <<\EOF
+      #!/bin/bash
+      #
+      # A small trivial scipt to find the disk usage of a folder. Generated
+      # during fxnSelftestFull().
+      #
+      # USAGE: sampleLevelwiseScript.sh [the name of the folder to examine] [tempdir for output]
+      #
+      folderName=${1}
+      tempDir=${2}
+      #
+      # 1) create the direcotry where this levelwise data will reside:
+      rm -fr ${tempDir}/levelOutputRaw
+      rm -fr ${tempDir}/singleLevelOutputVectorForComparisonAcrossLevels.txt
+      mkdir ${tempDir}/levelOutputRaw
+      #
+      # 2) query for size and number of files, putting raw output into levelOutputRaw:
+      du -sh /${folderName} >> ${tempDir}/levelOutputRaw/folderSize-raw.txt
+      find /${folderName}/ >> ${tempDir}/levelOutputRaw/fileCount-raw.txt
+      #
+      # 3) extract/summarize levelwise data to variables:
+      folderSize=`cat ${tempDir}/levelOutputRaw/folderSize-raw.txt | awk '{print $1}'`
+      fileCount=`wc -l ${tempDir}/levelOutputRaw/fileCount-raw.txt | awk '{print $1}'`
+      #
+      # 4) assemble header row and corresponding data row:
+      rowHeader="folderName,folderSize,fileCount"
+      rowSingleLevelData="${folderName},${folderSize},${fileCount}"
+      #
+      # 5) output to a levelwise text file with a filename that is expected by external summary/loop scripts:
+      #    singleLevelOutputVectorForComparisonAcrossLevels.txt
+      echo "${rowHeader}" >> ${tempDir}/singleLevelOutputVectorForComparisonAcrossLevels.txt
+      echo "${rowSingleLevelData}" >> ${tempDir}/singleLevelOutputVectorForComparisonAcrossLevels.txt
+
+      # return value: file path to singleLevelOutputVectorForComparisonAcrossLevels.txt
+EOF
+
+  mkdir ${tempDir}/sampleLevelwiseScript-output
+
+  echo "...done:"
+  echo ""
+  ls -lh  ${tempDir}/sampleLevelwiseScript.sh
+  ls -ldh ${tempDir}/sampleLevelwiseScript-output
+
+  echo ""
+  echo "Now, for fxnSelftestFull, running ${scriptName} using this simple sample script as an argument"
+  echo "(i.e., with -s ${tempDir}/sampleLevelwiseScript.sh)"
+  echo ""
+
+bash ${scriptDir}/${scriptName} \
+     -f systemDirectories       \
+     -l etc,tmp                 \
+     -s ${tempDir}/sampleLevelwiseScript.sh
+#bash ${tempDir}/sampleLevelwiseScript.sh /etc ${tempDir}/sampleLevelwiseScript-output
+
+  echo ""
+  echo "...done with everything in fxnSelftestFull."
+  echo ""
+
 }
 
 
@@ -393,29 +464,34 @@ echo ""
 
 # ------------------------- START: body of script ------------------------- #
 
-
-
-
-
 fxnSetTempDir                 # <- use internal function to create ${tempDir}
 deleteTempDirAtEndOfScript=0  # <- set to 1 to delete ${tempDir} or 0 to leave it. See end of script.
 
 
 fxnProcessInvocation          
 echo ""
+echo "(DEBUG) \${launchSelftest}=${launchSelftest}"
 echo "(DEBUG) \${factorName}=${factorName}"
 echo "(DEBUG) \${levelNameList}=${levelNameList}"
 echo "(DEBUG) \${levelScript}=${levelScript}"
 echo ""
 
-#fxnSetSomeFancyConstants
-# ...and then edit its function definition for your specific needs.
 
+if [ "${launchSelftest}" = "1" ]; then
+   fxnSelftestFull
+   #...the script will exit after completing the self-test, ignoring all lines below.
+   exit 0
+   # TBD: don't exit if there is a valid factorName from commandline
+fi
 
-fxnSelftestBasic
-#...the script will exit after completing the self-test, ignoring all lines below.
+# convert commas ot spaces in the "-l levelNameList" csv argument
+levelNameList=`echo ${levelNameList} | sed s/\,/' '/g`
 
-# turn csv levelNameList commas into spaces
+mkdir ${tempDir}/compareLevelsOfFactor_${factorName}
+for levelName in ${levelNameList}; do
+   mkdir ${tempDir}/compareLevelsOfFactor_${factorName}/factorLevel_${levelName}
+   bash ${levelScript} ${levelName} ${tempDir}/compareLevelsOfFactor_${factorName}/factorLevel_${levelName}
+done
 
 
 
@@ -454,12 +530,11 @@ COMMENTBLOCK
 
 # If a ${tempDir} was defined, remind the user about it and (optionally) delete it:
 if [ -n "${tempDir}" ]; then 
-	tempDirSize=`du -sh | cut -d ' ' -f 1`
-	tempDirFileCount=`find ${tempDir} | wc -l`
+	tempDirSize=`du -sh | awk '{print $1}'`
+	tempDirFileCount=`find ${tempDir} | wc -l | awk '{print $1}'`
 	echo ""
 	echo ""
-	echo "This script's temporary directory is ${tempDir}"
-	echo "...and it contains: ${tempDirFileCount} files and folders taking up total disk space of ${tempDirSize}"
+	echo "This script's temporary directory contains ${tempDirFileCount} files and folders taking up total disk space of ${tempDirSize} :"
 	ls -ld ${tempDir}
 	echo ""
 	# if previously indicated, delete $tempDir
@@ -470,7 +545,10 @@ if [ -n "${tempDir}" ]; then
       echo "Proof of removal per \"ls -ld \${tempDir}\" :"
 		ls -ld ${tempDir}
 	fi
-   ls -l ${tempDir}
+   cd ${tempDir}
+   echo "...which contains:"
+   find .
+   cd -
 	echo ""
 	echo ""
 fi
