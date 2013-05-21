@@ -4,13 +4,13 @@
 # USAGE:	    see the fxnPrintUsage() function below 
 #
 # CREATED:          20130516 by stowler@gmail.com
-# LAST UPDATED:     20130516 by stowler@gmail.com
+# LAST UPDATED:     20130520 by stowler@gmail.com
 #
 # DESCRIPTION:
-# A very general tool. Loops across levels of one factor. Each loop iteration
-# runs one script and produces one file containing one vector of results per
-# level. Level-wise vectors are then catenated into a formatted text file for
-# external comparison across levels. 
+# A very general tool. Loops over multiple levels of one factor. Each loop
+# iteration runs the user-specified script once and produces one file
+# containing one vector of results per level. Level-wise vectors are then
+# catenated into a formatted text file for external comparison across levels. 
 # 
 # SYSTEM REQUIREMENTS:
 #
@@ -29,8 +29,7 @@
 #   functions
 # - the output of levelScript should only be two objects:
 #	1) a subdirectory called levelOutputRaw
-#	2) a sibling text file called levelOutputVectorForComparisonAcrossLevels.txt
-# - TBD: would be helpful to have a template levelScript to aid consistancy 
+#	2) a sibling text file called levelOutputVectorForComparisonAcrossLevels.csv
 # 
 #
 # READING AND CODING NOTES:
@@ -62,37 +61,43 @@ fxnPrintUsage() {
 cat <<EOF
 $0 - a general tool for running an external script across multiple levels of a single factor
 Usage: $0 \ 
-  -f   [your factorName, which will just be used in output filenames.]
-  -l   [your levelNames for levels of the factor: a comma-separated list WITH NO SPACES]
+  -f   [your factorName, which will just be used in output filenames.]                    \
+  -l   [your levelNames for levels of the factor: a comma-separated list WITH NO SPACES]  \
   -s   [your levelwise script, to be executed for each level of the factor]
 
-When executed, your levelwise script is called once for each of the levels you
-provided in the -l csv list. Each time through the loop, one of your levelNames
-is provided as an argument to execution of your levelwise script. 
+When executed, the -s levelwise script is called once for each of the levels 
+provided in the -l csv list. Each time through the loop, one of the levelNames
+is provided as an argument in execution of the levelwise script. 
 
 E.g., $0 -f mySystemFolders -l etc,var,tmp -s calculateFolderSize.sh 
 
-The output of this script is a single new output directory containing per-level
-subdirectories and a structured text file containing one row of data per factor
-level, and a header row at the top. 
+The output of this script is a single new output directory containing levelwise
+subdirectories. Sibling to those subdirectories is a single 
+csv file containing one row of data per factor level (plus header row).
+\${outputDir}
+   └── SINGLEFACTOR_months
+       ├── FACTORLEVEL_january
+       ├── FACTORLEVEL_february
+       └── SINGLEFACTOROUTPUTMATRIX_months.csv
 
-For this to work, your levelwise script (-s scriptName) needs to produce output
-in this loose format:
+For this to work, the levelwise script (-s scriptName) needs to produce output
+in the following loose format:
 
-1) All output files from a single run of your levelwise script should be in a
+1) All output files from a single execution of the levelwise script should be in a
    folder called "levelOutputRaw"
 2) The only thing outside of levelOutputRaw should be a sibling text file
-   called singleLevelOutputVectorForComparisonAcrossLevels.txt . This text file
+   called singleLevelOutputVectorForComparisonAcrossLevels.csv . This text file
    contains a comma-separated list of summary values that you want analyzed across
    levels. It will have two lines: a field header line containing comma-separated
    field labels, and a data line containing the corresponding levelwise data that
    you are passing into analysis acrosss all factor levels.
 
-This script catenates those level-wise text files to produce a single
-factor-wise textfile in the root called (TBD)
+This script catenates those levelwise text files to produce a single
+factorwise textfile in the root called singleFactorOutputMatrix.csv 
 
-Calling this script without any arguments will create a template
-scriptForOneLevel.sh, as well calculate sample output from that script.
+TBD: Calling this script with the --selftest argument (can be in combination with
+the other arguments or alone) will create a sampleLevelwiseScript.sh ,
+and use it to generate sample output from ${scriptName}.
 
 EOF
 # TBD: will the exit value of the script be the filepath of the matrix?
@@ -100,6 +105,7 @@ EOF
 
 
 fxnProcessInvocation() {
+
 
 # # always: check for number of arguments, even if expecting zero:
 # if [ "${scriptArgsCount}" -ne "3" ] ; then
@@ -120,29 +126,31 @@ launchSelftest=''
 factorName=''
 levelNameList=''
 levelScript=''
+debug=''
 # STEP 2/3: set the getopt string:
-# echo "DEBUG getopt: Values before set -- getopt ... :"
-# echo "DEBUG getopt: \${scriptArgsVector}=${scriptArgsVector}"
-# echo "DEBUG getopt: \${@}=${@}"
-# echo "DEBUG getopt: \${scriptArgsCount}=${scriptArgsCount}"
-# echo "DEBUG getopt: \${#}=${#}"
-set -- `getopt tf:l:s: "${scriptArgsVector}"`
-# echo "DEBUG getopt: Values after set -- getopt ... :"
-# echo "DEBUG getopt: (notice that getopt changes \$@ and \$\, not \$script* :)"
-# echo "DEBUG getopt: \${scriptArgsVector}=${scriptArgsVector}"
-# echo "DEBUG getopt: \${@}=${@}"
-# echo "DEBUG getopt: \${scriptArgsCount}=${scriptArgsCount}"
-# echo "DEBUG getopt: \${#}=${#}"
+ echo "DEBUG getopt: Values before set -- getopt ... :"
+ echo "DEBUG getopt: \${scriptArgsVector}=${scriptArgsVector}"
+ echo "DEBUG getopt: \${@}=${@}"
+ echo "DEBUG getopt: \${scriptArgsCount}=${scriptArgsCount}"
+ echo "DEBUG getopt: \${#}=${#}"
+eval set -- `getopt t,d,f:,l:,s: -- "${scriptArgsVector}"`
+ echo "DEBUG getopt: Values after set -- getopt ... :"
+ echo "DEBUG getopt: (notice that getopt changes \$@ and \$\, not \$script* :)"
+ echo "DEBUG getopt: \${scriptArgsVector}=${scriptArgsVector}"
+ echo "DEBUG getopt: \${@}=${@}"
+ echo "DEBUG getopt: \${scriptArgsCount}=${scriptArgsCount}"
+ echo "DEBUG getopt: \${#}=${#}"
 # STEP 3/3: process command line switches in  a loop:
 [ $# -lt 1 ] && exit 1	# getopt failed
 while [ $# -gt 0 ]; do
     # echo "DEBUG getopt: \$\# == $# is still greater than 0"
     # echo "DEBUG getopt: \$\# == ${scriptArgsVector} "
     case "$1" in
-      -t)   launchSelftest=1; ;;
-      -f)   factorName="${2}"; shift ;;
-      -s)   levelScript="${2}"; shift ;;
-      -l)   levelNameList="${2}"; shift ;;
+      -t)   launchSelftest=1; shift ;;
+      -d)   debug=1; shift ;;
+      -f)   factorName="${2}"; shift 2 ;;
+      -l)   levelNameList="${2}"; shift 2 ;;
+      -s)   levelScript="${2}"; shift 2 ;;
       --)   shift; break ;;
       -*)   echo >&2 "usage: $0 -f factorLabel -l factorLevelList -s levelScript" exit 1 ;;
        *)   break ;;		# terminate while loop
@@ -167,9 +175,24 @@ done
 #    echo ""
 #    exit 1
 # fi
+echo ""
+echo "(DEBUG) \${launchSelftest}=${launchSelftest}"
+echo "(DEBUG) \${factorName}=${factorName}"
+echo "(DEBUG) \${levelNameList}=${levelNameList}"
+echo "(DEBUG) \${levelScript}=${levelScript}"
+echo ""
+
+exit
 
 }
 
+fxnPrintDebug() {
+if [ "${debug}" = "1" ]; then 
+   echo "/////// DEBUG ///////"
+   echo "$@"
+   echo "/////////////////////"
+fi
+}
 
 fxnSelftestBasic() {
    # Tests the basic funcions and variables of the template on which this
@@ -177,52 +200,60 @@ fxnSelftestBasic() {
    # of this script (TBD). This can be used to confirm that the basic functions
    # of the script are working on a particular system, or that they haven't
    # been broken by recent edits.
-
-   echo "Running internal function fxnSelftestBasic :"
-   echo ""
+   fxnPrintDebug "Launching internal fxnSelftestBasic ..."
 
    # expose the basic constants defined in the script:
-   echo "Some basic constants have been defined in this script."
-   echo "Their names are listed in variable \${listOfBasicConstants} : "
+   echo "Some basic constants have been defined in this script,"
+   echo "and their names are listed in variable \${listOfBasicConstants} : "
    echo "${listOfBasicConstants}"
    echo ""
-   #echo "...and here are their values:"
+   #echo "...and here are their values: (TBD: make this work)"
    #for scriptConstantName in ${listOfBasicConstants}; do
    #   scriptConstantValue="`echo ${scriptConstantName}`"
    #   echo "${scriptConstantName} == ${scriptConstantValue}"
    #done
 
    # test internal function fxnSetTempDir:
+   echo "(DEBUG)"
+   echo "(DEBUG) Launching internal fxnSetTempDir..."
+   echo "(DEBUG)"
    fxnSetTempDir
    deleteTempDirAtEndOfScript=0
+   echo "(DEBUG)"
+   echo "(DEBUG)...done testing internal fxnSetTempDir ."
+   echo "(DEBUG)"
+   echo "The temporary directory \${tempDir} has been created as:"
+   ls -dlh ${tempDir}
+   echo "...with its final destiny set by \${deleteTempDirAtEndOfScript} == ${deleteTempDirAtEndOfScript}"
+   echo ""
 
    # Strip out all comments that are marked as training. This will create a
    # slimmer, more readable version of the script :
    trainingMarker='###'       # trainingMarker must be sed-friendly. See below:
+   fxnPrintDebug "Removing training comments from the current script (lines prepended with '${trainingMarker}' ...)"
    cp ${scriptDir}/${scriptName} ${tempDir}/script-orig.sh
    sed "/^${trainingMarker}/ d" ${tempDir}/script-orig.sh > ${tempDir}/script-withoutTrainingComments.sh
    linecountOrig="`wc -l ${tempDir}/script-orig.sh | awk '{print $1}'`"
    linecountSkinny="`wc -l ${tempDir}/script-withoutTrainingComments.sh | awk '{print $1}'`"
-   echo ""
-   echo "This script has ${linecountOrig} lines, and the version without training comments has ${linecountSkinny} lines:"
-   echo ""
+   fxnPrintDebug "...done removing training comments."
+   echo "The current script (${scriptName}) has ${linecountOrig} lines, and I have generated a version"
+   echo "without training comments that has ${linecountSkinny} lines:"
    ls -l ${tempDir}/*
+   fxnPrintDebug "Completed internal fxnSelftestBasic"
 }
 
 
 fxnSelftestFull() {
   # Tests the full function of the script. Begins by calling fxnSelftestBaic() , and then...
   # <EDITME: description of tests and validating data>
-  echo ""
-  echo "Running fxnSelftestFull, starting with fxnSelftestBasic:"
-  echo ""
+  echo "(DEBUG)"
+  echo "(DEBUG) Launching internal fxnSelftestFull , starting with internal fxnSelftestBasic ..."
+  echo "(DEBUG)"
   fxnSelftestBasic
-  echo ""
-  echo "...done with fxnSelftestBasic."
-  echo ""
-
-  echo ""
-  echo "For fxnSelftestFull, creating sampleLevelwiseScript.sh and an output directory..."
+  echo "(DEBUG)"
+  echo "(DEBUG) ...fxnSelftestBasic completed. For the rest of fxnSelftestFull,"
+  echo "(DEBUG) creating sampleLevelwiseScript.sh and an output directory..."
+  echo "(DEBUG)"
 
   # create a sample levelwiseScript:
   cat >> ${tempDir}/sampleLevelwiseScript.sh <<\EOF
@@ -238,7 +269,7 @@ fxnSelftestFull() {
       #
       # 1) create the direcotry where this levelwise data will reside:
       rm -fr ${tempDir}/levelOutputRaw
-      rm -fr ${tempDir}/singleLevelOutputVectorForComparisonAcrossLevels.txt
+      rm -fr ${tempDir}/singleLevelOutputVectorForComparisonAcrossLevels.csv
       mkdir ${tempDir}/levelOutputRaw
       #
       # 2) query for size and number of files, putting raw output into levelOutputRaw:
@@ -254,34 +285,37 @@ fxnSelftestFull() {
       rowSingleLevelData="${folderName},${folderSize},${fileCount}"
       #
       # 5) output to a levelwise text file with a filename that is expected by external summary/loop scripts:
-      #    singleLevelOutputVectorForComparisonAcrossLevels.txt
-      echo "${rowHeader}" >> ${tempDir}/singleLevelOutputVectorForComparisonAcrossLevels.txt
-      echo "${rowSingleLevelData}" >> ${tempDir}/singleLevelOutputVectorForComparisonAcrossLevels.txt
+      #    singleLevelOutputVectorForComparisonAcrossLevels.csv
+      echo "${rowHeader}" >> ${tempDir}/singleLevelOutputVectorForComparisonAcrossLevels.csv
+      echo "${rowSingleLevelData}" >> ${tempDir}/singleLevelOutputVectorForComparisonAcrossLevels.csv
 
-      # return value: file path to singleLevelOutputVectorForComparisonAcrossLevels.txt
+      # return value (TBD?): file path to singleLevelOutputVectorForComparisonAcrossLevels.csv
 EOF
 
   mkdir ${tempDir}/sampleLevelwiseScript-output
 
-  echo "...done:"
-  echo ""
+  echo "(DEBUG)"
+  echo "(DEBUG)...done creating sampleLevelwiseScript.sh and an output directory."
+  echo "(DEBUG)"
+
+  echo "Generated sampleLevelwiseScript.sh, which can be used as a template for"
+  echo "creating your own levelwise scripts to call from ${scriptName} :"
   ls -lh  ${tempDir}/sampleLevelwiseScript.sh
   ls -ldh ${tempDir}/sampleLevelwiseScript-output
 
   echo ""
-  echo "Now, for fxnSelftestFull, running ${scriptName} using this simple sample script as an argument"
-  echo "(i.e., with -s ${tempDir}/sampleLevelwiseScript.sh)"
+  echo "And for the self-test we're currently performing, that sampleLevelwiseScript.sh will now"
+  echo "be used as the -s argument to ${scriptName} . Launching now: "
   echo ""
 
-bash ${scriptDir}/${scriptName} \
-     -f systemDirectories       \
-     -l etc,tmp                 \
-     -s ${tempDir}/sampleLevelwiseScript.sh
-#bash ${tempDir}/sampleLevelwiseScript.sh /etc ${tempDir}/sampleLevelwiseScript-output
+   bash ${scriptDir}/${scriptName} \
+        -f systemDirectories       \
+        -l etc,tmp                 \
+        -s ${tempDir}/sampleLevelwiseScript.sh
 
-  echo ""
-  echo "...done with everything in fxnSelftestFull."
-  echo ""
+  echo "(DEBUG)"
+  echo "(DEBUG) Completed internal fxnSelftestFull in ${scriptName}"
+  echo "(DEBUG)"
 
 }
 
@@ -464,59 +498,80 @@ echo ""
 
 # ------------------------- START: body of script ------------------------- #
 
+# good practice: try to keep debugging/verbose statements  in the functions when possible
+# ...and in body: short statements telling the user what's happening (when your called fxns don't have banners to do so)
+# maybe limit to objects the user interacts with directly?
+
+
+# Setup a temporary directory, which can be configured for clean-up:
 fxnSetTempDir                 # <- use internal function to create ${tempDir}
 deleteTempDirAtEndOfScript=0  # <- set to 1 to delete ${tempDir} or 0 to leave it. See end of script.
 
 
+# Set options based on script invocation:
 fxnProcessInvocation          
-echo ""
-echo "(DEBUG) \${launchSelftest}=${launchSelftest}"
-echo "(DEBUG) \${factorName}=${factorName}"
-echo "(DEBUG) \${levelNameList}=${levelNameList}"
-echo "(DEBUG) \${levelScript}=${levelScript}"
-echo ""
 
 
+# Decide whether to launch selftest, and then subsequently whether to continue or exit:
 if [ "${launchSelftest}" = "1" ]; then
+   echo ""
+   echo "Launching the self-test in ${scriptName} ..."
+   echo ""
    fxnSelftestFull
-   #...the script will exit after completing the self-test, ignoring all lines below.
+   echo ""
+   echo "Completed the self-test in ${scriptName} ."
+   echo ""
+   # exit after completing the self-test, ignoring all lines below:
    exit 0
    # TBD: don't exit if there is a valid factorName from commandline
 fi
 
-# convert commas ot spaces in the "-l levelNameList" csv argument
-levelNameList=`echo ${levelNameList} | sed s/\,/' '/g`
 
-mkdir ${tempDir}/compareLevelsOfFactor_${factorName}
+# Convert commas to spaces in the "-l levelNameList" csv argument:
+levelNameList=`echo ${levelNameList} | sed s/\,/' '/g`
+echo ""
+echo "Executing levelScript once for each levelName that was provided in the call to ${scriptName}."
+echo "levelScript == ${levelScript}"
+echo "levelNameList == ${levelNameList}"
+echo ""
+
+
+# Create output directories and launch the levelScript: 
+mkdir ${tempDir}/SINGLEFACTOR_${factorName}
 for levelName in ${levelNameList}; do
-   mkdir ${tempDir}/compareLevelsOfFactor_${factorName}/factorLevel_${levelName}
-   bash ${levelScript} ${levelName} ${tempDir}/compareLevelsOfFactor_${factorName}/factorLevel_${levelName}
+   echo ""
+   echo "================================================================="
+   echo "START: processing level '${levelName}' of factor '${factorName}' "
+         date
+   echo "================================================================="
+   echo ""
+   mkdir ${tempDir}/SINGLEFACTOR_${factorName}/FACTORLEVEL_${levelName}
+   bash ${levelScript} ${levelName} ${tempDir}/SINGLEFACTOR_${factorName}/FACTORLEVEL_${levelName}
+   echo ""
+   echo "================================================================="
+   echo "FINISHED: processed level '${levelName}' of factor '${factorName}' "
+         date
+   echo "================================================================="
+   echo ""
 done
 
-
-
-: <<'COMMENTBLOCK'
-echo ""
-echo ""
-echo "================================================================="
-echo "START: do some stuff EDITME"
-echo "(should take about EDITME minutes)"
-      date
-echo "================================================================="
-echo ""
-echo ""
-
-echo "(EDITME) If this line weren't just a placeholder in the template I'd be executing some useful commmands here."
-
-echo ""
-echo ""
-echo "================================================================="
-echo "FINISHED: did some stuff EDITME "
-      date
-echo "================================================================="
-echo ""
-echo ""
-COMMENTBLOCK
+# compile the individual factorLevel outputs into singleFactorOutputMatrix.csv:
+# (for now just dump them together for testing purposes)
+cat \
+${tempDir}/SINGLEFACTOR_${factorName}/FACTORLEVEL_*/singleLevelOutputVectorForComparisonAcrossLevels.csv >> \
+${tempDir}/SINGLEFACTOR_${factorName}/SINGLEFACTOROUTPUTMATRIX_${factorName}.csv
+# TBD do for real:
+# 1) are there zero? Exit if so
+# 2) else if there is one...
+   # make sure it has two lines (one header, one data)
+   # make sure they have the same number of csv fields
+# 3) else if there is > 1 ...
+   # compare header vectors. Exit if they are different, otherwise assign to variable headerRow
+   # make sure there is only one data row per level
+   # echo headerRow to output matrix, followed by one row for each individual factor levels 
+   # issue warning if there are any lines that have different number of fields
+   # than header rowmake sure same number of fields in headerRow and every data
+   # row
 
 
 #TBD: call fxnSelftestBasic if nothing happened earlier in the script
@@ -534,7 +589,8 @@ if [ -n "${tempDir}" ]; then
 	tempDirFileCount=`find ${tempDir} | wc -l | awk '{print $1}'`
 	echo ""
 	echo ""
-	echo "This script's temporary directory contains ${tempDirFileCount} files and folders taking up total disk space of ${tempDirSize} :"
+   echo "This script's temporary directory contains ${tempDirFileCount} files and folders,"
+   echo "occupying total disk space of ${tempDirSize} :"
 	ls -ld ${tempDir}
 	echo ""
 	# if previously indicated, delete $tempDir
@@ -545,10 +601,9 @@ if [ -n "${tempDir}" ]; then
       echo "Proof of removal per \"ls -ld \${tempDir}\" :"
 		ls -ld ${tempDir}
 	fi
-   cd ${tempDir}
-   echo "...which contains:"
-   find .
-   cd -
+   echo "...and here are its contents, NOT being deleted by ${scriptName} :"
+   echo ""
+   tree ${tempDir}
 	echo ""
 	echo ""
 fi
