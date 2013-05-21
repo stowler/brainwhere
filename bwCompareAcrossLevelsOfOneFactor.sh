@@ -59,45 +59,73 @@
 
 fxnPrintUsage() {
 cat <<EOF
-$0 - a general tool for running an external script across multiple levels of a single factor
-Usage: $0 \ 
-  -f   [your factorName, which will just be used in output filenames.]                    \
-  -l   [your levelNames for levels of the factor: a comma-separated list WITH NO SPACES]  \
+
+
+$0 - a general tool for running an external script against multiple levels of a single factor
+Usage: $0  \\ 
+  -f   [your factorName, which will just be used in output filenames.]                   \\
+  -l   [your levelNames for levels of the factor: a comma-separated list WITH NO SPACES] \\
   -s   [your levelwise script, to be executed for each level of the factor]
 
 When executed, the -s levelwise script is called once for each of the levels 
 provided in the -l csv list. Each time through the loop, one of the levelNames
 is provided as an argument in execution of the levelwise script. 
 
-E.g., $0 -f mySystemFolders -l etc,var,tmp -s calculateFolderSize.sh 
+E.g., $0 -f months -l january,february -s countLetterTypes.sh
 
 The output of this script is a single new output directory containing levelwise
 subdirectories. Sibling to those subdirectories is a single 
-csv file containing one row of data per factor level (plus header row).
+csv file containing one row of data per factor level (plus header row):
+
 \${outputDir}
-   └── SINGLEFACTOR_months
-       ├── FACTORLEVEL_january
-       ├── FACTORLEVEL_february
+   └── SINGLEFACTORDIR_months
+       ├── FACTORLEVELDIR_january
+       ├── FACTORLEVELDIR_february
        └── SINGLEFACTOROUTPUTMATRIX_months.csv
 
-For this to work, the levelwise script (-s scriptName) needs to produce output
-in the following loose format:
+For this to work, the script provided as -s levelwiseScript.sh needs to produce output
+in the following loose format, even when run alone:
+
+   ├── levelOutputRaw
+   │   ├── vowels.txt
+   │   └── consonants.txt
+   └── singleLevelOutputVectorForComparisonAcrossLevels.csv
+
+...in other words:
 
 1) All output files from a single execution of the levelwise script should be in a
    folder called "levelOutputRaw"
-2) The only thing outside of levelOutputRaw should be a sibling text file
-   called singleLevelOutputVectorForComparisonAcrossLevels.csv . This text file
-   contains a comma-separated list of summary values that you want analyzed across
-   levels. It will have two lines: a field header line containing comma-separated
-   field labels, and a data line containing the corresponding levelwise data that
-   you are passing into analysis acrosss all factor levels.
+2) The only thing outside of levelOutputRaw should be a sibling two-line text
+   file called singleLevelOutputVectorForComparisonAcrossLevels.csv . This text
+   file should contain a comma-separated row of levelwise summary values that you
+   will later be analyzing across levels. It should also contain a corresponding
+   row of comma-separated field labels.
 
-This script catenates those levelwise text files to produce a single
-factorwise textfile in the root called singleFactorOutputMatrix.csv 
+${scriptName} executes this script for each level and then catenates those
+levelwise text files to produce a single factorwise textfile in the root called
+SINGLEFACTOROUTPUTMATRIX_\${factorName}.csv 
 
-TBD: Calling this script with the --selftest argument (can be in combination with
-the other arguments or alone) will create a sampleLevelwiseScript.sh ,
-and use it to generate sample output from ${scriptName}.
+Calling this script with the -t argument (TBD: --selftest ?) (can be in combination
+with the other arguments or alone TBD) will create a exampleLevelwiseScript.sh
+, and use it to generate sample output from ${scriptName}.
+
+Its output should be something like this:
+
+\${tempDir}
+   └── SINGLEFACTORDIR_systemDirectories
+       ├── FACTORLEVELDIR_etc
+       │   ├── levelOutputRaw
+       │   │   ├── fileCount-raw.txt
+       │   │   └── folderSize-raw.txt
+       │   └── singleLevelOutputVectorForComparisonAcrossLevels.csv
+       ├── FACTORLEVELDIR_tmp
+       │   ├── levelOutputRaw
+       │   │   ├── fileCount-raw.txt
+       │   │   └── folderSize-raw.txt
+       │   └── singleLevelOutputVectorForComparisonAcrossLevels.csv
+       └── SINGLEFACTOROUTPUTMATRIX_systemDirectories.csv
+
+5 directories, 7 files
 
 EOF
 # TBD: will the exit value of the script be the filepath of the matrix?
@@ -126,36 +154,53 @@ launchSelftest=''
 factorName=''
 levelNameList=''
 levelScript=''
-debug=''
+# debug must not lose its current value:
+if [ -n ${debug} ] ; then debug=${debug} ; else debug=''; fi
 # STEP 2/3: set the getopt string:
- echo "DEBUG getopt: Values before set -- getopt ... :"
- echo "DEBUG getopt: \${scriptArgsVector}=${scriptArgsVector}"
- echo "DEBUG getopt: \${@}=${@}"
- echo "DEBUG getopt: \${scriptArgsCount}=${scriptArgsCount}"
- echo "DEBUG getopt: \${#}=${#}"
-eval set -- `getopt t,d,f:,l:,s: -- "${scriptArgsVector}"`
- echo "DEBUG getopt: Values after set -- getopt ... :"
- echo "DEBUG getopt: (notice that getopt changes \$@ and \$\, not \$script* :)"
- echo "DEBUG getopt: \${scriptArgsVector}=${scriptArgsVector}"
- echo "DEBUG getopt: \${@}=${@}"
- echo "DEBUG getopt: \${scriptArgsCount}=${scriptArgsCount}"
- echo "DEBUG getopt: \${#}=${#}"
+# echo ""
+# echo "DEBUG getopt: Values before set -- getopt ... :"
+# echo "DEBUG getopt: \${scriptArgsVector}=${scriptArgsVector}"
+# echo "DEBUG getopt: \${@}=${@}"
+# echo "DEBUG getopt: \${scriptArgsCount}=${scriptArgsCount}"
+# echo "DEBUG getopt: \${#}=${#}"
+# echo ""
+eval set -- ${scriptArgsVector}
+# echo ""
+# echo "DEBUG getopt: Values after trying to set @... :"
+# echo "DEBUG getopt: \${scriptArgsVector}=${scriptArgsVector}"
+# echo "DEBUG getopt: \${@}=${@}"
+# echo "DEBUG getopt: \${scriptArgsCount}=${scriptArgsCount}"
+# echo "DEBUG getopt: \${#}=${#}"
+# echo ""
+
+TEMP=`getopt -- tdf:l:s: "$@"`
+if [ $? != 0 ] ; then echo "Terminating...could not set string for getopt" >&2 ; fxnPrintUsage ; exit 1 ; fi
+
+eval set -- "$TEMP"
+# echo ""
+# echo "DEBUG getopt: Values after set -- getopt ... :"
+# echo "DEBUG getopt: (notice that getopt changes \$@ and \$\, not \$script* :)"
+# echo "DEBUG getopt: \${scriptArgsVector}=${scriptArgsVector}"
+# echo "DEBUG getopt: \${@}=${@}"
+# echo "DEBUG getopt: \${scriptArgsCount}=${scriptArgsCount}"
+# echo "DEBUG getopt: \${#}=${#}"
+# echo ""
 # STEP 3/3: process command line switches in  a loop:
-[ $# -lt 1 ] && exit 1	# getopt failed
-while [ $# -gt 0 ]; do
+# [ $# -lt 1 ] && exit 1	# getopt failed
+while true ; do
     # echo "DEBUG getopt: \$\# == $# is still greater than 0"
     # echo "DEBUG getopt: \$\# == ${scriptArgsVector} "
+    # echo "DEBUG \$1=${1}"
     case "$1" in
-      -t)   launchSelftest=1; shift ;;
-      -d)   debug=1; shift ;;
-      -f)   factorName="${2}"; shift 2 ;;
+      -t)   launchSelftest="1" ; shift ;;
+      -d)   debug="1" ;  shift ;;
+      -f)   factorName="${2}" ; shift 2 ;;
       -l)   levelNameList="${2}"; shift 2 ;;
       -s)   levelScript="${2}"; shift 2 ;;
       --)   shift; break ;;
       -*)   echo >&2 "usage: $0 -f factorLabel -l factorLevelList -s levelScript" exit 1 ;;
-       *)   break ;;		# terminate while loop
+       *)   echo "Error in arguments to ${scriptName}" ; fxnPrintUsage ; exit 1 ;;		# terminate while loop
     esac
-    shift
 done
 # ...and now all command line switches have been processed.
 # echo "DEBUG getopt: Values after the getopt while loop :"
@@ -177,12 +222,12 @@ done
 # fi
 echo ""
 echo "(DEBUG) \${launchSelftest}=${launchSelftest}"
+echo "(DEBUG) \${debug}=${debug}"
 echo "(DEBUG) \${factorName}=${factorName}"
 echo "(DEBUG) \${levelNameList}=${levelNameList}"
 echo "(DEBUG) \${levelScript}=${levelScript}"
 echo ""
 
-exit
 
 }
 
@@ -252,17 +297,25 @@ fxnSelftestFull() {
   fxnSelftestBasic
   echo "(DEBUG)"
   echo "(DEBUG) ...fxnSelftestBasic completed. For the rest of fxnSelftestFull,"
-  echo "(DEBUG) creating sampleLevelwiseScript.sh and an output directory..."
+  echo "(DEBUG) creating exampleLevelwiseScript.sh and an output directory..."
   echo "(DEBUG)"
 
+echo ""
+echo "(DEBUG) \${launchSelftest}=${launchSelftest}"
+echo "(DEBUG) \${debug}=${debug}"
+echo "(DEBUG) \${factorName}=${factorName}"
+echo "(DEBUG) \${levelNameList}=${levelNameList}"
+echo "(DEBUG) \${levelScript}=${levelScript}"
+echo ""
+
   # create a sample levelwiseScript:
-  cat >> ${tempDir}/sampleLevelwiseScript.sh <<\EOF
+  cat >> ${tempDir}/exampleLevelwiseScript.sh <<\EOF
       #!/bin/bash
       #
       # A small trivial scipt to find the disk usage of a folder. Generated
       # during fxnSelftestFull().
       #
-      # USAGE: sampleLevelwiseScript.sh [the name of the folder to examine] [tempdir for output]
+      # USAGE: exampleLevelwiseScript.sh [the name of the folder to examine] [tempdir for output]
       #
       folderName=${1}
       tempDir=${2}
@@ -292,26 +345,27 @@ fxnSelftestFull() {
       # return value (TBD?): file path to singleLevelOutputVectorForComparisonAcrossLevels.csv
 EOF
 
-  mkdir ${tempDir}/sampleLevelwiseScript-output
+  mkdir ${tempDir}/exampleLevelwiseScript-output
 
   echo "(DEBUG)"
-  echo "(DEBUG)...done creating sampleLevelwiseScript.sh and an output directory."
+  echo "(DEBUG)...done creating exampleLevelwiseScript.sh and an output directory."
   echo "(DEBUG)"
 
-  echo "Generated sampleLevelwiseScript.sh, which can be used as a template for"
+  echo "Generated exampleLevelwiseScript.sh, which can be used as a template for"
   echo "creating your own levelwise scripts to call from ${scriptName} :"
-  ls -lh  ${tempDir}/sampleLevelwiseScript.sh
-  ls -ldh ${tempDir}/sampleLevelwiseScript-output
+  ls -lh  ${tempDir}/exampleLevelwiseScript.sh
+  ls -ldh ${tempDir}/exampleLevelwiseScript-output
 
   echo ""
-  echo "And for the self-test we're currently performing, that sampleLevelwiseScript.sh will now"
+  echo "And for the self-test we're currently performing, that exampleLevelwiseScript.sh will now"
   echo "be used as the -s argument to ${scriptName} . Launching now: "
   echo ""
 
    bash ${scriptDir}/${scriptName} \
+        -d                         \
         -f systemDirectories       \
         -l etc,tmp                 \
-        -s ${tempDir}/sampleLevelwiseScript.sh
+        -s ${tempDir}/exampleLevelwiseScript.sh
 
   echo "(DEBUG)"
   echo "(DEBUG) Completed internal fxnSelftestFull in ${scriptName}"
@@ -537,7 +591,7 @@ echo ""
 
 
 # Create output directories and launch the levelScript: 
-mkdir ${tempDir}/SINGLEFACTOR_${factorName}
+mkdir ${tempDir}/SINGLEFACTORDIR_${factorName}
 for levelName in ${levelNameList}; do
    echo ""
    echo "================================================================="
@@ -545,8 +599,8 @@ for levelName in ${levelNameList}; do
          date
    echo "================================================================="
    echo ""
-   mkdir ${tempDir}/SINGLEFACTOR_${factorName}/FACTORLEVEL_${levelName}
-   bash ${levelScript} ${levelName} ${tempDir}/SINGLEFACTOR_${factorName}/FACTORLEVEL_${levelName}
+   mkdir ${tempDir}/SINGLEFACTORDIR_${factorName}/FACTORLEVELDIR_${levelName}
+   bash ${levelScript} ${levelName} ${tempDir}/SINGLEFACTORDIR_${factorName}/FACTORLEVELDIR_${levelName}
    echo ""
    echo "================================================================="
    echo "FINISHED: processed level '${levelName}' of factor '${factorName}' "
@@ -558,8 +612,8 @@ done
 # compile the individual factorLevel outputs into singleFactorOutputMatrix.csv:
 # (for now just dump them together for testing purposes)
 cat \
-${tempDir}/SINGLEFACTOR_${factorName}/FACTORLEVEL_*/singleLevelOutputVectorForComparisonAcrossLevels.csv >> \
-${tempDir}/SINGLEFACTOR_${factorName}/SINGLEFACTOROUTPUTMATRIX_${factorName}.csv
+${tempDir}/SINGLEFACTORDIR_${factorName}/FACTORLEVELDIR_*/singleLevelOutputVectorForComparisonAcrossLevels.csv >> \
+${tempDir}/SINGLEFACTORDIR_${factorName}/SINGLEFACTOROUTPUTMATRIX_${factorName}.csv
 # TBD do for real:
 # 1) are there zero? Exit if so
 # 2) else if there is one...
