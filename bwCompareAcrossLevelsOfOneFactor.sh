@@ -63,51 +63,57 @@ cat <<EOF
 
 $0 - a general tool for running an external script against multiple levels of a single factor
 Usage: $0  \\ 
+  -t   (optional: launches self-test for this script, with or without your data)         \\
+  -d   (optional: provides extra output to help with debugging)                          \\
   -f   [your factorName, which will just be used in output filenames.]                   \\
   -l   [your levelNames for levels of the factor: a comma-separated list WITH NO SPACES] \\
   -s   [your levelwise script, to be executed for each level of the factor]
 
-When executed, the -s levelwise script is called once for each of the levels 
-provided in the -l csv list. Each time through the loop, one of the levelNames
-is provided as an argument in execution of the levelwise script. 
+The levelwiseScript (-s) is launched once for each of the levels 
+listed in the levelNames list (-l). At each launch, one levelName
+is provided to the levelwiseScript as an argument.
 
-E.g., $0 -f months -l january,february -s countLetterTypes.sh
+E.g., $0 -f months -l january,february -s justCountLetterTypes.sh
 
-The output of this script is a single new output directory containing levelwise
-subdirectories. Sibling to those subdirectories is a single 
-csv file containing one row of data per factor level (plus header row):
+This creates a single new output directory containing levelwise subdirectories.
+Sibling to those subdirectories is a single csv file containing one row of data
+per factor level (plus header row):
 
-\${outputDir}
-   └── SINGLEFACTORDIR_months
-       ├── FACTORLEVELDIR_january
-       ├── FACTORLEVELDIR_february
-       └── SINGLEFACTOROUTPUTMATRIX_months.csv
+   \${outputDir}
+      └── SINGLEFACTORDIR_months
+          ├── FACTORLEVELDIR_january
+          ├── FACTORLEVELDIR_february
+          └── SINGLEFACTOROUTPUTMATRIX_months.csv
 
-For this to work, the script provided as -s levelwiseScript.sh needs to produce output
-in the following loose format, even when run alone:
+For this to work, the levelwiseScript (-s) needs to produce output in the
+following loose format, even when run alone:
 
-   ├── levelOutputRaw
-   │   ├── vowels.txt
-   │   └── consonants.txt
-   └── singleLevelOutputVectorForComparisonAcrossLevels.csv
+   1) All output files from a single execution of the levelwise script should be in a
+      folder called "levelOutputRaw"
+   2) The only thing outside of levelOutputRaw should be a sibling two-line text
+      file called singleLevelOutputVectorForComparisonAcrossLevels.csv . This text
+      file should contain a comma-separated row of levelwise summary values that you
+      will later be analyzing across levels. It should also contain a corresponding
+      row of comma-separated field labels.
 
-...in other words:
+...in our example -s justCountLetterTypes.sh from above:
 
-1) All output files from a single execution of the levelwise script should be in a
-   folder called "levelOutputRaw"
-2) The only thing outside of levelOutputRaw should be a sibling two-line text
-   file called singleLevelOutputVectorForComparisonAcrossLevels.csv . This text
-   file should contain a comma-separated row of levelwise summary values that you
-   will later be analyzing across levels. It should also contain a corresponding
-   row of comma-separated field labels.
+   \${someOutputDir}
+      ├── levelOutputRaw
+      │   ├── vowels.txt
+      │   └── consonants.txt
+      └── singleLevelOutputVectorForComparisonAcrossLevels.csv
 
-${scriptName} executes this script for each level and then catenates those
-levelwise text files to produce a single factorwise textfile in the root called
+${0} executes this -s levelwiseScript for each level and then
+catenates those levelwise text files to produce a single factorwise textfile in
+the root called:
+
 SINGLEFACTOROUTPUTMATRIX_\${factorName}.csv 
 
-Calling this script with the -t argument (TBD: --selftest ?) (can be in combination
-with the other arguments or alone TBD) will create a exampleLevelwiseScript.sh
-, and use it to generate sample output from ${scriptName}.
+Calling this script with the -t argument (TBD: --selftest ?) (can be in
+combination with the other arguments or alone TBD) will create
+exampleLevelwiseScript.sh , and use it to generate sample output from
+${0}.
 
 Its output should be something like this:
 
@@ -154,43 +160,34 @@ launchSelftest=''
 factorName=''
 levelNameList=''
 levelScript=''
-# debug must not lose its current value:
+# if already set, debug must not lose its current value:
 if [ -n ${debug} ] ; then debug=${debug} ; else debug=''; fi
+
+fxnPrintDebug "getopt: Values before set -- getopt ... :"
+fxnPrintDebug "getopt: \${scriptArgsVector}=${scriptArgsVector}"
+fxnPrintDebug "getopt: \${@}=${@}"
+fxnPrintDebug "getopt: \${scriptArgsCount}=${scriptArgsCount}"
+fxnPrintDebug "getopt: \${#}=${#}"
+
 # STEP 2/3: set the getopt string:
-# echo ""
-# echo "DEBUG getopt: Values before set -- getopt ... :"
-# echo "DEBUG getopt: \${scriptArgsVector}=${scriptArgsVector}"
-# echo "DEBUG getopt: \${@}=${@}"
-# echo "DEBUG getopt: \${scriptArgsCount}=${scriptArgsCount}"
-# echo "DEBUG getopt: \${#}=${#}"
-# echo ""
-eval set -- ${scriptArgsVector}
-# echo ""
-# echo "DEBUG getopt: Values after trying to set @... :"
-# echo "DEBUG getopt: \${scriptArgsVector}=${scriptArgsVector}"
-# echo "DEBUG getopt: \${@}=${@}"
-# echo "DEBUG getopt: \${scriptArgsCount}=${scriptArgsCount}"
-# echo "DEBUG getopt: \${#}=${#}"
-# echo ""
-
 TEMP=`getopt -- tdf:l:s: "$@"`
-if [ $? != 0 ] ; then echo "Terminating...could not set string for getopt" >&2 ; fxnPrintUsage ; exit 1 ; fi
-
+if [ $? != 0 ] ; then 
+   echo "Terminating...could not set string for getopt. Check out the Usage note:" >&2 
+   fxnPrintUsage 
+   exit 1 
+fi
 eval set -- "$TEMP"
-# echo ""
-# echo "DEBUG getopt: Values after set -- getopt ... :"
-# echo "DEBUG getopt: (notice that getopt changes \$@ and \$\, not \$script* :)"
-# echo "DEBUG getopt: \${scriptArgsVector}=${scriptArgsVector}"
-# echo "DEBUG getopt: \${@}=${@}"
-# echo "DEBUG getopt: \${scriptArgsCount}=${scriptArgsCount}"
-# echo "DEBUG getopt: \${#}=${#}"
-# echo ""
+
+fxnPrintDebug "getopt: Values after set -- getopt ... :"
+fxnPrintDebug "getopt: (notice that getopt changes \$@ and \$\, not \$script* :)"
+fxnPrintDebug "getopt: \${scriptArgsVector}=${scriptArgsVector}"
+fxnPrintDebug "getopt: \${@}=${@}"
+fxnPrintDebug "getopt: \${scriptArgsCount}=${scriptArgsCount}"
+fxnPrintDebug "getopt: \${#}=${#}"
+
 # STEP 3/3: process command line switches in  a loop:
-# [ $# -lt 1 ] && exit 1	# getopt failed
 while true ; do
-    # echo "DEBUG getopt: \$\# == $# is still greater than 0"
-    # echo "DEBUG getopt: \$\# == ${scriptArgsVector} "
-    # echo "DEBUG \$1=${1}"
+    fxnPrintDebug "\$1=${1}"
     case "$1" in
       -t)   launchSelftest="1" ; shift ;;
       -d)   debug="1" ;  shift ;;
@@ -203,12 +200,13 @@ while true ; do
     esac
 done
 # ...and now all command line switches have been processed.
-# echo "DEBUG getopt: Values after the getopt while loop :"
-# echo "DEBUG getopt: (notice that getopt changes \$@ and \$\, not \$script* :)"
-# echo "DEBUG getopt: \${scriptArgsVector}=${scriptArgsVector}"
-# echo "DEBUG getopt: \${@}=${@}"
-# echo "DEBUG getopt: \${scriptArgsCount}=${scriptArgsCount}"
-# echo "DEBUG getopt: \${#}=${#}"
+
+fxnPrintDebug "getopt: Values after the getopt while loop :"
+fxnPrintDebug "getopt: (notice that getopt changes \$@ and \$\, not \$script* :)"
+fxnPrintDebug "getopt: \${scriptArgsVector}=${scriptArgsVector}"
+fxnPrintDebug "getopt: \${@}=${@}"
+fxnPrintDebug "getopt: \${scriptArgsCount}=${scriptArgsCount}"
+fxnPrintDebug "getopt: \${#}=${#}"
 
 
 # check for incompatible invocation options:
@@ -220,23 +218,21 @@ done
 #    echo ""
 #    exit 1
 # fi
-echo ""
-echo "(DEBUG) \${launchSelftest}=${launchSelftest}"
-echo "(DEBUG) \${debug}=${debug}"
-echo "(DEBUG) \${factorName}=${factorName}"
-echo "(DEBUG) \${levelNameList}=${levelNameList}"
-echo "(DEBUG) \${levelScript}=${levelScript}"
-echo ""
 
+# for debug, display final check of invocation variables before returning:
+fxnPrintDebug "\${launchSelftest}=${launchSelftest}"
+fxnPrintDebug "\${debug}=${debug}"
+fxnPrintDebug "\${factorName}=${factorName}"
+fxnPrintDebug "\${levelNameList}=${levelNameList}"
+fxnPrintDebug "\${levelScript}=${levelScript}"
 
 }
 
 fxnPrintDebug() {
-if [ "${debug}" = "1" ]; then 
-   echo "/////// DEBUG ///////"
-   echo "$@"
-   echo "/////////////////////"
-fi
+   echo "////// DEBUG: ///// $@"
+# if [ "${debug}" = "1" ]; then 
+#    echo "////// DEBUG: ///// $@"
+# fi
 }
 
 fxnSelftestBasic() {
@@ -259,14 +255,10 @@ fxnSelftestBasic() {
    #done
 
    # test internal function fxnSetTempDir:
-   echo "(DEBUG)"
-   echo "(DEBUG) Launching internal fxnSetTempDir..."
-   echo "(DEBUG)"
+   fxnPrintDebug "Launching internal fxnSetTempDir..."
    fxnSetTempDir
    deleteTempDirAtEndOfScript=0
-   echo "(DEBUG)"
-   echo "(DEBUG)...done testing internal fxnSetTempDir ."
-   echo "(DEBUG)"
+   fxnPrintDebug "...done testing internal fxnSetTempDir..."
    echo "The temporary directory \${tempDir} has been created as:"
    ls -dlh ${tempDir}
    echo "...with its final destiny set by \${deleteTempDirAtEndOfScript} == ${deleteTempDirAtEndOfScript}"
@@ -291,22 +283,14 @@ fxnSelftestBasic() {
 fxnSelftestFull() {
   # Tests the full function of the script. Begins by calling fxnSelftestBaic() , and then...
   # <EDITME: description of tests and validating data>
-  echo "(DEBUG)"
-  echo "(DEBUG) Launching internal fxnSelftestFull , starting with internal fxnSelftestBasic ..."
-  echo "(DEBUG)"
+  fxnPrintDebug "Launching internal fxnSelftestFull , starting with internal fxnSelftestBasic ..."
   fxnSelftestBasic
-  echo "(DEBUG)"
-  echo "(DEBUG) ...fxnSelftestBasic completed. For the rest of fxnSelftestFull,"
-  echo "(DEBUG) creating exampleLevelwiseScript.sh and an output directory..."
-  echo "(DEBUG)"
-
-echo ""
-echo "(DEBUG) \${launchSelftest}=${launchSelftest}"
-echo "(DEBUG) \${debug}=${debug}"
-echo "(DEBUG) \${factorName}=${factorName}"
-echo "(DEBUG) \${levelNameList}=${levelNameList}"
-echo "(DEBUG) \${levelScript}=${levelScript}"
-echo ""
+  fxnPrintDebug "...fxnSelftestBasic completed. Continuing fxnSelftestFull..."
+  fxnPrintDebug "\${launchSelftest}=${launchSelftest}"
+  fxnPrintDebug "\${debug}=${debug}"
+  fxnPrintDebug "\${factorName}=${factorName}"
+  fxnPrintDebug "\${levelNameList}=${levelNameList}"
+  fxnPrintDebug "\${levelScript}=${levelScript}"
 
   # create a sample levelwiseScript:
   cat >> ${tempDir}/exampleLevelwiseScript.sh <<\EOF
@@ -347,9 +331,7 @@ EOF
 
   mkdir ${tempDir}/exampleLevelwiseScript-output
 
-  echo "(DEBUG)"
-  echo "(DEBUG)...done creating exampleLevelwiseScript.sh and an output directory."
-  echo "(DEBUG)"
+  fxnPrintDebug "...done creating exampleLevelwiseScript.sh and an output directory."
 
   echo "Generated exampleLevelwiseScript.sh, which can be used as a template for"
   echo "creating your own levelwise scripts to call from ${scriptName} :"
@@ -367,9 +349,7 @@ EOF
         -l etc,tmp                 \
         -s ${tempDir}/exampleLevelwiseScript.sh
 
-  echo "(DEBUG)"
-  echo "(DEBUG) Completed internal fxnSelftestFull in ${scriptName}"
-  echo "(DEBUG)"
+  fxnPrintDebug "Completed internal fxnSelftestFull in ${scriptName}"
 
 }
 
@@ -397,10 +377,10 @@ fxnSetTempDir() {
    tempParentPrevouslySetToWritableDir=''
    hostname=`hostname -s`
    kernel=`uname -s`
-   #echo "DEBUG: \$tempParent is currently set to ${tempParent}"
+   fxnPrintDebug "\$tempParent is currently set to ${tempParent}"
    if [ ! -z ${tempParent} ] && [ -d ${tempParent} ] && [ -w ${tempParent} ]; then
       tempParentPreviouslySetToWritableDir=1
-      #echo "DEBUG: tempParentPreviouslySetToWritableDir=1"
+      fxnPrintDebug "\$tempParentPreviouslySetToWritableDir=1"
    elif [ $hostname = "stowler-mba" ]; then
       tempParent="/Users/stowler/temp"
    elif [ $kernel = "Linux" ] && [ -d /tmp ] && [ -w /tmp ]; then
@@ -412,9 +392,7 @@ fxnSetTempDir() {
 	    create a new temporary directory. Edit script's $tempParent variable. Exiting."
       exit 1
    fi
-#   echo "DEBUG"
-#   echo "DEBUG: \${tempParent} is ${tempParent}"
-#   echo "DEBUG:"
+   fxnPrintDebug "\${tempParent} is ${tempParent}"
 
    # Now that writable ${tempParent} has been confirmed, create ${tempDir}:
    # e.g., tempDir="${tempParent}/${startDateTime}-from_${scriptName}.${scriptPID}"
@@ -422,7 +400,7 @@ fxnSetTempDir() {
    # does this $tempDir already exit? if so, don't try to make it again:
    if [ -d "${tempDir}" ] && [ -w "${tempDir}" ]; then
       echo ""
-      # echo "DEBUG: ${tempDir} already exists as a writable directory. Exiting fxnSetTempDir"
+      fxnPrintDebug "${tempDir} already exists as a writable directory. Exiting fxnSetTempDir ."
    else 
       mkdir ${tempDir}
       if [ $? -ne 0 ] ; then
@@ -531,9 +509,8 @@ listOfBasicConstants="\$startDate ${listOfBasicConstants}"
 startDateTime="`date +%Y%m%d%H%M%S`"
 listOfBasicConstants="\$startDateTime ${listOfBasicConstants}"
 
-# echo "DEBUG: \${listOfBasicConstants} is:"
-# echo "${listOfBasicConstants}"
-
+fxnPrintDebug "\${listOfBasicConstants} is:"
+fxnPrintDebug "${listOfBasicConstants}"
 
 # ------------------------- FINISH: define basic script constants ------------------------- #
 
