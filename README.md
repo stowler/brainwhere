@@ -12,7 +12,7 @@ When port to github is complete, there will be two branches:
 
 **STATUS:**
 - May 2013: final porting to github
-  - 20130515: everything in master branch for now. 
+  - 20130522: everything in master branch for now. 
 
 **INSTALLATION:**
 
