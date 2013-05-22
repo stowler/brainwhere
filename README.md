@@ -22,9 +22,10 @@ Please consider all code proof-of-concept dangerous, and test thoroughly
 **in a safe environment.** 
 
 1. First [install a basic set of system utilities.](https://github.com/stowler/stowlerGeneralComputing/blob/master/docs/setupBasicScriptingEnvironment.md#setupbasicscriptingenvironmentmd)
-2. Then [install FSL, AFNI, and BXH/XCEDE](https://gist.github.com/stowler/5544473)
+2. Then [install FSL, AFNI, and BXH/XCEDE.](https://gist.github.com/stowler/5544473)
 3. Then use git to instal the brainwhere repository:
 
+(It is safer to paste these into your terminal line-by-line rather than as a block:)
 
     ### Set installation directory (for my local OS X and linux installs: bwParentDir=/opt )
     bwParentDir=[where you would like the directory called brainwhere to reside]
@@ -41,8 +42,7 @@ Please consider all code proof-of-concept dangerous, and test thoroughly
     ### If that worked, just install from github:
     sudo git clone https://github.com/stowler/brainwhere.git 
     ### If you received an error about "git not found", install git and try again: http://git-scm.com/downloads
-
+    
+    
 NB: As in these installation instructions, you may notice that the source code is structured and commented
-for users who have a wide range of comfort with scripting.
-It can be inefficient, but I use this repository to make science *and* train new imagers, which isn't always pretty.
-
+for users who have a wide range of comfort with scripting. I use this repository to make science *and* train new imagers, which doesn't produce the prettiest, most reliable code.
