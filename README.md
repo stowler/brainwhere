@@ -45,4 +45,4 @@ Please consider all code proof-of-concept dangerous, and test thoroughly
     
     
 NB: As in these installation instructions, you may notice that the source code is structured and commented
-for users who have a wide range of comfort with scripting. I use this repository to make science *and* train new imagers, which doesn't produce the prettiest, most reliable code.
+for users who have a wide range of comfort with scripting. I use this repository to make science *and* train new imagers, which doesn't produce the prettiest or most efficient code.
