@@ -139,7 +139,7 @@ EOF
 
 
 fxnProcessInvocation() {
-
+   fxnPrintDebug "Starting fxnProcessInvocation..."
 
 # # always: check for number of arguments, even if expecting zero:
 # if [ "${scriptArgsCount}" -ne "3" ] ; then
@@ -170,6 +170,7 @@ fxnPrintDebug "getopt: \${scriptArgsCount}=${scriptArgsCount}"
 fxnPrintDebug "getopt: \${#}=${#}"
 
 # STEP 2/3: set the getopt string:
+eval set -- ${scriptArgsVector}
 TEMP=`getopt -- tdf:l:s: "$@"`
 if [ $? != 0 ] ; then 
    echo "Terminating...could not set string for getopt. Check out the Usage note:" >&2 
@@ -226,13 +227,14 @@ fxnPrintDebug "\${factorName}=${factorName}"
 fxnPrintDebug "\${levelNameList}=${levelNameList}"
 fxnPrintDebug "\${levelScript}=${levelScript}"
 
+fxnPrintDebug "...completed fxnProcessInvocation ."
+
 }
 
 fxnPrintDebug() {
+if [ "${debug}" = "1" ]; then 
    echo "////// DEBUG: ///// $@"
-# if [ "${debug}" = "1" ]; then 
-#    echo "////// DEBUG: ///// $@"
-# fi
+fi
 }
 
 fxnSelftestBasic() {
@@ -333,6 +335,7 @@ EOF
 
   fxnPrintDebug "...done creating exampleLevelwiseScript.sh and an output directory."
 
+  echo ""
   echo "Generated exampleLevelwiseScript.sh, which can be used as a template for"
   echo "creating your own levelwise scripts to call from ${scriptName} :"
   ls -lh  ${tempDir}/exampleLevelwiseScript.sh
@@ -342,9 +345,9 @@ EOF
   echo "And for the self-test we're currently performing, that exampleLevelwiseScript.sh will now"
   echo "be used as the -s argument to ${scriptName} . Launching now: "
   echo ""
-
+   
+   # TBD: figure out whether debug already has a value, execute this accordingly:
    bash ${scriptDir}/${scriptName} \
-        -d                         \
         -f systemDirectories       \
         -l etc,tmp                 \
         -s ${tempDir}/exampleLevelwiseScript.sh
@@ -372,6 +375,7 @@ fxnSetTempDir() {
    #    If tempParent or tempDir needs to include identifying information from the script,
    #    remember to assign values before calling fxnSetTempDir !
    #    e.g., tempParent=${participantDirectory}/manyTempProcessingDirsForThisParticipant && fxnSetTempDir()
+   fxnPrintDebug "Starting fxnSetTempDir ..."
 
    # Is $tempParent already defined as a writable directory? If not, try to define a reasonable one here:
    tempParentPrevouslySetToWritableDir=''
@@ -392,11 +396,12 @@ fxnSetTempDir() {
 	    create a new temporary directory. Edit script's $tempParent variable. Exiting."
       exit 1
    fi
-   fxnPrintDebug "\${tempParent} is ${tempParent}"
+   fxnPrintDebug "\${tempParent} is now ${tempParent}"
 
    # Now that writable ${tempParent} has been confirmed, create ${tempDir}:
    # e.g., tempDir="${tempParent}/${startDateTime}-from_${scriptName}.${scriptPID}"
    tempDir="${tempParent}/${startDateTime}-from_${scriptName}.${scriptPID}"
+   fxnPrintDebug "\${tempDir} has been set to ${tempDir}"
    # does this $tempDir already exit? if so, don't try to make it again:
    if [ -d "${tempDir}" ] && [ -w "${tempDir}" ]; then
       echo ""
@@ -412,8 +417,12 @@ fxnSetTempDir() {
          echo "Exiting."
          echo ""
          exit 1
+      else
+         echo "A temporary directory has been created:"
+         echo "${tempDir}"
       fi
    fi
+   fxnPrintDebug "...completed fxnSetTempDir ."
 }
 
 
