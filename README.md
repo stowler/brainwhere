@@ -21,6 +21,10 @@ but with attribution you are welcome to use this for non-clinical purposes.
 Please consider all code proof-of-concept dangerous, and test thoroughly 
 **in a safe environment.** 
 
+1. First [install a basic set of system utilities.](https://github.com/stowler/stowlerGeneralComputing/blob/master/docs/setupBasicScriptingEnvironment.md#setupbasicscriptingenvironmentmd)
+2. Then [install FSL, AFNI, and BXH/XCEDE](https://gist.github.com/stowler/5544473)
+3. Then use git to instal the brainwhere repository:
+
 
     ### Set installation directory (for my local OS X and linux installs: bwParentDir=/opt )
     bwParentDir=[where you would like the directory called brainwhere to reside]
