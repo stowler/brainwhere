@@ -3,30 +3,30 @@ brainwhere
 
 **brainwhere: a repository for my brain MRI development work**
 - It's mostly bash scripts. 
-- heavy lifting by FSL, AFNI, FREESURFER, FBIRN
-- two goals: get things done, support my training of new imagers
+- Heavy lifting by FSL, AFNI, FREESURFER, FBIRN.
+- Two goals: make the science, support my training of new imagers.
 
-When port to github is complete, there will be two branches:
-- master branch, which always passes Wednesday AM testing on my local platforms:
+This isn't formal enough for numbered releases, but I am maintaining two branches:
+- **master**, which passes weekly testing on my local platforms:
 	- OS X Mountain Lion + MacPorts
 	- Neurodebian on Ubuntu 12.04 on 64-bit processors
-	- Neurodebian-provided VM, running Debian 7.0 Wheezy 32-bit on VirtualBox
-- dev branch: my active development, broken daily
+	- Neurodebian VM, running Debian 7.0 wheezy 32-bit on VirtualBox
+- **dev**, where I make and break things daily
 
-**STATUS:**
+## STATUS:
 - May 2013: final porting to github
-  - 20130522: everything in master branch for now. 
+  - 20130522: everything in master branch for about one more week, maybe less
 
-**INSTALLATION:**
+## INSTALLATION:
 
 It may destroy your data and computer and everything attached to it, 
 but with attribution you are welcome to use this for non-clinical purposes.
-Please consider all code proof-of-concept dangerous, and test thoroughly 
+Please consider all code proof-of-concept-dangerous, and test thoroughly 
 **in a safe environment.** 
 
-1. First [install a basic set of system utilities.](https://github.com/stowler/stowlerGeneralComputing/blob/master/docs/setupBasicScriptingEnvironment.md#setupbasicscriptingenvironmentmd)
-2. Then [install FSL, AFNI, and BXH/XCEDE.](https://gist.github.com/stowler/5544473)
-3. Then use git to instal the brainwhere repository:
+1. Install [this basic set of system utilities.](https://github.com/stowler/stowlerGeneralComputing/blob/master/docs/setupBasicScriptingEnvironment.md#setupbasicscriptingenvironmentmd)
+2. Install FSL, AFNI, and BXH/XCEDE. You may want to refer to [my instructions.](https://gist.github.com/stowler/5544473)
+3. Install the brainwhere repository by cloning it with git:
 
 (It is safer to paste these into your terminal line-by-line rather than as a block:)
 
@@ -48,7 +48,7 @@ Please consider all code proof-of-concept dangerous, and test thoroughly
     #
     cd ${bwParentDir}
     sudo git clone https://github.com/stowler/brainwhere.git
-    bwDir=${bwParentDir}/brainwhere
+    export bwDir=${bwParentDir}/brainwhere
     ls ${bwDir}
     
     # =================================================================================================
