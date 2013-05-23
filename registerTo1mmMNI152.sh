@@ -848,10 +848,10 @@ echo ""
 echo ""
 
 if [ -n ${outDir} ]; then 
-	mkdir ${outDir}
-	cp ${tempDir}/*.nii.gz ${outDir}/
-	cp ${tempDir}/*.nii ${outDir}/
-	cp ${tempDir}/*.mat ${outDir}/
+	mkdir ${outDir} >2/dev/null
+	cp ${tempDir}/*.nii.gz ${outDir}/ >2/dev/null
+	cp ${tempDir}/*.nii ${outDir}/ >2/dev/null
+	cp ${tempDir}/*.mat ${outDir}/ >2/dev/null
 	finalDir=${outDir}
 else
 	deleteTempDirAtEndOfScript=0
@@ -895,7 +895,7 @@ fi
 # export FSLOUTPUTTYPE=${FSLOUTPUTTYPEorig}
 echo ""
 echo ""
-echo "One way to begin inspect your output images would be this command:"
+echo "One way to begin inspecting your output images would be this fslview command:"
 cat <<EOF
 
 standardTemplate=$FSLDIR/data/standard/MNI152_T1_1mm.nii.gz
@@ -904,7 +904,7 @@ warpedEPI=${finalDir}/${blind}_epi_averaged_warped
 bottomLayer=\${standardTemplate}
 middleLayer=\${warpedT1}
 topLayer=\${warpedEPI}
-fslview -m ortho \${bottomLayer} -l Green \${middleLayer} -l Yellow \${topLayer} -l Greyscale &
+fslview -m ortho \${bottomLayer} -l Green \${middleLayer} -l Pink \${topLayer} -l Greyscale &
 
 EOF
 
