@@ -74,6 +74,7 @@ Install MRIcron on Mac OS X Mountain/Lion:
 2. Unzip the downloaded file (which currently produces a folder called osx).
 3. Install:
 
+
      cd ~/Downloads/osx/
      mv mricron.app dcm2niigui.app npm.app /Applications/
     
@@ -205,12 +206,14 @@ There are multiple ways to install (as of May 2013). I get mixed results with th
 
 For system-wide installation, remove from those files and append to /etc/bashrc:
 
+
+
     #    WARNING: note the \${escapedVariables} below, which
     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
     #    Un-escape them if manually typing into a text editor.
     #    Otherwise, just paste these lines to your bash prompt
     #    (up to and including "EOF" line):
-    
+    #
     editDate=`/bin/date +%Y%m%d`
     editTime=$(date +%k%M)
     sudo tee -a /etc/bashrc >/dev/null <<EOF
@@ -223,31 +226,26 @@ For system-wide installation, remove from those files and append to /etc/bashrc:
     . \${FSLDIR}/etc/fslconf/fsl.sh
     #------------------------------------------
     EOF
-
     cat /etc/bashrc 
  
 
 Either log out and back in again, or issue this terminal command:
 
-    . /etc/bashrc
+     . /etc/bashrc
 
 TEST: did $FSLDIR get exported correctly? This should return "/usr/local/fsl" (no quotes) :
 
-
-    echo $FSLDIR
+     echo $FSLDIR
 
 TEST: Does fslview exist in /Applications?
-
 
     ls /Applications
     # ...if not create a shortcut like this:
     sudo ln -s /usr/local/fsl/bin/fslview.app /Applications/fslview.app
 
-
 TEST: we should be able to open /Applications/fslview.app from the commandline:
 
      open /Applications/fslview.app
-
 
 TEST: we should be able to open fslview.app from the commandline :
 
@@ -294,7 +292,7 @@ After the install completes, confirm whether the file /etc/bash.bashrc received 
     #    Un-escape them if manually typing into a text editor.
     #    Otherwise, just paste these lines to your bash prompt
     #    (up to and including "EOF" line):
-    
+    #
     editDate=`/bin/date +%Y%m%d`
     editTime=$(date +%k%M)
     sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
@@ -304,7 +302,7 @@ After the install completes, confirm whether the file /etc/bash.bashrc received 
     . /etc/fsl/5.0/fsl.sh
     #------------------------------------------
     EOF
-
+    #
     cat /etc/bashrc 
 
 
@@ -361,7 +359,7 @@ Add AFNI's new location to the path in /etc/bashrc :
     export AFNI_ENFORCE_ASPECT=YES
     #------------------------------------------
     EOF
-    
+    #
     cat /etc/bashrc
 
 Either log out and back in again, or issue this terminal command:
@@ -382,6 +380,8 @@ I'm currently happy with the version in the neurodebian repos:
 ...then "man afni" to get instructions for environmental variables (e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
 
 In the event that the neurodebian version of AFNI is broken/old/whatever you may want to substitute a binary version from outside of neurodebian. Two steps to do that:
+
+
 1. Download,  unzip, and move to a reasonable destination (not overwriting neurodebian's afni in the process):
 
 
@@ -419,7 +419,7 @@ I'm currently happy with the version in the neurodebian repos:
     . /etc/afni/afni.sh
     #------------------------------------------
     EOF
-
+    #
     cat /etc/bashrc
 
 
@@ -552,13 +552,12 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
 #  WARNINING: Stable 5.2 release WITHDRAWN awaiting upcoming version 5.3
 ###########################
 
-# If you haven't done so already, obtain a license, and copy the .license file to your 
-# $FREESURFER_HOME directory per https://surfer.nmr.mgh.harvard.edu/registration.html
+If you haven't done so already, obtain a license, and copy the .license file to your 
+$FREESURFER_HOME directory per https://surfer.nmr.mgh.harvard.edu/registration.html
 
 
-#-----------------------------------------------------------------
-# Installing FreeSurfer on Mac OS X Mountain/Lion:
-#-----------------------------------------------------------------
+Installing FreeSurfer on Mac OS X Mountain/Lion:
+-----------------------------------------------------------------
 
 1. Before installing freesurfer on Mountain/Lion be sure to install [XQuartz](http://xquartz.macosforge.org)
 and FSL (b/c FS's install will detect location of FSL).
@@ -643,17 +642,17 @@ and FSL (b/c FS's install will detect location of FSL).
       -f $SUBJECTS_DIR/bert/surf/rh.white:edgecolor=yellow \
       -f $SUBJECTS_DIR/bert/surf/lh.pial:annot=aparc:edgecolor=red \
       -f $SUBJECTS_DIR/bert/surf/rh.pial:annot=aparc:edgecolor=red
-
+        
       # TEST tkmedit (volume viewer):
       tkmedit bert orig.mgz
       tkmedit bert norm.mgz -segmentation aseg.mgz $FREESURFER_HOME/FreeSurferColorLUT.txt
-
+       
       # TEST tksurfer (surface viewer):
       tksurfer bert rh pial 
-
+       
       # TEST short reconstruction segment (< 30 minutes)
       recon-all -s bert -autorecon1 
-
+       
       # TEST full reconstruction (~ 24 hours)
       # 2013 i7 iMac:
       #     recon-all -s bert finished without error at Mon May  6 00:52:13 EDT 2013
@@ -671,12 +670,11 @@ Installing FreeSurfer on Ubuntu 12.04 :
 2. This can also be done from the commandline instead of the webpage:
 
 
-
       fsFtpDir="ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/5.2.0"
       fsFtpFilename="freesurfer-Linux-centos4_x86_64-stable-pub-v5.2.0.tar.gz"
       cd ~/Downloads
       wget ${fsFtpDir}/${fsFtpFilename}
- 
+        
       # …and to resume a failed download:
       curl -C - -o ${fsFtpFilename} ${fsFtpDir}/${fsFtpFilename}
  
