@@ -123,7 +123,7 @@ NB: pay attention to downloaded filename: if you already had osx.zip in your Dow
 ImageJ / FIJI
 ==================
 
-Installing FIJI on Mac OS X Mountain/Lion:
+Install FIJI on Mac OS X Mountain/Lion:
 -----------------------------------------------------------------
 
 1. Download the [fiji for macosx dmg](http://fiji.sc/Downloads)
@@ -139,7 +139,7 @@ Installing FIJI on Mac OS X Mountain/Lion:
 3. Install imagej plugins (instructions below)
 
 
-Installing ImageJ/FIJI on Ubuntu 12.04:
+Install ImageJ/FIJI on Ubuntu 12.04:
 -----------------------------------------------------------------
 
 I'm currently happy with the version in the neurodebian repos:
@@ -149,7 +149,7 @@ I'm currently happy with the version in the neurodebian repos:
 Then install imagej plugins (instructions below).
 
 
-Installing ImageJ plugins:
+Install ImageJ plugins:
 -----------------------------------------------------------------
 
 Even in 2013 imagej/fiji can't open .nii.gz files without a plugin (though .nii's work).
@@ -172,7 +172,7 @@ Download and install the [imagej nifti plugin](http://rsb.info.nih.gov/ij/plugin
 FSL
 ==================
 
-Installing FSL on Mac OS X Mountain/Lion:
+Install FSL on Mac OS X Mountain/Lion:
 ----------------------------------------------------------------
 
 Before installing FSL, freesurfer, or  AFNI on Mountain/Lion be doulbe-sure you have installed [XQuartz](http://xquartz.macosforge.org), and loged out and then back in.
@@ -255,7 +255,7 @@ TEST: we should be able to open fslview.app from the commandline :
 
 
 
-Installing FSL on Ubuntu 12.04:
+Install FSL on Ubuntu 12.04:
 -----------------------------------------------------------------
 
 I am currently happy with the version in the neurodebian repos:
@@ -272,7 +272,7 @@ After installation of the packages, get instructions for environmental variables
 
 
 
-Installing FSL on Debian 7.0 Wheezy Neurodebian VM:
+Install FSL on Debian 7.0 Wheezy Neurodebian VM:
 ------------------------------------------------------------
 
 I am currently happy with the version in the neurodebian repos:
@@ -466,62 +466,85 @@ earlier in the path than the system-wide afni directory, for example:
 BXH/XCEDE FBIRN TOOLS
 =======================
 
-#-----------------------------------------------------------------
-# Installing BXH/XCEDE tools on Mac OS X Mountain/Lion:
-#-----------------------------------------------------------------
 
-# As of May 2013, the shipping binaries of BXH/XCEDE tools includes broken imagemagick.
-# Here's a script describing the problem and my work-around: 
-# http://goo.gl/9Rd6V
+Install FBIRN BXH/XCEDE tools on Mac OS X Mountain/Lion:
+-----------------------------------------------------------------
 
-# ...after executing the steps in that script do this to confirm
-# the changes to /etc/bashrc :
-cat /etc/bashrc 
+As of May 2013, the shipping binaries of BXH/XCEDE tools includes imagemagick bugs on Mountain Lion.
+
+I wrote an installation script that [describes the problem](http://goo.gl/Nalzn) and provides a workaround via macports.
+
+1. Follow the steps in [my workaround install script](http://goo.gl/9Rd6V), then confirm the changes to /etc/bashrc:
+
+
+      cat /etc/bashrc 
+
+
+2. Either log out and back in again, or issue this terminal command:
+
+
+     . /etc/bashrc
+
+
+3. TEST: did $BXHDIR get exported correctly? This should return a listing of bxh programs :
+
+
+      ls $BXHDIR
+
+
+
+
+Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
+-----------------------------------------------------------------
+
+1. manualy download most recent bxh/xcede release from nitrc: http://www.nitrc.org/projects/bxh_xcede_tools
+
+
+     $ ls -l ~/Downloads/bxh_xcede_tools-*.tgz
+     bxh_xcede_tools-1.10.7-lsb31.i386.tgz
  
-# Either log out and back in again, or issue this terminal command:
-. /etc/bashrc
+2. unpack and install bxh/xcede:
 
-# TEST: did $BXHDIR get exported correctly? This should return a listing of bxh programs :
-ls $BXHDIR
 
-#-----------------------------------------------------------------
-# Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
-#-----------------------------------------------------------------
+     # ...first declare the bxh version as it appears in the download filename:
+     bxhVersion=1.10.7
+     
+     # ...then unpack and install:
+     cd ~/Downloads
+     tar -zxvf bxh_xcede_tools-${bxhVersion}-lsb31.i386.tgz
+     sudo mv bxh_xcede_tools-${bxhVersion}-lsb31.i386 /opt/
+     sudo ln -s /opt/bxh_xcede_tools-${bxhVersion}-lsb31.i386 /opt/bxh
 
-# manualy download most recent bxh/xcede release from nitrc: http://www.nitrc.org/projects/bxh_xcede_tools
-# ls -l ~/Downloads/bxh_xcede_tools-*.tgz
-bxh_xcede_tools-1.10.7-lsb31.i386.tgz
- 
-#  unpack and install bxh/xcede:
-#
-# ...first declare the bxh version as it appears in the download filename:
-bxhVersion=1.10.7
-# ...then unpack and install
-cd ~/Downloads
-tar -zxvf bxh_xcede_tools-${bxhVersion}-lsb31.i386.tgz
-sudo mv bxh_xcede_tools-${bxhVersion}-lsb31.i386 /opt/
-sudo ln -s /opt/bxh_xcede_tools-${bxhVersion}-lsb31.i386 /opt/bxh
+3. for system-wide access, configure the environment via /etc/bash.bashrc :
 
-# for system-wide access, configure the environment via /etc/bashrc :
-#
-#    WARNING: note the \${escapedVariables} below, which
-#    are escaped for heredoc (http://goo.gl/j3HMJ). 
-#    Un-escape them if manually typing into a text editor.
-#    Otherwise, just paste these lines to your bash prompt
-#    (up to and including "EOF" line):
- 
-editDate=`/bin/date +%Y%m%d`
-editTime=$(date +%k%M)
-sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
-#------------------------------------------
-# on ${editDate} at ${editTime}, $USER 
-# added some BXH/XCEDE environment statements:
-BXHDIR=/opt/bxh
-PATH=\${BXHDIR}/bin:\${PATH}
-export BXHDIR PATH
-#------------------------------------------
-EOF
 
+     #    WARNING: note the \${escapedVariables} below, which
+     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
+     #    Un-escape them if manually typing into a text editor.
+     #    Otherwise, just paste these lines to your bash prompt
+     #    (up to and including "EOF" line):
+     #
+     editDate=`/bin/date +%Y%m%d`
+     editTime=$(date +%k%M)
+     sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
+     #------------------------------------------
+     # on ${editDate} at ${editTime}, $USER 
+     # added some BXH/XCEDE environment statements:
+     BXHDIR=/opt/bxh
+     PATH=\${BXHDIR}/bin:\${PATH}
+     export BXHDIR PATH
+     #------------------------------------------
+     EOF
+
+4. Either log out and back in again, or issue this terminal command:
+
+
+     . /etc/bashrc
+
+5. TEST: did $BXHDIR get exported correctly? This should return a listing of bxh programs :
+
+
+      ls $BXHDIR
 
 
 
