@@ -7,7 +7,10 @@ brainwhere
 - two goals: get things done, support my training of new imagers
 
 When port to github is complete, there will be two branches:
-- master branch: tested good on my local platforms (OS X Mountain Lion, Ubuntu 12.04 + neurodebian, and the neurodebian-provided VM)
+- master branch, which always passes Wednesday AM testing on my local platforms:
+	- OS X Mountain Lion + MacPorts
+	- Neurodebian on Ubuntu 12.04 on 64-bit processors
+	- Neurodebian-provided VM, running Debian 7.0 Wheezy 32-bit on VirtualBox
 - dev branch: my active development, broken daily
 
 **STATUS:**
