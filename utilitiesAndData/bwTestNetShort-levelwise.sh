@@ -40,4 +40,5 @@ rowSingleLevelData="${nameOfTest},${nameOfStorage},${resultNonzeroEntropy}"
 echo "${rowHeader}" >> ${tempDir}/singleLevelOutputVectorForComparisonAcrossLevels.csv
 echo "${rowSingleLevelData}" >> ${tempDir}/singleLevelOutputVectorForComparisonAcrossLevels.csv
 
+cat ${tempDir}/singleLevelOutputVectorForComparisonAcrossLevels.csv | column -s , -t
 # return value (TBD?): file path to singleLevelOutputVectorForComparisonAcrossLevels.csv

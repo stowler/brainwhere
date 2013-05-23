@@ -4,7 +4,7 @@
 # USAGE:	    see the fxnPrintUsage() function below 
 #
 # CREATED:          20130516 by stowler@gmail.com
-# LAST UPDATED:     20130520 by stowler@gmail.com
+# LAST UPDATED:     20130523 by stowler@gmail.com
 #
 # DESCRIPTION:
 # A very general tool. Loops over multiple levels of one factor. Each loop
@@ -50,6 +50,9 @@
 # so they can be stripped out automatically
 #
 #
+# TBD: implement quiet mode so only summary appears
+# TBD: add pretty borders to the summary table
+# TBD: usage and self-test if no arguments given
 
 
 
@@ -596,22 +599,41 @@ for levelName in ${levelNameList}; do
 done
 
 # compile the individual factorLevel outputs into singleFactorOutputMatrix.csv:
-# (for now just dump them together for testing purposes)
+
+# The identical header rows for each level should be the only non-unique rows
+# (the rest are actual unique per-level rows). Identify those header rows by
+# their non-uniqueness, and then use them (it) as the first row (header row) of the
+# output file:
 cat \
-${tempDir}/SINGLEFACTORDIR_${factorName}/FACTORLEVELDIR_*/singleLevelOutputVectorForComparisonAcrossLevels.csv >> \
-${tempDir}/SINGLEFACTORDIR_${factorName}/SINGLEFACTOROUTPUTMATRIX_${factorName}.csv
-# TBD do for real:
-# 1) are there zero? Exit if so
-# 2) else if there is one...
+${tempDir}/SINGLEFACTORDIR_${factorName}/FACTORLEVELDIR_*/singleLevelOutputVectorForComparisonAcrossLevels.csv \
+| sort \
+| uniq -d \
+>> ${tempDir}/SINGLEFACTORDIR_${factorName}/SINGLEFACTOROUTPUTMATRIX_${factorName}.csv
+
+# The remaining unique rows should be the data from each level. Append them to
+# the output file's existing header row:
+cat \
+${tempDir}/SINGLEFACTORDIR_${factorName}/FACTORLEVELDIR_*/singleLevelOutputVectorForComparisonAcrossLevels.csv \
+| sort \
+| uniq -u \
+>> ${tempDir}/SINGLEFACTORDIR_${factorName}/SINGLEFACTOROUTPUTMATRIX_${factorName}.csv
+
+
+# TBD Seriously let's be adults about this:
+#
+# 1) are there zero levelwise vectors? Exit if so
+# 2) else if there is one levelwise vector :
    # make sure it has two lines (one header, one data)
    # make sure they have the same number of csv fields
-# 3) else if there is > 1 ...
+# 3) else if there > 1 levelwise vector:
    # compare header vectors. Exit if they are different, otherwise assign to variable headerRow
    # make sure there is only one data row per level
    # echo headerRow to output matrix, followed by one row for each individual factor levels 
    # issue warning if there are any lines that have different number of fields
    # than header rowmake sure same number of fields in headerRow and every data
    # row
+# 4) else if there are exactly two vectors, maybe consider calculating percent difference
+
 
 
 #TBD: call fxnSelftestBasic if nothing happened earlier in the script
@@ -647,6 +669,18 @@ if [ -n "${tempDir}" ]; then
 	echo ""
 	echo ""
 fi
+
+
+# Display results for the user:
+echo ""
+echo "Results for levels \"${levelNameList}\" of single factor \"${factorName}\"":
+echo ""
+column -s , -t ${tempDir}/SINGLEFACTORDIR_${factorName}/SINGLEFACTOROUTPUTMATRIX_${factorName}.csv
+echo ""
+echo "(stored as csv file with header row here:)"
+ls ${tempDir}/SINGLEFACTORDIR_${factorName}/SINGLEFACTOROUTPUTMATRIX_${factorName}.csv
+echo ""
+
 
 # Did we change any environmental variables? It would be polite to set them to their original values:
 # export FSLOUTPUTTYPE=${FSLOUTPUTTYPEorig}
