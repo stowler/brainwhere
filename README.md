@@ -27,19 +27,29 @@ Please consider all code proof-of-concept dangerous, and test thoroughly
 
 (It is safer to paste these into your terminal line-by-line rather than as a block:)
 
-    ### Set installation directory (for my local OS X and linux installs: bwParentDir=/opt )
+    # =================================================================================================
+    # STEP 1/5: Set installation directory (for my local OS X and linux installs: bwParentDir=/opt )
+    #
     bwParentDir=[where you would like the directory called brainwhere to reside]
-    ### Test whether you have permissions to write to ${bwParentDir} :
+    
+    # =================================================================================================
+    # STEP 2/5: Test whether you have permissions to write to ${bwParentDir} :
+    #
     cd ${bwParentDir}
     sudo touch doIhavePermissionsToWriteHere.txt 
     ls -l doIhavePermissionsToWriteHere.txt
     sudo rm doIhavePermissionsToWriteHere.txt
-    ### If that worked, just install from github:
+    
+    # =================================================================================================
+    # STEP 3/5: If that worked, just install from github:
+    #
+    cd ${bwParentDir}
     sudo git clone https://github.com/stowler/brainwhere.git
     bwDir=${bwParentDir}/brainwhere
     ls ${bwDir}
-    #
-    # Finally, add brainwhere's new location to the path in your system-wide bash config file:
+    
+    # =================================================================================================
+    # STEP 4/5: Add brainwhere's new location to the path in your system-wide bash config file:
     #
     #    WARNING: note the \${escapedVariables} below, which
     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
@@ -47,7 +57,7 @@ Please consider all code proof-of-concept dangerous, and test thoroughly
     #    Otherwise, just paste these lines to your bash prompt
     #    (up to and including "EOF" line):
     #
-    mySystemBashConfig=/etc/bash.bashrc       #debian is /etc/bash.bashrc , ubuntu and lion are /etc/bashrc
+    mySystemBashConfig=/etc/bash.bashrc    #debian is /etc/bash.bashrc , ubuntu and lion are /etc/bashrc
     editDate=`/bin/date +%Y%m%d`
     editTime=$(date +%k%M)
     sudo tee -a ${mySystemBashConfig} >/dev/null <<EOF
@@ -58,6 +68,15 @@ Please consider all code proof-of-concept dangerous, and test thoroughly
     export PATH=\${bwDir}:\${PATH}
     #------------------------------------------
     EOF
+    
+    # =================================================================================================
+    # STEP 5/5: Confirm that the system-wide access works:
+    #
+    cat ${mySystemBashConfig}
+    # open a new terminal window and confirm $bwDir:
+    ls $bwDir
+    echo $PATH
+
     
     
 NB: As in these installation instructions, you may notice that the source code is structured and commented
