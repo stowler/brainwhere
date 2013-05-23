@@ -67,16 +67,17 @@ I'm currently happy with the version in the neurodebian repos:
 MRIcron
 ==============================
 
+
 Install MRIcron on Mac OS X Mountain/Lion:
------------------------------------------------------------------
+--------------------------------------------------------------
 
 1. Download latest [MRIcron binary](http://www.nitrc.org/projects/mricron) (probably called "MRIcron [month]/[year] osx.zip")
 2. Unzip the downloaded file (which currently produces a folder called osx).
 3. Install:
 
 
-     cd ~/Downloads/osx/
-     mv mricron.app dcm2niigui.app npm.app /Applications/
+    cd ~/Downloads/osx/
+    mv mricron.app dcm2niigui.app npm.app /Applications/
     
 Move dcm2nii to a folder in the $PATH, e.g., /usr/local/bin:
 
@@ -110,6 +111,8 @@ Install MRIcroGL on Mac OS X Mountain/Lion:
 1. Download the [latest version](http://www.mccauslandcenter.sc.edu/mricrogl/).
 NB: pay attention to downloaded filename: if you already had osx.zip in your Downloads folder from mricrON, this mricrogl download may get called "osx(1).zip" etc.
 
+2. Unzip and install it: 
+
 
     cd ~/Downloads
     mkdir mricrogl
@@ -117,7 +120,8 @@ NB: pay attention to downloaded filename: if you already had osx.zip in your Dow
     unzip ~/Downloads/osx.zip
     sudo mv mricrogl.app /Applications/
     mv *.nii.gz /Users/Shared/sampleBrainVolumes/mricrogl # or other parent of sample data
-    # save the pdf manual somewhere
+
+3. Save the pdf manual somewhere handy.
 
 
 
