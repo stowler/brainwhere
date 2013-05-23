@@ -524,14 +524,14 @@ echo "- IMPORTANT: a lesion must match T1's geometry"
 echo "- IMPORTANT: images following EPI must match EPI geometry"
 echo ""
 # ...first just create the header row:
-bash ${bwDir}/displayImageGeometry.sh -n ${t1} >> ${tempDir}/inputUnformatted.txt
+bash ${bwDir}/bwDisplayImageGeometry.sh -n ${t1} >> ${tempDir}/inputUnformatted.txt
 # ...then create the per-image rows:
 # (the following requires echo $var, not just $var for ws-sep'd values in $var
 # to be subsequently read as multiple values instead of single value containing
 # ws:)
 for image in $t1 $lesion $epi `echo ${integerVolumes} ${decimalVolumes}`; do
 	if [ -s $image ]; then
-		bash ${bwDir}/displayImageGeometry.sh -r $image >> ${tempDir}/inputUnformatted.txt
+		bash ${bwDir}/bwDisplayImageGeometry.sh -r $image >> ${tempDir}/inputUnformatted.txt
 	fi
 done
 fxnPrintDebug "${tempDir}/inputUnformatted.txt put into columns for your pleasure:"
