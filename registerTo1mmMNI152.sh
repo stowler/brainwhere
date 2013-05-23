@@ -848,10 +848,10 @@ echo ""
 echo ""
 
 if [ -n ${outDir} ]; then 
-	mkdir ${outDir} >2/dev/null
-	cp ${tempDir}/*.nii.gz ${outDir}/ >2/dev/null
-	cp ${tempDir}/*.nii ${outDir}/ >2/dev/null
-	cp ${tempDir}/*.mat ${outDir}/ >2/dev/null
+	mkdir ${outDir} &> /dev/null
+	cp ${tempDir}/*.nii.gz ${outDir}/ &> /dev/null
+	cp ${tempDir}/*.nii ${outDir}/ &> /dev/null
+	cp ${tempDir}/*.mat ${outDir}/ &> /dev/null
 	finalDir=${outDir}
 else
 	deleteTempDirAtEndOfScript=0
