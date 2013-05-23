@@ -34,14 +34,30 @@ Please consider all code proof-of-concept dangerous, and test thoroughly
     sudo touch doIhavePermissionsToWriteHere.txt 
     ls -l doIhavePermissionsToWriteHere.txt
     sudo rm doIhavePermissionsToWriteHere.txt
-    ### If that worked, export this directory as part of variable $bwDir 
-    ### (add to your profile/rc configs as you like)
-    export bwDir=${bwParentDir}/brainwhere
-    ### Add ${bwDir} to your $PATH (executable scripts are in the brainwhere root):
-    export PATH=${bwDir}:${PATH}
     ### If that worked, just install from github:
-    sudo git clone https://github.com/stowler/brainwhere.git 
-    ### If you received an error about "git not found", install git and try again: http://git-scm.com/downloads
+    sudo git clone https://github.com/stowler/brainwhere.git
+    bwDir=${bwParentDir}/brainwhere
+    ls ${bwDir}
+    #
+    # Finally, add brainwhere's new location to the path in your system-wide bash config file:
+    #
+    #    WARNING: note the \${escapedVariables} below, which
+    #    are escaped for heredoc (http://goo.gl/j3HMJ). 
+    #    Un-escape them if manually typing into a text editor.
+    #    Otherwise, just paste these lines to your bash prompt
+    #    (up to and including "EOF" line):
+    #
+    mySystemBashConfig=/etc/bash.bashrc       #debian is /etc/bash.bashrc , ubuntu and lion are /etc/bashrc
+    editDate=`/bin/date +%Y%m%d`
+    editTime=$(date +%k%M)
+    sudo tee -a ${mySystemBashConfig} >/dev/null <<EOF
+    #------------------------------------------
+    # on ${editDate} at ${editTime}, $USER  
+    # added some brainwhere environmental variables:
+    export bwDir=$bwDir
+    export PATH=\${bwDir}:\${PATH}
+    #------------------------------------------
+    EOF
     
     
 NB: As in these installation instructions, you may notice that the source code is structured and commented
