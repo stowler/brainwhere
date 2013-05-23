@@ -78,7 +78,9 @@ Install MRIcron on Mac OS X Mountain/Lion:
     cd ~/Downloads/osx/
     mv mricron.app dcm2niigui.app npm.app /Applications/
     
-    # Move dcm2nii to a folder in the $PATH, e.g., /usr/local/bin :
+    
+ Move dcm2nii to a folder in the $PATH, e.g., /usr/local/bin : 
+
     echo ${PATH}   # does this contain /usr/local/bin ?
     ls /usr/local  # is there a folder called bin inside of /usr/local ? If not: sudo mkdir /usr/local/bin
     sudo mv ~/Downloads/osx/dcm2nii /usr/local/bin/
