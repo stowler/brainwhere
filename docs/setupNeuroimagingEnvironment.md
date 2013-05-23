@@ -477,21 +477,20 @@ I wrote an installation script that [describes the problem](http://goo.gl/Nalzn)
 1. Follow the steps in [my workaround install script](http://goo.gl/9Rd6V), then confirm the changes to /etc/bashrc:
 
 
-      cat /etc/bashrc 
-
+      cat /etc/bashrc
+      
 
 2. Either log out and back in again, or issue this terminal command:
 
 
      . /etc/bashrc
-
+     
 
 3. TEST: did $BXHDIR get exported correctly? This should return a listing of bxh programs :
 
 
       ls $BXHDIR
-
-
+      
 
 
 Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
@@ -561,145 +560,158 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
 # Installing FreeSurfer on Mac OS X Mountain/Lion:
 #-----------------------------------------------------------------
 
-# Before installing freesurfer on Mountain/Lion be sure to install XQuartz (http://xquartz.macosforge.org)
-# and FSL (b/c FS's install will detect location of FSL).
+1. Before installing freesurfer on Mountain/Lion be sure to install [XQuartz](http://xquartz.macosforge.org)
+and FSL (b/c FS's install will detect location of FSL).
 
-# Download latest .dmg from the Freesurfer Wiki: 
-# http://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall
-# This can be done from the commandline instead of the webpage:
-fsFtpDir="ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/5.2.0"
-fsFtpFilename="freesurfer-Darwin-lion-stable-pub-v5.2.0.dmg"
-cd ~/Downloads
-curl -O ${fsFtpDir}/${fsFtpFilename}
+2. [Download](http://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall) latest .dmg from the Freesurfer Wiki. This can also be done from the commandline instead of the webpage:
 
-# …and to resume a failed download:
-curl -C - -o ${fsFtpFilename} ${fsFtpDir}/${fsFtpFilename}
 
-# confirm that the download is valid:
-sh <<EOF
-curl -s -o freesurfer_md5sums.txt http://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/md5sum.txt
-echo ""
-echo "expected md5 sum:"
-grep ${fsFtpFilename} freesurfer_md5sums.txt
-echo ""
-echo "md5sum of downloaded ${fsFtpFilename}:"
-md5 ${fsFtpFilename}
-echo ""
-echo "(re-download if they don't match)"
-echo ""
-EOF
+      fsFtpDir="ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/5.2.0"
+      fsFtpFilename="freesurfer-Darwin-lion-stable-pub-v5.2.0.dmg"
+      cd ~/Downloads
+      curl -O ${fsFtpDir}/${fsFtpFilename}
+     
+      # …and to resume a failed download:
+      curl -C - -o ${fsFtpFilename} ${fsFtpDir}/${fsFtpFilename}
+
+3. Confirm that the download is valid:
+
+
+     sh <<EOF
+     curl -s -o freesurfer_md5sums.txt http://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/md5sum.txt
+     echo ""
+     echo "expected md5 sum:"
+     grep ${fsFtpFilename} freesurfer_md5sums.txt
+     echo ""
+     echo "md5sum of downloaded ${fsFtpFilename}:"
+     md5 ${fsFtpFilename}
+     echo ""
+     echo "(re-download if they don't match)"
+     echo ""
+     EOF
  
-# Doubleclick on the .dmg and run the .pkg installation file found inside of it.  
-# Detailed instructions at http://surfer.nmr.mgh.harvard.edu/fswiki/Installation 
-# (Note the folder that this installs to, likely /Applications/freesurfer, which you will assign to $FREESURFER_HOME below.)
+2. Doubleclick on the .dmg and run the .pkg installation file found inside of it. 
+   [Detailed instructions](http://surfer.nmr.mgh.harvard.edu/fswiki/Installation) are available if you want them.
+   (Note the folder that this installs to, likely /Applications/freesurfer, which you will assign to $FREESURFER_HOME below.)
 
-# add post-install config to /etc/bashrc per the bash section of 
-# http://surfer.nmr.mgh.harvard.edu/fswiki/SetupConfiguration) :
-#
-#    WARNING: note the \${escapedVariables} below, which
-#    are escaped for heredoc (http://goo.gl/j3HMJ). 
-#    Un-escape them if manually typing into a text editor.
-#    Otherwise, just paste these lines to your bash prompt
-#    (up to and including "EOF" line):
-#
-editDate=`/bin/date +%Y%m%d`
-editTime=$(date +%k%M)
-sudo tee -a /etc/bashrc >/dev/null <<EOF
-#------------------------------------------
-# on ${editDate} at ${editTime}, $USER   
-# added some freesurfer environmental variables:
-export FREESURFER_HOME=/Applications/freesurfer
-. \${FREESURFER_HOME}/SetUpFreeSurfer.sh
-#------------------------------------------
-EOF
+3. add post-install config to /etc/bashrc per the bash section of the freesurfer [documentation](http://surfer.nmr.mgh.harvard.edu/fswiki/SetupConfiguration) :
 
-cat /etc/bashrc 
 
-# copy the sample data to a place where users can write to it:
-cp -a $SUBJECTS_DIR /Users/Shared/fs_sampleSubjects
-# edit ${FREESURFER_HOME}/SetUpFreeSurfer.sh to reflect the change in $SUBJECTS_DIR, then
-# either log out and back in again, or issue this terminal command:
-. /etc/bashrc 
+     #
+     #    WARNING: note the \${escapedVariables} below, which
+     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
+     #    Un-escape them if manually typing into a text editor.
+     #    Otherwise, just paste these lines to your bash prompt
+     #    (up to and including "EOF" line):
+     #
+     editDate=`/bin/date +%Y%m%d`
+     editTime=$(date +%k%M)
+     sudo tee -a /etc/bashrc >/dev/null <<EOF
+     #------------------------------------------
+     # on ${editDate} at ${editTime}, $USER   
+     # added some freesurfer environmental variables:
+     export FREESURFER_HOME=/Applications/freesurfer
+     . \${FREESURFER_HOME}/SetUpFreeSurfer.sh
+     #------------------------------------------
+     EOF
+     
+     cat /etc/bashrc 
+
+4. Copy the sample data to a place where users can write to it:
+
+
+     cp -a $SUBJECTS_DIR /Users/Shared/fs_sampleSubjects
+
+5. Edit ${FREESURFER_HOME}/SetUpFreeSurfer.sh to reflect the change in $SUBJECTS_DIR, then
+   either log out and back in again, or issue this terminal command:
+
+
+       . /etc/bashrc 
  
-# TEST: open a new terminal windows. You should see a number of freesurfer-related
-# lines at the top of the new terminal window, and all the terminal windows you open after that.
-
-# TESTS: Test your installation by issuing the test commands detailed on the Testing Freesurfer webpage 
-# (as of January 2013: http://surfer.nmr.mgh.harvard.edu/fswiki/TestingFreeSurfer )
-
-# TEST freeview:
-freeview \
--v $SUBJECTS_DIR/bert/mri/norm.mgz \
--v $SUBJECTS_DIR/bert/mri/aseg.mgz:colormap=lut:opacity=0.2 \
--f $SUBJECTS_DIR/bert/surf/lh.white:edgecolor=yellow \
--f $SUBJECTS_DIR/bert/surf/rh.white:edgecolor=yellow \
--f $SUBJECTS_DIR/bert/surf/lh.pial:annot=aparc:edgecolor=red \
--f $SUBJECTS_DIR/bert/surf/rh.pial:annot=aparc:edgecolor=red
-
-# TEST tkmedit (volume viewer):
-tkmedit bert orig.mgz
-tkmedit bert norm.mgz -segmentation aseg.mgz $FREESURFER_HOME/FreeSurferColorLUT.txt
-
-# TEST tksurfer (surface viewer):
-tksurfer bert rh pial 
-
-# TEST short reconstruction segment (< 30 minutes)
-recon-all -s bert -autorecon1 
-
-# TEST full reconstruction (~ 24 hours)
-# 2013 i7 iMac:
-#     recon-all -s bert finished without error at Mon May  6 00:52:13 EDT 2013
-#     22032.75 real     21947.85 user        60.84 sys
-recon-all -s bert -all 
-
-
-#-----------------------------------------------------------------
-# Installing FreeSurfer on Ubuntu 12.04 :
-#-----------------------------------------------------------------
-
-# download latest .tar.gz from the Freesurfer Wiki: 
-# http://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall
-# This can also be done from the commandline instead of the webpage:
-fsFtpDir="ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/5.2.0"
-fsFtpFilename="freesurfer-Linux-centos4_x86_64-stable-pub-v5.2.0.tar.gz"
-cd ~/Downloads
-wget ${fsFtpDir}/${fsFtpFilename}
  
-# …and to resume a failed download:
-curl -C - -o ${fsFtpFilename} ${fsFtpDir}/${fsFtpFilename}
  
-# confirm that the download is valid:
-sh <<EOF
-curl -s -o freesurfer_md5sums.txt http://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/md5sum.txt
-echo ""
-echo "expected md5 sum:"
-grep ${fsFtpFilename} freesurfer_md5sums.txt
-echo ""
-echo "md5sum of downloaded ${fsFtpFilename}:"
-md5 ${fsFtpFilename}
-echo ""
-echo "(re-download if they don't match)"
-echo ""
-EOF
+6. TEST: open a new terminal window. You should see a number of freesurfer-related lines at the top of the new terminal window, and all the terminal windows you open after that.
+
+7. TESTS: Test your installation by issuing the test commands detailed on the [Testing Freesurfer webpage](http://surfer.nmr.mgh.harvard.edu/fswiki/TestingFreeSurfer ).
+
+
+      # TEST freeview:
+      freeview \
+      -v $SUBJECTS_DIR/bert/mri/norm.mgz \
+      -v $SUBJECTS_DIR/bert/mri/aseg.mgz:colormap=lut:opacity=0.2 \
+      -f $SUBJECTS_DIR/bert/surf/lh.white:edgecolor=yellow \
+      -f $SUBJECTS_DIR/bert/surf/rh.white:edgecolor=yellow \
+      -f $SUBJECTS_DIR/bert/surf/lh.pial:annot=aparc:edgecolor=red \
+      -f $SUBJECTS_DIR/bert/surf/rh.pial:annot=aparc:edgecolor=red
+
+      # TEST tkmedit (volume viewer):
+      tkmedit bert orig.mgz
+      tkmedit bert norm.mgz -segmentation aseg.mgz $FREESURFER_HOME/FreeSurferColorLUT.txt
+
+      # TEST tksurfer (surface viewer):
+      tksurfer bert rh pial 
+
+      # TEST short reconstruction segment (< 30 minutes)
+      recon-all -s bert -autorecon1 
+
+      # TEST full reconstruction (~ 24 hours)
+      # 2013 i7 iMac:
+      #     recon-all -s bert finished without error at Mon May  6 00:52:13 EDT 2013
+      #     22032.75 real     21947.85 user        60.84 sys
+      recon-all -s bert -all 
 
 
 
-###########################
-#   SPM (Mountain Lion)
-###########################
+Installing FreeSurfer on Ubuntu 12.04 :
+---------------------------------------------------------------
 
-# Download the latest SPM 8 package.
-# (currently from http://www.fil.ion.ucl.ac.uk/spm/software/spm8/ )
+1. [Download](http://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall) the latest .tar.gz binaries from the Freesurfer Wiki.
 
-# Unzip the downloaded SPM package and move the resulting SPM folder to /usr/local , 
-# so that SPM's program files are not in /usr/local/spm.
 
-# Open matlab and issue the command "userpath;" (no quotes). This will tell you what
-# folder Matlab is going to look in for certain files. You care about this folder because 
-# in the next step you're going to create a special file that gets placed there.
+2. This can also be done from the commandline instead of the webpage:
 
-# In the Matlab window issue the command "pathtool;" (no quotes). This opens a new window. 
-# In this window, add /usr/local/spm to # the list of folders that Matlab searches for files. 
-# Upon clicking "save", this window may complain about problems creating a file called pathdef.m, and ask you where you would like to put this file. Put it on the folder that was returned by the userpath # command you entered earlier.
 
-# Test your installation by closing and then reopening Matlab. Type "spm;" (no quotes) at the Matlab prompt, and the SPM graphical user interface should open.
+
+      fsFtpDir="ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/5.2.0"
+      fsFtpFilename="freesurfer-Linux-centos4_x86_64-stable-pub-v5.2.0.tar.gz"
+      cd ~/Downloads
+      wget ${fsFtpDir}/${fsFtpFilename}
+ 
+      # …and to resume a failed download:
+      curl -C - -o ${fsFtpFilename} ${fsFtpDir}/${fsFtpFilename}
+ 
+3. Confirm that the download is valid:
+
+
+      sh <<EOF
+      curl -s -o freesurfer_md5sums.txt http://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/md5sum.txt
+      echo ""
+      echo "expected md5 sum:"
+      grep ${fsFtpFilename} freesurfer_md5sums.txt
+      echo ""
+      echo "md5sum of downloaded ${fsFtpFilename}:"
+      md5 ${fsFtpFilename}
+      echo ""
+      echo "(re-download if they don't match)"
+      echo ""
+      EOF
+
+
+
+SPM (Mountain Lion)
+=========================
+
+1. Download the latest [SPM 8 package](http://www.fil.ion.ucl.ac.uk/spm/software/spm8/)
+
+2. Unzip the downloaded SPM package and move the resulting SPM folder to /usr/local , 
+   so that SPM program files are not in /usr/local/spm.
+
+3. Open matlab and issue the command "userpath;" (no quotes). This will tell you what
+   folder Matlab is going to look in for certain files. You care about this folder because 
+   in the next step you are going to create a special file that gets placed there.
+
+4. In the Matlab window issue the command "pathtool;" (no quotes). This opens a new window. 
+   In this window, add /usr/local/spm to the list of folders that Matlab searches for files. 
+   (NB: Upon clicking "save", this window may complain about problems creating a file called pathdef.m, and ask you where you would like to put this file. Put it on the folder that was returned by the userpath command you entered earlier.)
+
+5. Test your installation by closing and then reopening Matlab. Type "spm;" (no quotes) at the Matlab prompt, and the SPM graphical user interface should open.
