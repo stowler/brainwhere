@@ -72,14 +72,12 @@ Install MRIcron on Mac OS X Mountain/Lion:
 
 1. Download latest [MRIcron binary](http://www.nitrc.org/projects/mricron) (probably called "MRIcron [month]/[year] osx.zip")
 2. Unzip the downloaded file (which currently produces a folder called osx).
-3. Install: 
+3. Install:
 
-
-    cd ~/Downloads/osx/
-    mv mricron.app dcm2niigui.app npm.app /Applications/
+     cd ~/Downloads/osx/
+     mv mricron.app dcm2niigui.app npm.app /Applications/
     
-    
- Move dcm2nii to a folder in the $PATH, e.g., /usr/local/bin : 
+Move dcm2nii to a folder in the $PATH, e.g., /usr/local/bin:
 
     echo ${PATH}   # does this contain /usr/local/bin ?
     ls /usr/local  # is there a folder called bin inside of /usr/local ? If not: sudo mkdir /usr/local/bin
@@ -109,330 +107,364 @@ Install MRIcroGL on Mac OS X Mountain/Lion:
 -----------------------------------------------------------------
 
 1. Download the [latest version](http://www.mccauslandcenter.sc.edu/mricrogl/).
-# pay attention to downloaded filename: if you already had osx.zip
-# in your Downloads folder from mricrON, this may get called "osx(1).zip" etc.
-cd ~/Downloads
-mkdir mricrogl
-cd mricrogl
-unzip ~/Downloads/osx.zip
-sudo mv mricrogl.app /Applications/
-mv *.nii.gz /Users/Shared/sampleBrainVolumes/mricrogl # or other parent of sample data
-# save the pdf manual somewhere
+NB: pay attention to downloaded filename: if you already had osx.zip in your Downloads folder from mricrON, this mricrogl download may get called "osx(1).zip" etc.
+
+
+    cd ~/Downloads
+    mkdir mricrogl
+    cd mricrogl
+    unzip ~/Downloads/osx.zip
+    sudo mv mricrogl.app /Applications/
+    mv *.nii.gz /Users/Shared/sampleBrainVolumes/mricrogl # or other parent of sample data
+    # save the pdf manual somewhere
 
 
 
-###########################
-#   ImageJ / FIJI
-########################### 
+ImageJ / FIJI
+==================
 
-#-----------------------------------------------------------------
-# Installing FIJI on Mac OS X Mountain/Lion:
-#-----------------------------------------------------------------
+Installing FIJI on Mac OS X Mountain/Lion:
+-----------------------------------------------------------------
 
-# download dmg file from http://fiji.sc/Downloads, then do this:
-cd ~/Downloads
-open fiji-macosx.dmg
-cp -R /Volumes/Fiji/Fiji.app /Applications/
-hdiutil unmount /Volumes/Fiji
-open /Applications/Fiji.app 
-
-# then install imagej plugins (instructions below)
+1. Download the [fiji for macosx dmg](http://fiji.sc/Downloads)
+2. Install:
 
 
-#-----------------------------------------------------------------
-# Installing ImageJ/FIJI on Ubuntu 12.04:
-#-----------------------------------------------------------------
+    cd ~/Downloads
+    open fiji-macosx.dmg
+    cp -R /Volumes/Fiji/Fiji.app /Applications/
+    hdiutil unmount /Volumes/Fiji
+    open /Applications/Fiji.app 
 
-# I'm currently happy with the version in the neurodebian repos:
-sudo apt-get install fiji
-
-# then install imagej plugins (instructions below)
-
-
-#-----------------------------------------------------------------
-# Installing ImageJ plugins:
-#-----------------------------------------------------------------
-
-# Even in 2013 imagej/fiji can't open .nii.gz files without a plugin (though .nii's work).
-# Download and install the plugin from http://rsb.info.nih.gov/ij/plugins/nifti.html :
-cd ~/Downloads
-curl -O http://rsb.info.nih.gov/ij/plugins/download/jars/nifti_io.jar
-cp nifti_io.jar /Applications/Fiji.app/plugins/      # ...for OS X . Adapt for linux.
-
-# Re-open imagej/fiji. Opening nii.gz files should now work (drag & drop, or File->Open).
-# Also should now see five new commands in imagej/fiji:  
-#     File/Import/NIfTI-Analyze, 
-#     File/Save As/Analyze (NIfTI-1), 
-#     File/Save As/NIfTI-1, 
-#     File/Save As/Analyze 7.5 and 
-#     Analyze/Tools/Coordinate Viewer.
+3. Install imagej plugins (instructions below)
 
 
+Installing ImageJ/FIJI on Ubuntu 12.04:
+-----------------------------------------------------------------
 
-###########################
-#   FSL
-###########################
+I'm currently happy with the version in the neurodebian repos:
 
-#-----------------------------------------------------------------
-# Installing FSL on Mac OS X Mountain/Lion:
-#-----------------------------------------------------------------
+    sudo apt-get install fiji
 
-# Before installing FSL, freesurfer, or  AFNI on Mountain/Lion be sure to install XQuartz, 
-# and logout and then back in: (http://xquartz.macosforge.org)
+Then install imagej plugins (instructions below).
+
+
+Installing ImageJ plugins:
+-----------------------------------------------------------------
+
+Even in 2013 imagej/fiji can't open .nii.gz files without a plugin (though .nii's work).
+Download and install the [imagej nifti plugin](http://rsb.info.nih.gov/ij/plugins/nifti.html):
+
+    cd ~/Downloads
+    curl -O http://rsb.info.nih.gov/ij/plugins/download/jars/nifti_io.jar
+    cp nifti_io.jar /Applications/Fiji.app/plugins/      # ...for OS X . Adapt for linux.
+
+* Re-open imagej/fiji. Opening nii.gz files should now work (drag & drop, or File->Open).
+* Also should now see five new commands in imagej/fiji:  
+ * File/Import/NIfTI-Analyze, 
+ * File/Save As/Analyze (NIfTI-1), 
+ * File/Save As/NIfTI-1, 
+ * File/Save As/Analyze 7.5 and 
+ * Analyze/Tools/Coordinate Viewer.
+
+
+
+FSL
+==================
+
+Installing FSL on Mac OS X Mountain/Lion:
+----------------------------------------------------------------
+
+Before installing FSL, freesurfer, or  AFNI on Mountain/Lion be doulbe-sure you have installed [XQuartz](http://xquartz.macosforge.org), and loged out and then back in.
+
+
+Google "FSL install" and [follow instructions](http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation/MacOsX#Downloading_the_install_file_without_installing_the_software)
+
+
+There are multiple ways to install (as of May 2013). I get mixed results with the recommended fslinstaller.py, but I typically use it and then just fix whatever didn't work.
+
+1. Run FSL's installer script in  "download only" mode (about 1-hr):
+
+
+    cd ~/Downloads
+    python fslinstaller.py -o
+
+
+2. Calculate the md5 sum of the downloaded file and use it to launch installation:
+
+
+
+
+    fslDownload=fsl-5.0.2.2-macosx.tar.gz
+    fslDestDir="/usr/local"
+    fslMD5=`md5 ${fslDownload} | awk '{ print $NF}'` 
+    python fslinstaller.py -d ${fslDestDir} -f ${fslDownload} -C ${fslMD5}
+
+
+3. After the install completes, confirm that the file /etc/bashrc received a block of FSL environmental variables (below). If not, the install program may have added it to your personal ~/.profile or ~/.bash_profile instead.
+
+For system-wide installation, remove from those files and append to /etc/bashrc:
+
+    #    WARNING: note the \${escapedVariables} below, which
+    #    are escaped for heredoc (http://goo.gl/j3HMJ). 
+    #    Un-escape them if manually typing into a text editor.
+    #    Otherwise, just paste these lines to your bash prompt
+    #    (up to and including "EOF" line):
+    
+    editDate=`/bin/date +%Y%m%d`
+    editTime=$(date +%k%M)
+    sudo tee -a /etc/bashrc >/dev/null <<EOF
+    #------------------------------------------
+    # on ${editDate} at ${editTime}, $USER 
+    # added some FSL setup:
+    FSLDIR=/usr/local/fsl
+    PATH=\${FSLDIR}/bin:\${PATH}
+    export FSLDIR PATH
+    . \${FSLDIR}/etc/fslconf/fsl.sh
+    #------------------------------------------
+    EOF
+
+    cat /etc/bashrc 
  
-# Google "FSL install" and follow instructions. Currently here:
-# http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation/MacOsX#Downloading_the_install_file_without_installing_the_software
 
-# There are multiple ways to install (as of May 2013). I get mixed results with the recommended fslinstaller.py, but I typically use it and then just fix whatever didn't work.
+Either log out and back in again, or issue this terminal command:
 
-# Run FSL's installer script in  "download only" mode (about 1-hr):
-cd ~/Downloads
-python fslinstaller.py -o
+    . /etc/bashrc
 
-# Calculate the md5 sum of the downloaded file and use it to launch installation:
-fslDownload=fsl-5.0.2.2-macosx.tar.gz
-fslDestDir="/usr/local"
-fslMD5=`md5 ${fslDownload} | awk '{ print $NF}'` 
-python fslinstaller.py -d ${fslDestDir} -f ${fslDownload} -C ${fslMD5}
-
-# After the install completes, confirm that the file /etc/bashrc received a block of FSL environmental variables (below). 
-# If not, the install program may have added it to your personal ~/.profile or ~/.bash_profile instead.
-# For system-wide installation, remove from those files and append to /etc/bashrc:
-
-#    WARNING: note the \${escapedVariables} below, which
-#    are escaped for heredoc (http://goo.gl/j3HMJ). 
-#    Un-escape them if manually typing into a text editor.
-#    Otherwise, just paste these lines to your bash prompt
-#    (up to and including "EOF" line):
-
-editDate=`/bin/date +%Y%m%d`
-editTime=$(date +%k%M)
-sudo tee -a /etc/bashrc >/dev/null <<EOF
-#------------------------------------------
-# on ${editDate} at ${editTime}, $USER 
-# added some FSL setup:
-FSLDIR=/usr/local/fsl
-PATH=\${FSLDIR}/bin:\${PATH}
-export FSLDIR PATH
-. \${FSLDIR}/etc/fslconf/fsl.sh
-#------------------------------------------
-EOF
-
-cat /etc/bashrc 
- 
-# Either log out and back in again, or issue this terminal command:
-. /etc/bashrc
-
-# TEST: did $FSLDIR get exported correctly? This should return "/usr/local/fsl" (no quotes) :
-echo $FSLDIR
-
-# TEST: Does fslview exist in /Applications?
-ls /Applications
-# ...if not create a shortcut like this:
-sudo ln -s /usr/local/fsl/bin/fslview.app /Applications/fslview.app
-
-# TEST: we should be able to open /Applications/fslview.app :
-open /Applications/fslview.app
-
-# TEST: we should be able to open fslview.app from the commandline :
-fslview ${FSLDIR}/data/standard/MNI152_T1_2mm_LR-masked.nii.gz
+TEST: did $FSLDIR get exported correctly? This should return "/usr/local/fsl" (no quotes) :
 
 
-#-----------------------------------------------------------------
-# Installing FSL on Ubuntu 12.04:
-#-----------------------------------------------------------------
+    echo $FSLDIR
 
-# I'm currently happy with the version in the neurodebian repos:
-sudo apt-get install fsl-complete fsl-feeds
-# ...but previous to fsl-completed, you needed to apt-get instal fsl-atlases fsl-feeds fsl-first-data fslview and fsl-feeds?
-# then get instructions for environmental variables (e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
-man fsl
+TEST: Does fslview exist in /Applications?
 
-#-----------------------------------------------------------------
-# Installing FSL on Debian 7.0 Wheezy Neurodebian VM:
-#-----------------------------------------------------------------
 
-# I'm currently happy with the version in the neurodebian repos:
-sudo apt-get install fsl-complete fsl-feeds
-# ...but previous to fsl-completed, you needed to apt-get instal fsl-atlases fsl-feeds fsl-first-data fslview and fsl-feeds?
-# then get instructions for environmental variables (e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
-man fsl
+    ls /Applications
+    # ...if not create a shortcut like this:
+    sudo ln -s /usr/local/fsl/bin/fslview.app /Applications/fslview.app
 
-# After the install completes, confirm that the file /etc/bash.bashrc received a block of FSL environmental variables (below). 
-# If not, the install program may have added it to your personal ~/.profile or ~/.bash_profile instead.
-# For system-wide installation, remove from those files and append to /etc/bash.bashrc:
 
-#    WARNING: note the \${escapedVariables} below, which
-#    are escaped for heredoc (http://goo.gl/j3HMJ). 
-#    Un-escape them if manually typing into a text editor.
-#    Otherwise, just paste these lines to your bash prompt
-#    (up to and including "EOF" line):
+TEST: we should be able to open /Applications/fslview.app from the commandline:
 
-editDate=`/bin/date +%Y%m%d`
-editTime=$(date +%k%M)
-sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
-#------------------------------------------
-# on ${editDate} at ${editTime}, $USER 
-# added some FSL setup:
-. /etc/fsl/5.0/fsl.sh
-#------------------------------------------
-EOF
+     open /Applications/fslview.app
 
-cat /etc/bashrc 
 
-#-----------------------------------------------------------------
-# Install and run FSL test suite ("FEEDS"):
-#-----------------------------------------------------------------
+TEST: we should be able to open fslview.app from the commandline :
 
-# Download FEEDS from FSL (> 270 MB): http://fsl.fmrib.ox.ac.uk/fsldownloads/
-# (on neurodebian download via command "sudo apt-get install fsl-feeds")
-
-# Run FEEDS (http://fsl.fmrib.ox.ac.uk/fsl/feeds/doc/):
-# (on neurodebian, this is all replaced by command fsl-selftest or /usr/bin/time fsl-selftest)
-# 2013 i7 imac: 971.77 real 951.78 user 22.83 sys
-cd ~/Downloads (or where ever you saved your download)
-tar -zxvf fsl-*-feeds.tar.gz
-cd feeds
-/usr/bin/time ./RUN all
+     fslview ${FSLDIR}/data/standard/MNI152_T1_2mm_LR-masked.nii.gz
 
 
 
-###########################
-#   AFNI
-###########################
+Installing FSL on Ubuntu 12.04:
+-----------------------------------------------------------------
 
-#-----------------------------------------------------------------
-# Installing AFNI on Mac OS X Mountain/Lion:
-#-----------------------------------------------------------------
+I am currently happy with the version in the neurodebian repos:
 
-# Before installing FSL, freesurfer, or  AFNI on Mountain/Lion be sure to install XQuartz, 
-# and logout and then back in: (http://xquartz.macosforge.org)
+    sudo apt-get install fsl-complete fsl-feeds
 
-# …then download latest AFNI for Mac, unzip, and move to a reasonable location: 
-cd ~/Downloads
-curl -O http://afni.nimh.nih.gov/pub/dist/tgz/macosx_10.7_Intel_64.tgz
-tar -zxvf macosx_10.7_Intel_64.tgz
-sudo mv macosx_10.7_Intel_64 /usr/local/abin
+...but previous to fsl-completed, you needed to install separate packages:
 
-# Add AFNI's new location to the path in /etc/bashrc :
-#
-#    WARNING: note the \${escapedVariables} below, which
-#    are escaped for heredoc (http://goo.gl/j3HMJ). 
-#    Un-escape them if manually typing into a text editor.
-#    Otherwise, just paste these lines to your bash prompt
-#    (up to and including "EOF" line):
-#
-editDate=`/bin/date +%Y%m%d`
-editTime=$(date +%k%M)
-sudo tee -a /etc/bashrc >/dev/null <<EOF
-#------------------------------------------
-# on ${editDate} at ${editTime}, $USER  
-# added some AFNI environmental variables:
-export PATH=/usr/local/abin:\${PATH}
-export AFNI_ENFORCE_ASPECT=YES
-#------------------------------------------
-EOF
+    sudo apt-get instal fsl-atlases fsl-feeds fsl-first-data fslview and fsl-feeds?
 
-cat /etc/bashrc
+After installation of the packages, get instructions for environmental variables (e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
 
-# Either log out and back in again, or issue this terminal command:
-. /etc/bashrc 
-
-# TEST: Open a new terminal window and test your afni install by issuing the command "afni" (no quotes) to open GUI 
-# make sure AFNI_ENFORCE_ASPECT is working effectively (see below)
-
-
-#-----------------------------------------------------------------
-# Installing AFNI on Ubuntu 12.04:
-#-----------------------------------------------------------------
-
-# I'm currently happy with the version in the neurodebian repos:
-sudo apt-get install afni afni-atlases
-# ...then "man afni" to get instructions for environmental variables
-# (e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
-
-# In the event that the neurodebian version of AFNI is broken/old/whatever
-# you may want to substitute a binary version from outside of neurodebian.
-# Two steps to do that:
-# 1) Download,  unzip, and move to a reasonable destination (not overwriting
-# neurodebian's afni in the process):
-curl -O http://afni.nimh.nih.gov/pub/dist/tgz/linux_xorg7_64.tgz  # (> 600 MB)
-tar -zxvf linux_xorg7_64.tgz
-mv linux_xorg7_64 ~/abin
-# 2) Kill neurodebian's AFNI environmental variables and add
-# this new directory (~/abin in my example) to $PATH (see below)
-
-
-#-----------------------------------------------------------------
-# Installing AFNI on Debian 7.0 Wheezy Neurodebian VM:
-#-----------------------------------------------------------------
-
-# I'm currently happy with the version in the neurodebian repos:
-sudo apt-get install afni afni-atlases
-# ...then "man afni" to get instructions for environmental variables
-# (e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
-
-# For system-wide install, source the AFNI config file from /etc/afni/afni.sh :
-#
-#    WARNING: note the \${escapedVariables} below, which
-#    are escaped for heredoc (http://goo.gl/j3HMJ). 
-#    Un-escape them if manually typing into a text editor.
-#    Otherwise, just paste these lines to your bash prompt
-#    (up to and including "EOF" line):
-#
-editDate=`/bin/date +%Y%m%d`
-editTime=$(date +%k%M)
-sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
-#------------------------------------------
-# on ${editDate} at ${editTime}, $USER  
-# added some AFNI environmental variables:
-. /etc/afni/afni.sh
-#------------------------------------------
-EOF
-
-cat /etc/bashrc
-
-
-#-----------------------------------------------------------------
-# Checking and Setting env variable AFNI_ENFORCE_ASPECT :
-#-----------------------------------------------------------------
-
-# In some environments the AFNI GUI allows you to accidentally distort image 
-# aspect ratio by resizing an image window. Not good, but avoidable:
-
-# First here's a reminder of how to read and set AFNI environmental variables:
-afni -help | grep Vname
-afni -help | grep Dname
-
-# If the following command returns no output, the variable AFNI_ENFORCE_ASPECT isn't set
-# [sic: yes, this command should end with "=" as written here:]
-afni -VAFNI_ENFORCE_ASPECT= 
-
-# To set AFNI_ENFORCE_ASPECT on a per-execution basis, can launch the afni GUI with:
-afni -DAFNI_ENFORCE_ASPECT=YES
-
-
-#-----------------------------------------------------------------
-# Unsetting AFNI environmental variables:
-#-----------------------------------------------------------------
-
-# Sometimes you need to clear AFNI-related environmental variables, for example 
-# if Neurodebian is installed but you need to temporarily use AFNI installed in a user-space directory:
-unset `env | awk -F= '/AFNI/ ${print $1}' | xargs`
-
-# ...this would probably be followed by listing your local user-space afni directory 
-# earlier in the path than the system-wide afni directory, for example:
-export PATH=~/abin:${PATH}
-
-# ...and then check that the "right" AFNI will run:
-which afni
-which 3dinfo
+    man fsl
 
 
 
-###########################
-#  BXH/XCEDE FBIRN TOOLS
-###########################
+Installing FSL on Debian 7.0 Wheezy Neurodebian VM:
+------------------------------------------------------------
+
+I am currently happy with the version in the neurodebian repos:
+
+    sudo apt-get install fsl-complete fsl-feeds
+
+...but previous to fsl-completed, you needed to apt-get install separate packages:
+
+    sudo apt-get install fsl-atlases fsl-feeds fsl-first-data fslview and fsl-feeds
+    
+After installation of the packages, get instructions for environmental variables (e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
+
+    man fsl
+
+After the install completes, confirm whether the file /etc/bash.bashrc received a block of FSL environmental variables (below). If not, the install program may have added it to your personal ~/.profile or ~/.bash_profile instead. For system-wide installation, remove from those files and append to /etc/bash.bashrc:
+
+    #    WARNING: note the \${escapedVariables} below, which
+    #    are escaped for heredoc (http://goo.gl/j3HMJ). 
+    #    Un-escape them if manually typing into a text editor.
+    #    Otherwise, just paste these lines to your bash prompt
+    #    (up to and including "EOF" line):
+    
+    editDate=`/bin/date +%Y%m%d`
+    editTime=$(date +%k%M)
+    sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
+    #------------------------------------------
+    # on ${editDate} at ${editTime}, $USER 
+    # added some FSL setup:
+    . /etc/fsl/5.0/fsl.sh
+    #------------------------------------------
+    EOF
+
+    cat /etc/bashrc 
+
+
+
+Install and run FSL test suite ("FEEDS"):
+---------------------------------------------------------------
+
+Download [FEEDS from FSL > 270 MB](http://fsl.fmrib.ox.ac.uk/fsldownloads/)
+OR neurodebian can download via command:
+
+    sudo apt-get install fsl-feeds
+
+[Run FEEDS](http://fsl.fmrib.ox.ac.uk/fsl/feeds/doc/):
+
+    # (on neurodebian, this is all replaced by command fsl-selftest or /usr/bin/time fsl-selftest)
+    # 2013 i7 imac: 971.77 real 951.78 user 22.83 sys
+    cd ~/Downloads (or where ever you saved your download)
+    tar -zxvf fsl-*-feeds.tar.gz
+    cd feeds
+    /usr/bin/time ./RUN all
+
+
+
+AFNI
+==========
+
+Installing AFNI on Mac OS X Mountain/Lion:
+------------------------------------------------------------
+
+Before installing FSL, freesurfer, or  AFNI on Mountain/Lion be sure to install [XQuartz](http://xquartz.macosforge.org), and logout and then back in. 
+
+Then download latest AFNI for Mac, unzip, and move to a reasonable location: 
+
+    cd ~/Downloads
+    curl -O http://afni.nimh.nih.gov/pub/dist/tgz/macosx_10.7_Intel_64.tgz
+    tar -zxvf macosx_10.7_Intel_64.tgz
+    sudo mv macosx_10.7_Intel_64 /usr/local/abin
+
+Add AFNI's new location to the path in /etc/bashrc :
+
+    #    WARNING: note the \${escapedVariables} below, which
+    #    are escaped for heredoc (http://goo.gl/j3HMJ). 
+    #    Un-escape them if manually typing into a text editor.
+    #    Otherwise, just paste these lines to your bash prompt
+    #    (up to and including "EOF" line):
+    #
+    editDate=`/bin/date +%Y%m%d`
+    editTime=$(date +%k%M)
+    sudo tee -a /etc/bashrc >/dev/null <<EOF
+    #------------------------------------------
+    # on ${editDate} at ${editTime}, $USER  
+    # added some AFNI environmental variables:
+    export PATH=/usr/local/abin:\${PATH}
+    export AFNI_ENFORCE_ASPECT=YES
+    #------------------------------------------
+    EOF
+    
+    cat /etc/bashrc
+
+Either log out and back in again, or issue this terminal command:
+
+    . /etc/bashrc 
+
+TEST: Open a new terminal window and test your afni install by issuing the command "afni" (no quotes) to open GUI. Confirm whether AFNI_ENFORCE_ASPECT is working effectively (see below)
+
+
+
+Installing AFNI on Ubuntu 12.04:
+-----------------------------------------------------------------
+
+I'm currently happy with the version in the neurodebian repos:
+
+    sudo apt-get install afni afni-atlases
+
+...then "man afni" to get instructions for environmental variables (e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
+
+In the event that the neurodebian version of AFNI is broken/old/whatever you may want to substitute a binary version from outside of neurodebian. Two steps to do that:
+1. Download,  unzip, and move to a reasonable destination (not overwriting neurodebian's afni in the process):
+
+
+    curl -O http://afni.nimh.nih.gov/pub/dist/tgz/linux_xorg7_64.tgz  # (> 600 MB)
+    tar -zxvf linux_xorg7_64.tgz
+    mv linux_xorg7_64 ~/abin
+
+2. Kill neurodebian's AFNI environmental variables and add this new directory (~/abin in my example above) to $PATH (see below)
+
+
+Installing AFNI on Debian 7.0 Wheezy Neurodebian VM:
+---------------------------------------------------------------
+
+I'm currently happy with the version in the neurodebian repos:
+
+    sudo apt-get install afni afni-atlases
+
+...then "man afni" to get instructions for environmental variables
+(e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
+
+    # For system-wide install, source the AFNI config file from /etc/afni/afni.sh :
+    #
+    #    WARNING: note the \${escapedVariables} below, which
+    #    are escaped for heredoc (http://goo.gl/j3HMJ). 
+    #    Un-escape them if manually typing into a text editor.
+    #    Otherwise, just paste these lines to your bash prompt
+    #    (up to and including "EOF" line):
+    #
+    editDate=`/bin/date +%Y%m%d`
+    editTime=$(date +%k%M)
+    sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
+    #------------------------------------------
+    # on ${editDate} at ${editTime}, $USER  
+    # added some AFNI environmental variables:
+    . /etc/afni/afni.sh
+    #------------------------------------------
+    EOF
+
+    cat /etc/bashrc
+
+
+Checking and Setting env variable AFNI_ENFORCE_ASPECT :
+---------------------------------------------------------------
+
+In some environments the AFNI GUI allows you to accidentally distort image aspect ratio by resizing an image window. Not good, but avoidable:
+
+First here's a reminder of how to read and set AFNI environmental variables:
+
+    afni -help | grep Vname
+    afni -help | grep Dname
+
+If the following command returns no output, the variable AFNI_ENFORCE_ASPECT isn't set [sic: yes, this command should end with "=" as written here:]
+
+    afni -VAFNI_ENFORCE_ASPECT= 
+
+To set AFNI_ENFORCE_ASPECT on a per-execution basis, can launch the afni GUI with:
+
+    afni -DAFNI_ENFORCE_ASPECT=YES
+
+
+Unsetting AFNI environmental variables:
+----------------------------------------------------------
+
+Sometimes you need to clear AFNI-related environmental variables, for example 
+if Neurodebian is installed but you need to temporarily use AFNI installed in a user-space directory:
+
+    unset `env | awk -F= '/AFNI/ ${print $1}' | xargs`
+
+...this would probably be followed by listing your local user-space afni directory 
+earlier in the path than the system-wide afni directory, for example:
+
+    export PATH=~/abin:${PATH}
+
+...and then check that the "right" AFNI will run:
+
+    which afni
+    which 3dinfo
+
+
+
+
+BXH/XCEDE FBIRN TOOLS
+=======================
 
 #-----------------------------------------------------------------
 # Installing BXH/XCEDE tools on Mac OS X Mountain/Lion:
