@@ -28,7 +28,7 @@ elif [ "${storage}" = "remote" ]; then
 	nameOfStorage=local.${hostname}
 	nameOfStorage=remoteHippostoreNFS
 fi
-image=${imageRootDir}/data/standard/MNI152_T1_1mm_brain.nii.gz
+image=${imageDir}/MNI152_T1_1mm_brain.nii.gz
 resultNonzeroEntropy=`fslstats ${image} -E`
  
 # assemble header row and corresponding data row:
