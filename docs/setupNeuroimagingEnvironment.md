@@ -63,7 +63,6 @@ I'm currently happy with the version in the neurodebian repos:
 
 
 
-
 MRIcron
 ==============================
 
@@ -72,19 +71,23 @@ Install MRIcron on Mac OS X Mountain/Lion:
 --------------------------------------------------------------
 
 1. Download latest [MRIcron binary](http://www.nitrc.org/projects/mricron) (probably called "MRIcron [month]/[year] osx.zip")
+
 2. Unzip the downloaded file (which currently produces a folder called osx).
+
 3. Install:
 
+     ```
+     cd ~/Downloads/osx/
+     mv mricron.app dcm2niigui.app npm.app /Applications/
+     ```
 
-    cd ~/Downloads/osx/
-    mv mricron.app dcm2niigui.app npm.app /Applications/
-    
-Move dcm2nii to a folder in the $PATH, e.g., /usr/local/bin:
+4. Move dcm2nii to a folder in the $PATH, e.g., /usr/local/bin:
 
+    ```
     echo ${PATH}   # does this contain /usr/local/bin ?
     ls /usr/local  # is there a folder called bin inside of /usr/local ? If not: sudo mkdir /usr/local/bin
     sudo mv ~/Downloads/osx/dcm2nii /usr/local/bin/
-
+    ```
 
 Install MRIcron on Neurodebian (Ubuntu or Debian)
 -----------------------------------------------------------------
@@ -113,13 +116,14 @@ NB: pay attention to downloaded filename: if you already had osx.zip in your Dow
 
 2. Unzip and install it: 
 
-
+    ```
     cd ~/Downloads
     mkdir mricrogl
     cd mricrogl
     unzip ~/Downloads/osx.zip
     sudo mv mricrogl.app /Applications/
     mv *.nii.gz /Users/Shared/sampleBrainVolumes/mricrogl # or other parent of sample data
+    ```
 
 3. Save the pdf manual somewhere handy.
 
@@ -132,15 +136,17 @@ Install FIJI on Mac OS X Mountain/Lion:
 -----------------------------------------------------------------
 
 1. Download the [fiji for macosx dmg](http://fiji.sc/Downloads)
+
 2. Install:
 
-
+    ```
     cd ~/Downloads
     open fiji-macosx.dmg
     cp -R /Volumes/Fiji/Fiji.app /Applications/
     hdiutil unmount /Volumes/Fiji
     open /Applications/Fiji.app 
-
+    ```
+    
 3. Install imagej plugins (instructions below)
 
 
@@ -190,21 +196,19 @@ There are multiple ways to install (as of May 2013). I get mixed results with th
 
 1. Run FSL's installer script in  "download only" mode (about 1-hr):
 
-
+    ```
     cd ~/Downloads
     python fslinstaller.py -o
-
+    ```
 
 2. Calculate the md5 sum of the downloaded file and use it to launch installation:
 
-
-
-
+    ```
     fslDownload=fsl-5.0.2.2-macosx.tar.gz
     fslDestDir="/usr/local"
     fslMD5=`md5 ${fslDownload} | awk '{ print $NF}'` 
     python fslinstaller.py -d ${fslDestDir} -f ${fslDownload} -C ${fslMD5}
-
+    ```
 
 3. After the install completes, confirm that the file /etc/bashrc received a block of FSL environmental variables (below). If not, the install program may have added it to your personal ~/.profile or ~/.bash_profile instead.
 
