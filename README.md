@@ -25,7 +25,7 @@ Please consider all code proof-of-concept-dangerous, and test thoroughly
 **in a safe environment.** 
 
 1. Install [this basic set of system utilities.](https://github.com/stowler/stowlerGeneralComputing/blob/master/docs/setupBasicScriptingEnvironment.md#setupbasicscriptingenvironmentmd)
-2. Install FSL, AFNI, and BXH/XCEDE. You may want to refer to [my instructions.](https://gist.github.com/stowler/5544473)
+2. Install FSL, AFNI, and BXH/XCEDE. You may want to refer to [my instructions.](https://github.com/stowler/brainwhere/blob/master/docs/setupNeuroimagingEnvironment.md#setupneuroimagingenvironmentmd)
 3. Install the brainwhere repository by cloning it with git:
 
 (It is safer to paste these into your terminal line-by-line rather than as a block:)
