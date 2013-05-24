@@ -24,9 +24,9 @@ This document describes how to deploy these resources in the three computing env
 * Neurodebian on Ubuntu 12.04 on 64-bit processors
 * Neurodebian VM, running Debian 7.0 wheezy 32-bit on VirtualBox
 
-[This basic set of system utilities](https://github.com/stowler/stowlerGeneralComputing/blob/master/docs/setupBasicScriptingEnvironment.md#setupbasicscriptingenvironmentmd) must be installed prior to following these instructions.
+[This basic set of system utilities](http://goo.gl/ncbZD) must be installed prior to following these instructions.
 
-Once these neuroimaging packages have been installed and tested you could also follow [these instructions](https://github.com/stowler/brainwhere/blob/master/README.md#brainwhere) to install my personal repository of neuroimaging scripts.
+Once these neuroimaging packages have been installed and tested you could also follow [these instructions](http://goo.gl/gwZCv) to install my personal repository of neuroimaging scripts.
 
 
 Neurodebian Virtual Machine (VM)
