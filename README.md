@@ -1,7 +1,7 @@
 brainwhere
 ==========
 
-**brainwhere: a repository for my brain MRI development work**
+**brainwhere: a repository for my neuroimaging scripts and resources**
 - It's mostly bash scripts. 
 - Heavy lifting by FSL, AFNI, FREESURFER, FBIRN.
 - Two goals: make the science, support my training of new imagers.
