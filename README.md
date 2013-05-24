@@ -6,16 +6,18 @@ brainwhere
 - Heavy lifting by FSL, AFNI, FREESURFER, FBIRN.
 - Two goals: make the science, support my training of new imagers.
 
-This isn't formal enough for numbered releases, but I am maintaining two branches:
+
+## STATUS:
+*May 2013:* final porting to github. Before June 3 the master branch will become stable, with broken daily development isolated in a dev branch. 
+
+
+
+This codebase isn't formal enough for numbered releases, but I am maintaining two branches:
 - **master**, which passes weekly testing on my local platforms:
 	- OS X Mountain Lion + MacPorts
 	- Neurodebian on Ubuntu 12.04 on 64-bit processors
 	- Neurodebian VM, running Debian 7.0 wheezy 32-bit on VirtualBox
 - **dev**, where I make and break things daily
-
-## STATUS:
-- May 2013: final porting to github
-  - 20130522: everything in master branch for about one more week, maybe less
 
 ## INSTALLATION:
 
@@ -24,9 +26,9 @@ but with attribution you are welcome to use this for non-clinical purposes.
 Please consider all code proof-of-concept-dangerous, and test thoroughly 
 **in a safe environment.** 
 
-1. Install [this basic set of system utilities.](https://github.com/stowler/stowlerGeneralComputing/blob/master/docs/setupBasicScriptingEnvironment.md#setupbasicscriptingenvironmentmd)
-2. Install FSL, AFNI, and BXH/XCEDE. You may want to refer to [my instructions.](https://github.com/stowler/brainwhere/blob/master/docs/setupNeuroimagingEnvironment.md#setupneuroimagingenvironmentmd)
-3. Install the brainwhere repository by cloning it with git:
+1. Install [this basic set of system utilities.](http://goo.gl/ncbZD)
+2. Install FSL, AFNI, and BXH/XCEDE. You may want to refer to [my instructions.](http://goo.gl/BAEH2)
+3. Install the brainwhere repository by cloning it with git. Install instrutions:
 
 (It is safer to paste these into your terminal line-by-line rather than as a block:)
 
