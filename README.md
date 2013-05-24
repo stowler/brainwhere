@@ -28,7 +28,7 @@ Please consider all code proof-of-concept-dangerous, and test thoroughly
 
 1. Install [this basic set of system utilities.](http://goo.gl/ncbZD)
 2. Install FSL, AFNI, and BXH/XCEDE. You may want to refer to [my instructions.](http://goo.gl/BAEH2)
-3. Install the brainwhere repository by cloning it with git. Install instrutions:
+3. Install the brainwhere repository by cloning it with git. Here's how:
 
 (It is safer to paste these into your terminal line-by-line rather than as a block:)
 
