@@ -387,17 +387,19 @@ I'm currently happy with the version in the neurodebian repos:
 
 ...then "man afni" to get instructions for environmental variables (e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
 
-In the event that the neurodebian version of AFNI is broken/old/whatever you may want to substitute a binary version from outside of neurodebian. Two steps to do that:
+In the event that the Neurodebian version of AFNI is broken/old/whatever 
+you may want to substitute a binary version from outside of Neurodebian. Two steps to do that:
 
 
-1. Download,  unzip, and move to a reasonable destination (not overwriting neurodebian's afni in the process):
+1. Download,  unzip, and move to a reasonable destination (not overwriting Neurodebian's AFNI in the process):
 
-
+    ```
     curl -O http://afni.nimh.nih.gov/pub/dist/tgz/linux_xorg7_64.tgz  # (> 600 MB)
-    tar -zxvf linux_xorg7_64.tgz
-    mv linux_xorg7_64 ~/abin
-
-2. Kill neurodebian's AFNI environmental variables and add this new directory (~/abin in my example above) to $PATH (see below)
+    tar -zxvf linux_xorg7_64.tgz    # ...results in directory called linux_xorg7_64
+    mv linux_xorg7_64 /opt/abin     # ...simultaneous move and rename of directory
+    ```
+    
+2. Kill Neurodebian's AFNI environmental variables and add this new directory to $PATH (see below)
 
 
 Installing AFNI on Debian 7.0 Wheezy Neurodebian VM:
@@ -454,20 +456,28 @@ Unsetting AFNI environmental variables:
 ----------------------------------------------------------
 
 Sometimes you need to clear AFNI-related environmental variables, for example 
-if Neurodebian is installed but you need to temporarily use AFNI installed in a user-space directory:
+if Neurodebian is installed but you need to temporarily use a more up-to-date version of AFNI:
 
+1. Unset current AFNI environmental variables:
+
+    ```
     unset `env | awk -F= '/AFNI/ ${print $1}' | xargs`
+    ```
+    
+2. Prepend this new AFNI directory to your ${PATH}, so that its program are found before the programs from the old versio of AFNI:
 
-...this would probably be followed by listing your local user-space afni directory 
-earlier in the path than the system-wide afni directory, for example:
+    ```
+    export PATH=/opt/abin:${PATH}
+    ```
+    
+3. TEST: check that the "right" AFNI will run:
 
-    export PATH=~/abin:${PATH}
-
-...and then check that the "right" AFNI will run:
-
+    ```
     which afni
     which 3dinfo
-
+    ```
+    
+ 4. Comment out any of the existing AFNI lines in the /etc/bashrc or /etc/bash.bashrc, and add the new location so that it can continue to be found after logging out and back in again.
 
 
 
@@ -484,21 +494,21 @@ I wrote an installation script that [describes the problem](http://goo.gl/Nalzn)
 
 1. Follow the steps in [my workaround install script](http://goo.gl/9Rd6V), then confirm the changes to /etc/bashrc:
 
-
+      ```
       cat /etc/bashrc
+      ```
       
-
 2. Either log out and back in again, or issue this terminal command:
 
-
+     ```
      . /etc/bashrc
-     
+     ```
 
 3. TEST: did $BXHDIR get exported correctly? This should return a listing of bxh programs :
 
-
+      ```
       ls $BXHDIR
-      
+      ```
 
 
 Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
@@ -506,13 +516,14 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
 
 1. manualy download most recent bxh/xcede release from nitrc: http://www.nitrc.org/projects/bxh_xcede_tools
 
-
+     ```
      $ ls -l ~/Downloads/bxh_xcede_tools-*.tgz
      bxh_xcede_tools-1.10.7-lsb31.i386.tgz
- 
+     ```
+     
 2. unpack and install bxh/xcede:
 
-
+     ```
      # ...first declare the bxh version as it appears in the download filename:
      bxhVersion=1.10.7
      
@@ -521,10 +532,11 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
      tar -zxvf bxh_xcede_tools-${bxhVersion}-lsb31.i386.tgz
      sudo mv bxh_xcede_tools-${bxhVersion}-lsb31.i386 /opt/
      sudo ln -s /opt/bxh_xcede_tools-${bxhVersion}-lsb31.i386 /opt/bxh
+     ```
+     
+3. For system-wide access, configure the environment via /etc/bash.bashrc :
 
-3. for system-wide access, configure the environment via /etc/bash.bashrc :
-
-
+     ```
      #    WARNING: note the \${escapedVariables} below, which
      #    are escaped for heredoc (http://goo.gl/j3HMJ). 
      #    Un-escape them if manually typing into a text editor.
@@ -542,23 +554,24 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
      export BXHDIR PATH
      #------------------------------------------
      EOF
+     ```
 
 4. Either log out and back in again, or issue this terminal command:
 
-
+     ```
      . /etc/bashrc
-
+     ```
+     
 5. TEST: did $BXHDIR get exported correctly? This should return a listing of bxh programs :
 
-
+      ```
       ls $BXHDIR
-
-
-
-###########################
-#  FreeSurfer
-#  WARNINING: Stable 5.2 release WITHDRAWN awaiting upcoming version 5.3
-###########################
+      ```
+      
+      
+FreeSurfer
+===============
+(WARNINING: Stable 5.2 release WITHDRAWN awaiting upcoming version 5.3)
 
 If you haven't done so already, obtain a license, and copy the .license file to your 
 $FREESURFER_HOME directory per https://surfer.nmr.mgh.harvard.edu/registration.html
@@ -572,7 +585,7 @@ and FSL (b/c FS's install will detect location of FSL).
 
 2. [Download](http://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall) latest .dmg from the Freesurfer Wiki. This can also be done from the commandline instead of the webpage:
 
-
+      ```
       fsFtpDir="ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/5.2.0"
       fsFtpFilename="freesurfer-Darwin-lion-stable-pub-v5.2.0.dmg"
       cd ~/Downloads
@@ -580,10 +593,11 @@ and FSL (b/c FS's install will detect location of FSL).
      
       # …and to resume a failed download:
       curl -C - -o ${fsFtpFilename} ${fsFtpDir}/${fsFtpFilename}
-
+      ```
+      
 3. Confirm that the download is valid:
 
-
+     ```
      sh <<EOF
      curl -s -o freesurfer_md5sums.txt http://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/md5sum.txt
      echo ""
@@ -596,14 +610,15 @@ and FSL (b/c FS's install will detect location of FSL).
      echo "(re-download if they don't match)"
      echo ""
      EOF
+     ```
  
-2. Doubleclick on the .dmg and run the .pkg installation file found inside of it. 
+4. Doubleclick on the .dmg and run the .pkg installation file found inside of it. 
    [Detailed instructions](http://surfer.nmr.mgh.harvard.edu/fswiki/Installation) are available if you want them.
    (Note the folder that this installs to, likely /Applications/freesurfer, which you will assign to $FREESURFER_HOME below.)
 
-3. add post-install config to /etc/bashrc per the bash section of the freesurfer [documentation](http://surfer.nmr.mgh.harvard.edu/fswiki/SetupConfiguration) :
+5. add post-install config to /etc/bashrc per the bash section of the freesurfer [documentation](http://surfer.nmr.mgh.harvard.edu/fswiki/SetupConfiguration) :
 
-
+     ```
      #
      #    WARNING: note the \${escapedVariables} below, which
      #    are escaped for heredoc (http://goo.gl/j3HMJ). 
@@ -623,25 +638,26 @@ and FSL (b/c FS's install will detect location of FSL).
      EOF
      
      cat /etc/bashrc 
+     ```
 
 4. Copy the sample data to a place where users can write to it:
 
-
+     ```
      cp -a $SUBJECTS_DIR /Users/Shared/fs_sampleSubjects
+     ```
 
 5. Edit ${FREESURFER_HOME}/SetUpFreeSurfer.sh to reflect the change in $SUBJECTS_DIR, then
    either log out and back in again, or issue this terminal command:
 
-
-       . /etc/bashrc 
- 
- 
+     ```
+     . /etc/bashrc 
+     ```
  
 6. TEST: open a new terminal window. You should see a number of freesurfer-related lines at the top of the new terminal window, and all the terminal windows you open after that.
 
 7. TESTS: Test your installation by issuing the test commands detailed on the [Testing Freesurfer webpage](http://surfer.nmr.mgh.harvard.edu/fswiki/TestingFreeSurfer ).
 
-
+      ```
       # TEST freeview:
       freeview \
       -v $SUBJECTS_DIR/bert/mri/norm.mgz \
@@ -666,6 +682,7 @@ and FSL (b/c FS's install will detect location of FSL).
       #     recon-all -s bert finished without error at Mon May  6 00:52:13 EDT 2013
       #     22032.75 real     21947.85 user        60.84 sys
       recon-all -s bert -all 
+      ```
 
 
 
@@ -677,7 +694,7 @@ Installing FreeSurfer on Ubuntu 12.04 :
 
 2. This can also be done from the commandline instead of the webpage:
 
-
+      ```
       fsFtpDir="ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/5.2.0"
       fsFtpFilename="freesurfer-Linux-centos4_x86_64-stable-pub-v5.2.0.tar.gz"
       cd ~/Downloads
@@ -685,10 +702,11 @@ Installing FreeSurfer on Ubuntu 12.04 :
         
       # …and to resume a failed download:
       curl -C - -o ${fsFtpFilename} ${fsFtpDir}/${fsFtpFilename}
+      ```
  
 3. Confirm that the download is valid:
 
-
+      ```
       sh <<EOF
       curl -s -o freesurfer_md5sums.txt http://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/md5sum.txt
       echo ""
@@ -701,6 +719,7 @@ Installing FreeSurfer on Ubuntu 12.04 :
       echo "(re-download if they don't match)"
       echo ""
       EOF
+      ```
 
 
 
