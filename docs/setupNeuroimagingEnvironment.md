@@ -1,29 +1,30 @@
 setupNeuroimagingEnvironment.md
 ==========
 
-All of my scripts and documentation assume that these neuroimaging resources have been installed. For each package I cover the three computing environments I currently use:
+stowler@gmail.com
+updated: 20130524
+
+
+My neuroimaging scripts and documentation refer to these open-source neuroimaging resources:
+
+* neurodebian virtual machine
+* fsl
+* afni
+* BXH/XCEDE tools (from FBIRN)
+* freesurfer
+* itksnap
+* mricron
+* mricrogl
+* imagej/fiji
+* spm
+
+This document describes how to deploy these resources in the three computing environments I currently use:
 
 * OS X Mountain Lion + MacPorts
 * Neurodebian on Ubuntu 12.04 on 64-bit processors
 * Neurodebian VM, running Debian 7.0 wheezy 32-bit on VirtualBox
 
-Software covered:
-
-* neurodebian virtual machine
-* itksnap
-* mricron
-* mricrogl
-* imagej/fiji
-* fsl
-* afni
-* BXH/XCEDE tools (from FBIRN)
-* freesurfer
-* spm
- 
-
-stowler@gmail.com
-updated: 20130523
-
+[This basic set of system utilities](https://github.com/stowler/stowlerGeneralComputing/blob/master/docs/setupBasicScriptingEnvironment.md#setupbasicscriptingenvironmentmd) must be installed prior to following these instructions.
 
 
 
@@ -40,143 +41,6 @@ Neurodebian Virtual Machine (VM)
 3. Follow the neurodebian [install instructions](http://neuro.debian.net/vm.html#chap-vm), which they support with a [youtube video](http://www.youtube.com/watch?v=eqfjKV5XaTE).
 
 4. Boot up the new virtual machine. Don't bother to select any new packages from the point-and-click wizard that autoruns.
-
-
-
-ITK-SNAP
-====================
-
-Install the ITK-SNAP binary on OS X Mountain/Lion:
------------------------------------------------------------------
-
-Download latest version from the [ITK-SNAP Downloads page](http://www.itksnap.org/pmwiki/pmwiki.php?n=Main.Downloads).
-* Choose "MacOS Binary (Intel, 64 bit, OSX 10.5+)"
-* Drag the resulting ITK-SNAP.app to /Applications folder
-
-
-Install the ITK-SNAP binary on Ubuntu 12.04:
------------------------------------------------------------------
-
-I'm currently happy with the version in the neurodebian repos:
-
-    sudo apt-get install itksnap
-
-
-
-MRIcron
-==============================
-
-
-Install MRIcron on Mac OS X Mountain/Lion:
---------------------------------------------------------------
-
-1. Download latest [MRIcron binary](http://www.nitrc.org/projects/mricron) (probably called "MRIcron [month]/[year] osx.zip")
-
-2. Unzip the downloaded file (which currently produces a folder called osx).
-
-3. Install:
-
-     ```
-     cd ~/Downloads/osx/
-     mv mricron.app dcm2niigui.app npm.app /Applications/
-     ```
-
-4. Move dcm2nii to a folder in the $PATH, e.g., /usr/local/bin:
-
-    ```
-    echo ${PATH}   # does this contain /usr/local/bin ?
-    ls /usr/local  # is there a folder called bin inside of /usr/local ? If not: sudo mkdir /usr/local/bin
-    sudo mv ~/Downloads/osx/dcm2nii /usr/local/bin/
-    ```
-
-Install MRIcron on Neurodebian (Ubuntu or Debian)
------------------------------------------------------------------
-
-I'm currently happy with the version in the neurodebian repos:
-
-    sudo apt-get install mricron mricron-data mricron-doc
-
-Remember that preferences are stored here if you would like to edit them:
-
-    ~/.dcm2niigui/dcm2niigui.ini
-    ~/.dcm2nii/dcm2nii.ini
-
-
-
-
-MRIcroGL
-===============
-
-
-Install MRIcroGL on Mac OS X Mountain/Lion:
------------------------------------------------------------------
-
-1. Download the [latest version](http://www.mccauslandcenter.sc.edu/mricrogl/).
-NB: pay attention to downloaded filename: if you already had osx.zip in your Downloads folder from mricrON, this mricrogl download may get called "osx(1).zip" etc.
-
-2. Unzip and install it: 
-
-    ```
-    cd ~/Downloads
-    mkdir mricrogl
-    cd mricrogl
-    unzip ~/Downloads/osx.zip
-    sudo mv mricrogl.app /Applications/
-    mv *.nii.gz /Users/Shared/sampleBrainVolumes/mricrogl # or other parent of sample data
-    ```
-
-3. Save the pdf manual somewhere handy.
-
-
-
-ImageJ / FIJI
-==================
-
-Install FIJI on Mac OS X Mountain/Lion:
------------------------------------------------------------------
-
-1. Download the [fiji for macosx dmg](http://fiji.sc/Downloads)
-
-2. Install:
-
-    ```
-    cd ~/Downloads
-    open fiji-macosx.dmg
-    cp -R /Volumes/Fiji/Fiji.app /Applications/
-    hdiutil unmount /Volumes/Fiji
-    open /Applications/Fiji.app 
-    ```
-    
-3. Install imagej plugins (instructions below)
-
-
-Install ImageJ/FIJI on Ubuntu 12.04:
------------------------------------------------------------------
-
-I'm currently happy with the version in the neurodebian repos:
-
-    sudo apt-get install fiji
-
-Then install imagej plugins (instructions below).
-
-
-Install ImageJ plugins:
------------------------------------------------------------------
-
-Even in 2013 imagej/fiji can't open .nii.gz files without a plugin (though .nii's work).
-Download and install the [imagej nifti plugin](http://rsb.info.nih.gov/ij/plugins/nifti.html):
-
-    cd ~/Downloads
-    curl -O http://rsb.info.nih.gov/ij/plugins/download/jars/nifti_io.jar
-    cp nifti_io.jar /Applications/Fiji.app/plugins/      # ...for OS X . Adapt for linux.
-
-* Re-open imagej/fiji. Opening nii.gz files should now work (drag & drop, or File->Open).
-* Also should now see five new commands in imagej/fiji:  
- * File/Import/NIfTI-Analyze, 
- * File/Save As/Analyze (NIfTI-1), 
- * File/Save As/NIfTI-1, 
- * File/Save As/Analyze 7.5 and 
- * Analyze/Tools/Coordinate Viewer.
 
 
 
@@ -480,7 +344,6 @@ if Neurodebian is installed but you need to temporarily use a more up-to-date ve
  4. Comment out any of the existing AFNI lines in the /etc/bashrc or /etc/bash.bashrc, and add the new location so that it can continue to be found after logging out and back in again.
 
 
-
 BXH/XCEDE FBIRN TOOLS
 =======================
 
@@ -567,8 +430,7 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
       ```
       ls $BXHDIR
       ```
-      
-      
+
 FreeSurfer
 ===============
 (WARNINING: Stable 5.2 release WITHDRAWN awaiting upcoming version 5.3)
@@ -720,6 +582,142 @@ Installing FreeSurfer on Ubuntu 12.04 :
       echo ""
       EOF
       ```
+
+ITK-SNAP
+====================
+
+Install the ITK-SNAP binary on OS X Mountain/Lion:
+-----------------------------------------------------------------
+
+Download latest version from the [ITK-SNAP Downloads page](http://www.itksnap.org/pmwiki/pmwiki.php?n=Main.Downloads).
+* Choose "MacOS Binary (Intel, 64 bit, OSX 10.5+)"
+* Drag the resulting ITK-SNAP.app to /Applications folder
+
+
+Install the ITK-SNAP binary on Ubuntu 12.04:
+-----------------------------------------------------------------
+
+I'm currently happy with the version in the neurodebian repos:
+
+    sudo apt-get install itksnap
+
+
+
+MRIcron
+==============================
+
+
+Install MRIcron on Mac OS X Mountain/Lion:
+--------------------------------------------------------------
+
+1. Download latest [MRIcron binary](http://www.nitrc.org/projects/mricron) (probably called "MRIcron [month]/[year] osx.zip")
+
+2. Unzip the downloaded file (which currently produces a folder called osx).
+
+3. Install:
+
+     ```
+     cd ~/Downloads/osx/
+     mv mricron.app dcm2niigui.app npm.app /Applications/
+     ```
+
+4. Move dcm2nii to a folder in the $PATH, e.g., /usr/local/bin:
+
+    ```
+    echo ${PATH}   # does this contain /usr/local/bin ?
+    ls /usr/local  # is there a folder called bin inside of /usr/local ? If not: sudo mkdir /usr/local/bin
+    sudo mv ~/Downloads/osx/dcm2nii /usr/local/bin/
+    ```
+
+Install MRIcron on Neurodebian (Ubuntu or Debian)
+-----------------------------------------------------------------
+
+I'm currently happy with the version in the neurodebian repos:
+
+    sudo apt-get install mricron mricron-data mricron-doc
+
+Remember that preferences are stored here if you would like to edit them:
+
+    ~/.dcm2niigui/dcm2niigui.ini
+    ~/.dcm2nii/dcm2nii.ini
+
+
+
+
+MRIcroGL
+===============
+
+
+Install MRIcroGL on Mac OS X Mountain/Lion:
+-----------------------------------------------------------------
+
+1. Download the [latest version](http://www.mccauslandcenter.sc.edu/mricrogl/).
+NB: pay attention to downloaded filename: if you already had osx.zip in your Downloads folder from mricrON, this mricrogl download may get called "osx(1).zip" etc.
+
+2. Unzip and install it: 
+
+    ```
+    cd ~/Downloads
+    mkdir mricrogl
+    cd mricrogl
+    unzip ~/Downloads/osx.zip
+    sudo mv mricrogl.app /Applications/
+    mv *.nii.gz /Users/Shared/sampleBrainVolumes/mricrogl # or other parent of sample data
+    ```
+
+3. Save the pdf manual somewhere handy.
+
+
+
+ImageJ / FIJI
+==================
+
+Install FIJI on Mac OS X Mountain/Lion:
+-----------------------------------------------------------------
+
+1. Download the [fiji for macosx dmg](http://fiji.sc/Downloads)
+
+2. Install:
+
+    ```
+    cd ~/Downloads
+    open fiji-macosx.dmg
+    cp -R /Volumes/Fiji/Fiji.app /Applications/
+    hdiutil unmount /Volumes/Fiji
+    open /Applications/Fiji.app 
+    ```
+    
+3. Install imagej plugins (instructions below)
+
+
+Install ImageJ/FIJI on Ubuntu 12.04:
+-----------------------------------------------------------------
+
+I'm currently happy with the version in the neurodebian repos:
+
+    sudo apt-get install fiji
+
+Then install imagej plugins (instructions below).
+
+
+Install ImageJ plugins:
+-----------------------------------------------------------------
+
+Even in 2013 imagej/fiji can't open .nii.gz files without a plugin (though .nii's work).
+Download and install the [imagej nifti plugin](http://rsb.info.nih.gov/ij/plugins/nifti.html):
+
+    cd ~/Downloads
+    curl -O http://rsb.info.nih.gov/ij/plugins/download/jars/nifti_io.jar
+    cp nifti_io.jar /Applications/Fiji.app/plugins/      # ...for OS X . Adapt for linux.
+
+* Re-open imagej/fiji. Opening nii.gz files should now work (drag & drop, or File->Open).
+* Also should now see five new commands in imagej/fiji:  
+ * File/Import/NIfTI-Analyze, 
+ * File/Save As/Analyze (NIfTI-1), 
+ * File/Save As/NIfTI-1, 
+ * File/Save As/Analyze 7.5 and 
+ * Analyze/Tools/Coordinate Viewer.
+
 
 
 
