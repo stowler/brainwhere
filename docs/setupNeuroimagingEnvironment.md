@@ -26,6 +26,7 @@ This document describes how to deploy these resources in the three computing env
 
 [This basic set of system utilities](https://github.com/stowler/stowlerGeneralComputing/blob/master/docs/setupBasicScriptingEnvironment.md#setupbasicscriptingenvironmentmd) must be installed prior to following these instructions.
 
+Once these neuroimaging packages have been installed and tested you could also follow [these instructions](https://github.com/stowler/brainwhere/blob/master/README.md#brainwhere) to install my personal repository of neuroimaging scripts.
 
 
 Neurodebian Virtual Machine (VM)
