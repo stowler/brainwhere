@@ -195,8 +195,9 @@ OR neurodebian can download via command:
 [Run FEEDS](http://fsl.fmrib.ox.ac.uk/fsl/feeds/doc/):
 
     # (on neurodebian, this is all replaced by command fsl-selftest or /usr/bin/time fsl-selftest)
-    # 2013 i7 imac: 971.77 real 951.78 user 22.83 sys
-    cd ~/Downloads       # (or where ever you saved your download)
+    # 2013 i7 imac:  971.77 real  951.78 user 22.83 sys
+    # 2012 i7 rMBP: 1108.44 real 1080.64 user 31.06 sys
+    cd ~/Downloads       # (or the folder where you saved your download)
     tar -zxvf fsl-*-feeds.tar.gz
     cd feeds
     /usr/bin/time ./RUN all
