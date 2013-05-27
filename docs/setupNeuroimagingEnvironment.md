@@ -160,6 +160,10 @@ After installation of the packages, get instructions for environmental variables
 
 After the install completes, confirm whether the file /etc/bash.bashrc received a block of FSL environmental variables (below). If not, the install program may have added it to your personal ~/.profile or ~/.bash_profile instead. For system-wide installation, remove from those files and append to /etc/bash.bashrc:
 
+    cat /etc/bashrc
+    #
+    # No FSL environmental variables in /etc/bashrc ? Add them by pasting these lines into the terminal:
+    #
     #    WARNING: note the \${escapedVariables} below, which
     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
     #    Un-escape them if manually typing into a text editor.
@@ -192,7 +196,7 @@ OR neurodebian can download via command:
 
     # (on neurodebian, this is all replaced by command fsl-selftest or /usr/bin/time fsl-selftest)
     # 2013 i7 imac: 971.77 real 951.78 user 22.83 sys
-    cd ~/Downloads (or where ever you saved your download)
+    cd ~/Downloads       # (or where ever you saved your download)
     tar -zxvf fsl-*-feeds.tar.gz
     cd feeds
     /usr/bin/time ./RUN all
