@@ -1,35 +1,21 @@
 #!/bin/bash
 #
-# LOCATION:	    ${bwDir}/bwCompareAcrossLevelsOfOneFactor.sh
+# LOCATION:	    ${bwDir}/bwNetTest-short.sh
 # USAGE:	    see the fxnPrintUsage() function below 
 #
 # CREATED:          20130516 by stowler@gmail.com
 # LAST UPDATED:     20130523 by stowler@gmail.com
 #
 # DESCRIPTION:
-# A very general tool. Loops over multiple levels of one factor. Each loop
-# iteration runs the user-specified script once and produces one file
-# containing one vector of results per level. Level-wise vectors are then
-# catenated into a formatted text file for external comparison across levels. 
+# Performs a short user-friendly network test that displays a minimum of output.
 # 
 # SYSTEM REQUIREMENTS:
 #
 # INPUT FILES AND PERMISSIONS FOR OUTPUT:
 #
 # INPUT:
-# - argument factorName (to be used in filenaming)
-# - argument levelNameList (a vector of factorLevels)
-# - argument levelScript (a script to run for each level; accepts argument factorLevel)
-#	- script should put all data into a subdir called "levelOutputRaw"
-#	- script should create a level-wise 
 #
 # OTHER ASSUMPTIONS:
-# - levelScript should accept as an argument a single factorLevel extracted
-#   from this script's vector of factorLevels and use it to perform internal
-#   functions
-# - the output of levelScript should only be two objects:
-#	1) a subdirectory called levelOutputRaw
-#	2) a sibling text file called levelOutputVectorForComparisonAcrossLevels.csv
 # 
 #
 # READING AND CODING NOTES:
@@ -63,83 +49,13 @@
 fxnPrintUsage() {
 cat <<EOF
 
-
-$0 - a general tool for running an external script against multiple levels of a single factor
-Usage: $0  \\ 
-  -t   (optional: launches self-test for this script, with or without your data)         \\
-  -d   (optional: provides extra output to help with debugging)                          \\
-  -f   [your factorName, which will just be used in output filenames.]                   \\
-  -l   [your levelNames for levels of the factor: a comma-separated list WITH NO SPACES] \\
-  -s   [your levelwise script, to be executed for each level of the factor]
-
-The levelwiseScript (-s) is launched once for each of the levels 
-listed in the levelNames list (-l). At each launch, one levelName
-is provided to the levelwiseScript as an argument.
-
-E.g., $0 -f months -l january,february -s justCountLetterTypes.sh
-
-This creates a single new output directory containing levelwise subdirectories.
-Sibling to those subdirectories is a single csv file containing one row of data
-per factor level (plus header row):
-
-   \${outputDir}
-      └── SINGLEFACTORDIR_months
-          ├── FACTORLEVELDIR_january
-          ├── FACTORLEVELDIR_february
-          └── SINGLEFACTOROUTPUTMATRIX_months.csv
-
-For this to work, the levelwiseScript (-s) needs to produce output in the
-following loose format, even when run alone:
-
-   1) All output files from a single execution of the levelwise script should be in a
-      folder called "levelOutputRaw"
-   2) The only thing outside of levelOutputRaw should be a sibling two-line text
-      file called singleLevelOutputVectorForComparisonAcrossLevels.csv . This text
-      file should contain a comma-separated row of levelwise summary values that you
-      will later be analyzing across levels. It should also contain a corresponding
-      row of comma-separated field labels.
-
-...in our example -s justCountLetterTypes.sh from above:
-
-   \${someOutputDir}
-      ├── levelOutputRaw
-      │   ├── vowels.txt
-      │   └── consonants.txt
-      └── singleLevelOutputVectorForComparisonAcrossLevels.csv
-
-${0} executes this -s levelwiseScript for each level and then
-catenates those levelwise text files to produce a single factorwise textfile in
-the root called:
-
-SINGLEFACTOROUTPUTMATRIX_\${factorName}.csv 
-
-Calling this script with the -t argument (TBD: --selftest ?) (can be in
-combination with the other arguments or alone TBD) will create
-exampleLevelwiseScript.sh , and use it to generate sample output from
-${0}.
-
-Its output should be something like this:
-
-\${tempDir}
-   └── SINGLEFACTORDIR_systemDirectories
-       ├── FACTORLEVELDIR_etc
-       │   ├── levelOutputRaw
-       │   │   ├── fileCount-raw.txt
-       │   │   └── folderSize-raw.txt
-       │   └── singleLevelOutputVectorForComparisonAcrossLevels.csv
-       ├── FACTORLEVELDIR_tmp
-       │   ├── levelOutputRaw
-       │   │   ├── fileCount-raw.txt
-       │   │   └── folderSize-raw.txt
-       │   └── singleLevelOutputVectorForComparisonAcrossLevels.csv
-       └── SINGLEFACTOROUTPUTMATRIX_systemDirectories.csv
-
-5 directories, 7 files
+$0 - a short network performance test with minimum output
+Usage: $0   
 
 EOF
-# TBD: will the exit value of the script be the filepath of the matrix?
 }
 
+# TBD: will the exit value of the script be the filepath of the matrix?
 
 fxnProcessInvocation() {
    fxnPrintDebug "Starting fxnProcessInvocation..."
@@ -427,8 +343,9 @@ fxnSetTempDir() {
          echo ""
          exit 1
       else
-         echo "A temporary directory has been created:"
-         echo "${tempDir}"
+         #echo "A temporary directory has been created:"
+         #echo "${tempDir}"
+	 echo ""
       fi
    fi
    fxnPrintDebug "...completed fxnSetTempDir ."
@@ -534,14 +451,14 @@ fxnPrintDebug "${listOfBasicConstants}"
 
 
 # ------------------------- START: greet user/logs ------------------------- #
-echo ""
-echo ""
-echo "#################################################################"
-echo "START: \"${scriptName}\""
-      date
-echo "#################################################################"
-echo ""
-echo ""
+#echo ""
+#echo ""
+#echo "#################################################################"
+#echo "START: \"${scriptName}\""
+#      date
+#echo "#################################################################"
+#echo ""
+#echo ""
 # ------------------------- FINISHED: greet user/logs------------------------- #
 
 
@@ -554,92 +471,27 @@ echo ""
 
 # Setup a temporary directory, which can be configured for clean-up:
 fxnSetTempDir                 # <- use internal function to create ${tempDir}
-deleteTempDirAtEndOfScript=0  # <- set to 1 to delete ${tempDir} or 0 to leave it. See end of script.
-
+deleteTempDirAtEndOfScript=1  # <- set to 1 to delete ${tempDir} or 0 to leave it. See end of script.
 
 # Set options based on script invocation:
-fxnProcessInvocation          
+#fxnProcessInvocation          
 
 
-# Decide whether to launch selftest, and then subsequently whether to continue or exit:
-if [ "${launchSelftest}" = "1" ]; then
-   echo ""
-   echo "Launching the self-test in ${scriptName} ..."
-   echo ""
-   fxnSelftestFull
-   echo ""
-   echo "Completed the self-test in ${scriptName} ."
-   echo ""
-   # exit after completing the self-test, ignoring all lines below:
-   exit 0
-   # TBD: don't exit if there is a valid factorName from commandline
-fi
-
-
-# Convert commas to spaces in the "-l levelNameList" csv argument:
-levelNameList=`echo ${levelNameList} | sed s/\,/' '/g`
 echo ""
-echo "Executing levelScript once for each levelName that was provided in the call to ${scriptName}."
-echo "levelScript == ${levelScript}"
-echo "levelNameList == ${levelNameList}"
+echo "Launching a very short test of whether current network conditions might introduce error or delay in your fsl/afni work:"
 echo ""
-
-
-# Create output directories and launch the levelScript: 
-mkdir ${tempDir}/SINGLEFACTORDIR_${factorName}
-for levelName in ${levelNameList}; do
-   echo ""
-   echo "================================================================="
-   echo "START: processing level '${levelName}' of factor '${factorName}' "
-         date
-   echo "================================================================="
-   echo ""
-   mkdir ${tempDir}/SINGLEFACTORDIR_${factorName}/FACTORLEVELDIR_${levelName}
-   bash ${levelScript} ${levelName} ${tempDir}/SINGLEFACTORDIR_${factorName}/FACTORLEVELDIR_${levelName}
-   echo ""
-   echo "================================================================="
-   echo "FINISHED: processed level '${levelName}' of factor '${factorName}' "
-         date
-   echo "================================================================="
-   echo ""
-done
-
-# compile the individual factorLevel outputs into singleFactorOutputMatrix.csv:
-
-# The identical header rows for each level should be the only non-unique rows
-# (the rest are actual unique per-level rows). Identify those header rows by
-# their non-uniqueness, and then use them (it) as the first row (header row) of the
-# output file:
-cat \
-${tempDir}/SINGLEFACTORDIR_${factorName}/FACTORLEVELDIR_*/singleLevelOutputVectorForComparisonAcrossLevels.csv \
-| sort \
-| uniq -d \
->> ${tempDir}/SINGLEFACTORDIR_${factorName}/SINGLEFACTOROUTPUTMATRIX_${factorName}.csv
-
-# The remaining unique rows should be the data from each level. Append them to
-# the output file's existing header row:
-cat \
-${tempDir}/SINGLEFACTORDIR_${factorName}/FACTORLEVELDIR_*/singleLevelOutputVectorForComparisonAcrossLevels.csv \
-| sort \
-| uniq -u \
->> ${tempDir}/SINGLEFACTORDIR_${factorName}/SINGLEFACTOROUTPUTMATRIX_${factorName}.csv
-
-
-# TBD Seriously let's be adults about this:
-#
-# 1) are there zero levelwise vectors? Exit if so
-# 2) else if there is one levelwise vector :
-   # make sure it has two lines (one header, one data)
-   # make sure they have the same number of csv fields
-# 3) else if there > 1 levelwise vector:
-   # compare header vectors. Exit if they are different, otherwise assign to variable headerRow
-   # make sure there is only one data row per level
-   # echo headerRow to output matrix, followed by one row for each individual factor levels 
-   # issue warning if there are any lines that have different number of fields
-   # than header rowmake sure same number of fields in headerRow and every data
-   # row
-# 4) else if there are exactly two vectors, maybe consider calculating percent difference
-
+# 1) call the comparison script, protecting user from stdout:
+bash ${bwDir}/utilitiesAndData/bwProcessLevelsOfOneFactor.sh -f locationOfInputData -l local,remote -s ${bwDir}/utilitiesAndData/bwLevelwise-testNetShort.sh > ${tempDir}/log.txt
+# 2) display results pretty for user:
+column -s , -t /tmp/bwLevelCompMostRecent.csv
+echo ""
+echo ""
+# 3) TBD: copy to common location of cumulative results and launch plot:
+# commonResultsDir=/data/birc/forNetworkTesting/inboxTestResults
+# if [ commonResultsDir is writable ]; then
+#      cp /tmp/bwLevelCompMostRecent.csv ${commonResultsDir}/result_bwNetTest-short_${startDateTime}_${scriptUser}.csv
+# fi
+exit
 
 
 #TBD: call fxnSelftestBasic if nothing happened earlier in the script
@@ -675,19 +527,6 @@ if [ -n "${tempDir}" ]; then
 	echo ""
 	echo ""
 fi
-
-
-# Display results for the user:
-echo ""
-echo "Results for levels \"${levelNameList}\" of single factor \"${factorName}\"":
-echo ""
-column -s , -t ${tempDir}/SINGLEFACTORDIR_${factorName}/SINGLEFACTOROUTPUTMATRIX_${factorName}.csv
-echo ""
-echo "(stored as csv file with header row here:)"
-ls ${tempDir}/SINGLEFACTORDIR_${factorName}/SINGLEFACTOROUTPUTMATRIX_${factorName}.csv
-echo ""
-#export bwLevelCompMostRecent=${tempDir}/SINGLEFACTORDIR_${factorName}/SINGLEFACTOROUTPUTMATRIX_${factorName}.csv
-cp -f ${tempDir}/SINGLEFACTORDIR_${factorName}/SINGLEFACTOROUTPUTMATRIX_${factorName}.csv /tmp/bwLevelCompMostRecent.csv
 
 
 # Did we change any environmental variables? It would be polite to set them to their original values:
