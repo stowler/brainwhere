@@ -478,13 +478,16 @@ deleteTempDirAtEndOfScript=1  # <- set to 1 to delete ${tempDir} or 0 to leave i
 
 
 echo ""
-echo "Launching a very short test of whether current network conditions might introduce error or delay in your fsl/afni work:"
+echo "Launching a very short test of whether current network conditions" 
+echo "might introduce error or delay in your fsl/afni work:"
 echo ""
 # 1) call the comparison script, protecting user from stdout:
 bash ${bwDir}/utilitiesAndData/bwProcessLevelsOfOneFactor.sh -f locationOfInputData -l local,remote -s ${bwDir}/utilitiesAndData/bwLevelwise-testNetShort.sh > ${tempDir}/log.txt
 # 2) display results pretty for user:
 column -s , -t /tmp/bwLevelCompMostRecent.csv
 echo ""
+echo ""
+echo "...network testing complete."
 echo ""
 # 3) TBD: copy to common location of cumulative results and launch plot:
 # commonResultsDir=/data/birc/forNetworkTesting/inboxTestResults
