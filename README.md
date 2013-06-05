@@ -8,7 +8,7 @@ brainwhere
 
 
 ## STATUS:
-*May 2013:* final porting to github. Before June 3 the master branch will become stable, with broken daily development isolated in a dev branch. 
+*May 2013:* final porting to github. Before June **7** the master branch will become stable, with broken daily development isolated in a dev branch. 
 
 
 
