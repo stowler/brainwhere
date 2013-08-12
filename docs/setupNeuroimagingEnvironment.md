@@ -2,7 +2,7 @@ setupNeuroimagingEnvironment.md
 ==========
 
 stowler@gmail.com
-updated: 20130524
+updated: 20130812
 
 
 My neuroimaging scripts and documentation refer to these open-source neuroimaging resources:
@@ -235,6 +235,17 @@ Add AFNI's new location to the path in /etc/bashrc :
     # added some AFNI environmental variables:
     export PATH=/usr/local/abin:\${PATH}
     export AFNI_ENFORCE_ASPECT=YES
+    echo ""
+    echo "----------- active afni version and variables: -----------"
+    afni -ver
+    echo -n "The command 'afni' will launch: "
+    which afni
+    echo -n "The command '3dinfo' will launch: "
+    which 3dinfo
+    echo "AFNI environmental variables, if any exist:"
+    env | grep AFNI
+    echo "----------------------------------------------------------"
+    echo ""
     #------------------------------------------
     EOF
     #
@@ -255,10 +266,12 @@ I'm currently happy with the version in the neurodebian repos:
 
     sudo apt-get install afni afni-atlases
 
-...then "man afni" to get instructions for environmental variables (e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
+...then `man afni` to see instructions for setting environmental variables (e.g., may need to source AFNI setup script from /etc/bash.bashrc)
+
+
 
 In the event that the Neurodebian version of AFNI is broken/old/whatever 
-you may want to substitute a binary version from outside of Neurodebian. Two steps to do that:
+you may want to substitute an alternative binary version from outside of Neurodebian. Two steps to do that:
 
 
 1. Download,  unzip, and move to a reasonable destination (not overwriting Neurodebian's AFNI in the process):
@@ -282,7 +295,8 @@ I'm currently happy with the version in the neurodebian repos:
 ...then "man afni" to get instructions for environmental variables
 (e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
 
-    # For system-wide install, source the AFNI config file from /etc/afni/afni.sh :
+    # For system-wide install, source the AFNI config file from /etc/afni/afni.sh 
+    # or whatever file is specified in "man afni". Here's how:
     #
     #    WARNING: note the \${escapedVariables} below, which
     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
