@@ -231,7 +231,7 @@ Add AFNI's new location to the path in /etc/bashrc :
     #------------------------------------------
     # on ${editDate} at ${editTime}, $USER  
     # added some AFNI environmental variables:
-    export PATH=/usr/local/abin:\${PATH}
+    export PATH=/usr/local/abin:${PATH}
     export AFNI_ENFORCE_ASPECT=YES
     echo ""
     echo "----------- active afni version and variables: -----------"
