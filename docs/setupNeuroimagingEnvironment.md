@@ -79,8 +79,6 @@ There are multiple ways to install (as of May 2013). I get mixed results with th
 
 For system-wide installation, remove from those files and append to /etc/bashrc:
 
-
-
     #    WARNING: note the \${escapedVariables} below, which
     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
     #    Un-escape them if manually typing into a text editor.
@@ -259,45 +257,16 @@ TEST: Open a new terminal window and test your afni install by issuing the comma
 
 
 
-Installing AFNI on Ubuntu 12.04:
+Installing AFNI on Ubuntu 12.04 or Debian 7.0 Wheezy Neurodebian VM::
 -----------------------------------------------------------------
 
 I'm currently happy with the version in the neurodebian repos:
 
     sudo apt-get install afni afni-atlases
 
-...then `man afni` to see instructions for setting environmental variables (e.g., may need to source AFNI setup script from /etc/bash.bashrc)
+...then execute `man afni` to see instructions for setting environmental variables.
+You may be instructed to source an AFNI setup script from /etc/bash.bashrc , like this:
 
-
-
-In the event that the Neurodebian version of AFNI is broken/old/whatever 
-you may want to substitute an alternative binary version from outside of Neurodebian. Two steps to do that:
-
-
-1. Download,  unzip, and move to a reasonable destination (not overwriting Neurodebian's AFNI in the process):
-
-    ```
-    curl -O http://afni.nimh.nih.gov/pub/dist/tgz/linux_xorg7_64.tgz  # (> 600 MB)
-    tar -zxvf linux_xorg7_64.tgz    # ...results in directory called linux_xorg7_64
-    mv linux_xorg7_64 /opt/abin     # ...simultaneous move and rename of directory
-    ```
-    
-2. Kill Neurodebian's AFNI environmental variables and add this new directory to $PATH (see below)
-
-
-Installing AFNI on Debian 7.0 Wheezy Neurodebian VM:
----------------------------------------------------------------
-
-I'm currently happy with the version in the neurodebian repos:
-
-    sudo apt-get install afni afni-atlases
-
-...then "man afni" to get instructions for environmental variables
-(e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
-
-    # For system-wide install, source the AFNI config file from /etc/afni/afni.sh 
-    # or whatever file is specified in "man afni". Here's how:
-    #
     #    WARNING: note the \${escapedVariables} below, which
     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
     #    Un-escape them if manually typing into a text editor.
@@ -308,16 +277,43 @@ I'm currently happy with the version in the neurodebian repos:
     editTime=$(date +%k%M)
     sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
     #------------------------------------------
-    # on ${editDate} at ${editTime}, $USER  
-    # added some AFNI environmental variables:
+    # on ${editDate} at ${editTime}, $USER 
+    # added some AFNI setup:
     . /etc/afni/afni.sh
+    echo ""
+    echo "----------- active afni version and variables: -----------"
+    afni -ver
+    echo -n "The command 'afni' will launch: "
+    which afni
+    echo -n "The command '3dinfo' will launch: "
+    which 3dinfo
+    echo "AFNI environmental variables, if any exist:"
+    env | grep AFNI
+    echo "----------------------------------------------------------"
+    echo ""
     #------------------------------------------
     EOF
     #
-    cat /etc/bashrc
+    cat /etc/bash.bashrc
+
+In the event that the Neurodebian version of AFNI is broken/old/whatever 
+you may want to substitute an alternative binary version from outside of Neurodebian. Two steps to do that:
 
 
-Checking and Setting env variable AFNI_ENFORCE_ASPECT :
+1. Download the correct AFNI archive, unpack, and move to a reasonable destination (not overwriting Neurodebian's AFNI in the process):
+
+    ```
+    curl -O http://afni.nimh.nih.gov/pub/dist/tgz/linux_xorg7_64.tgz  # (> 600 MB)
+    tar -zxvf linux_xorg7_64.tgz    # ...results in directory called linux_xorg7_64
+    mv linux_xorg7_64 /opt/abin     # ...simultaneous move and rename of directory
+    ```
+    
+2. Download and edit these scripts to switch between the neurodebian repository version of afni and this alternative version: 
+[/opt/afniSwitchFromRepo.sh](http://goo.gl/LVrpaj) and [/opt/afniSwitchToRepo.sh](http://goo.gl/hx8JVF).
+
+
+
+Checking and Setting environmental variable AFNI_ENFORCE_ASPECT :
 ---------------------------------------------------------------
 
 In some environments the AFNI GUI allows you to accidentally distort image aspect ratio by resizing an image window. Not good, but avoidable:
@@ -335,33 +331,6 @@ To set AFNI_ENFORCE_ASPECT on a per-execution basis, can launch the afni GUI wit
 
     afni -DAFNI_ENFORCE_ASPECT=YES
 
-
-Unsetting AFNI environmental variables:
-----------------------------------------------------------
-
-Sometimes you need to clear AFNI-related environmental variables, for example 
-if Neurodebian is installed but you need to temporarily use a more up-to-date version of AFNI:
-
-1. Unset current AFNI environmental variables:
-
-    ```
-    unset `env | awk -F= '/AFNI/ {print $1}' | xargs`
-    ```
-    
-2. Prepend this new AFNI directory to your ${PATH}, so that its program are found before the programs from the old versio of AFNI:
-
-    ```
-    export PATH=/opt/abin:${PATH}
-    ```
-    
-3. TEST: check that the "right" AFNI will run:
-
-    ```
-    which afni
-    which 3dinfo
-    ```
-    
- 4. Comment out any of the existing AFNI lines in the /etc/bashrc or /etc/bash.bashrc, and add the new location so that it can continue to be found after logging out and back in again.
 
 
 BXH/XCEDE FBIRN TOOLS
