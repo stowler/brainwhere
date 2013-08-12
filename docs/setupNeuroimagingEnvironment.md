@@ -331,7 +331,7 @@ if Neurodebian is installed but you need to temporarily use a more up-to-date ve
 1. Unset current AFNI environmental variables:
 
     ```
-    unset `env | awk -F= '/AFNI/ ${print $1}' | xargs`
+    unset `env | awk -F= '/AFNI/ {print $1}' | xargs`
     ```
     
 2. Prepend this new AFNI directory to your ${PATH}, so that its program are found before the programs from the old versio of AFNI:
