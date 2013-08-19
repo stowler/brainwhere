@@ -32,7 +32,7 @@ Once these neuroimaging packages have been installed and tested you could also f
 Neurodebian Virtual Machine (VM)
 ===================================
 At the time of writing, the neurodebian virtual machine (VM) is built on Debian stable 7.0 "wheezy". 
-In prepreation for installing applications and using the VM, import the VM and update its guest additions.
+In prepreation for installing applications and using the VM, first import the VM and update its guest additions:
 
 
 1. Download and install the latest [VirtualBox binaries](https://www.virtualbox.org/wiki/Downloads).
@@ -45,18 +45,22 @@ In prepreation for installing applications and using the VM, import the VM and u
 3. Import the virtual machine by following the neurodebian [install instructions](http://neuro.debian.net/vm.html#chap-vm), which they support with a [youtube video](http://www.youtube.com/watch?v=eqfjKV5XaTE).
 
 4. Before booting the VM, confirm a few settings that will help avoid initial errors:
- * single cpu
- * 64 MB video ram
- * no 3D acceleration
+ * 2048 MB of RAM
+ * single CPU
+ * 64 MB video RAM
+ * no 3D or 2D accelleration
  * create a shared folder that the guest sees as "host"
 
-5. Boot the VM and follow the neurodebian wizard to completion:
+5. Boot the VM and follow the NeuroDebian Setuup Wizard to completion:
+ * answer "Yes" to system update
  * answer "Yes" to safe upgrades
+ * close the Update Manager once complete
+ * participate in the package popularity contest
  * answer "Yes" to custom environment ("Packages, such as AFNI and FSL, provide large collections of command line tools...")
- * select no items from the package list
+ * select no items from the list of additional components, and click "OK"
  * allow the wizard to close
 
-6. Reboot the guest to complete the initial updates you just installed.
+6. Reboot the guest to complete installation of those initial updates.
 
 7. After rebooting, update again for good measure:
     ```
