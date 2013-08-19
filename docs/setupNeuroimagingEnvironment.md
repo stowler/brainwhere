@@ -2,7 +2,7 @@ setupNeuroimagingEnvironment.md
 ==========
 
 stowler@gmail.com
-updated: 20130812
+updated: 20130818
 
 
 My neuroimaging scripts and documentation refer to these open-source neuroimaging resources:
@@ -31,18 +31,79 @@ Once these neuroimaging packages have been installed and tested you could also f
 
 Neurodebian Virtual Machine (VM)
 ===================================
+At the time of writing, the neurodebian virtual machine (VM) is built on Debian stable 7.0 "wheezy". 
+In prepreation for installing applications and using the VM, import the VM and update its guest additions.
 
-1. Download the [neurodebian VM .ova/.ovf](http://neuro.debian.net/):
+
+1. Download and install the latest [VirtualBox binaries](https://www.virtualbox.org/wiki/Downloads).
+ 
+2. Download the [neurodebian VM .ova/.ovf](http://neuro.debian.net/):
  * click "Get Neurodebian"
  * Select operating system: Mac or Windows
  * Download the Debian 7.0 .ova or zip/ovf file (I prefer the 32-bit version. Easier to distribute to heterogeneous hardware).
 
-2. Download and install the latest [VirtualBox binaries](https://www.virtualbox.org/wiki/Downloads).
+3. Import the virtual machine by following the neurodebian [install instructions](http://neuro.debian.net/vm.html#chap-vm), which they support with a [youtube video](http://www.youtube.com/watch?v=eqfjKV5XaTE).
 
-3. Follow the neurodebian [install instructions](http://neuro.debian.net/vm.html#chap-vm), which they support with a [youtube video](http://www.youtube.com/watch?v=eqfjKV5XaTE).
+4. Before booting the VM, confirm a few settings that will help avoid initial errors:
+ * single cpu
+ * 64 MB video ram
+ * no 3D acceleration
+ * create a shared folder that the guest sees as "host"
 
-4. Boot up the new virtual machine. Don't bother to select any new packages from the point-and-click wizard that autoruns.
+5. Boot the VM and follow the neurodebian wizard to completion:
+ * answer "Yes" to safe upgrades
+ * answer "Yes" to custom environment ("Packages, such as AFNI and FSL, provide large collections of command line tools...")
+ * select no items from the package list
+ * allow the wizard to close
 
+6. Reboot the guest to complete the initial updates you just installed.
+
+7. After rebooting, update again for good measure:
+    ```
+    sudo apt-get update
+    sudo apt-get dist-upgrade
+    sudo aptitude (then "g", "g" to see queue and allow it to complete)
+    ```
+
+8. If you installed the newest version of virtualbox (which you should have in step 1), 
+notice that the currently installed virtualbox guest additions are older than your version of virtualbox: 
+    ```
+    sudo lsmod | grep -io vboxguest | xargs sudo modinfo
+    ```
+9. Find the installed packages that currently supply those older guest additions:
+    ```
+    dpkg -l | grep virtualbox
+    ```
+10. Uninstall those outdated guest additions: 
+    ```
+    sudo apt-get purge virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11 virtualbox-ose-guest-dkms virtualbox-ose-guest-utils virtualbox-ose-guest-x11
+    ```
+11. Reboot the guest, and confirm that the modules from those old guest additions are no longer present: 
+    ```
+    sudo lsmod | grep -io vboxguest | xargs sudo modinfo
+    ```
+12. Install the guest additions that match your current version of virutalbox:
+    ```
+    sudo apt-get install build-essential module-assistant
+    sudo m-a prepare
+    (use the mouse in the virutalbox GUI to choose Device -> Install Guest Additions)
+    sudo mount /media/cdrom0
+    ls /media/cdrom0
+    sudo sh /media/cdrom0/VBoxLinuxAdditions.run
+    ```
+13. Shutdown the VM (not reboot).
+14. Enable 3D accelleration.
+15. Boot the guest.
+16. `sudo aptitude` and git rid of the queued items ("g", "-")
+17. Install support for 3D operations and the impending R installation:
+    ```
+    sudo apt-get install xorg-dev libx11-dev libglu1-mesa-dev libxml2-dev libopenmpi-dev mesa-utils glew-utils
+    sudo apt-get install cdbs debhelper tcl-tclreadline tk8.5-dev unixodbc-dev
+    ```
+18. Reboot the guest.
+19. Test 3D support by running `glxgears`.
+
+If everything is stable, the VM is now ready to receive [this basic set of system utilities](http://goo.gl/ncbZD), followed by the neuroimaging apps listed below.  
 
 
 FSL
