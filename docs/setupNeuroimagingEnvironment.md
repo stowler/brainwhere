@@ -198,11 +198,13 @@ I am currently happy with the version in the neurodebian repos:
 
 ...but previous to fsl-completed, you needed to install separate packages:
 
-    sudo apt-get instal fsl-atlases fsl-feeds fsl-first-data fslview and fsl-feeds?
+    sudo apt-get instal fsl-atlases fsl-feeds fsl-first-data fslview and fsl-feeds
 
 After installation of the packages, get instructions for environmental variables (e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
 
     man fsl
+
+For instructions on how to configure those environmental variables, see the neurodebian VM section below.
 
 
 
@@ -223,9 +225,7 @@ After installation of the packages, get instructions for environmental variables
 
 After the install completes, confirm whether the file /etc/bash.bashrc received a block of FSL environmental variables (below). If not, the install program may have added it to your personal ~/.profile or ~/.bash_profile instead. For system-wide installation, remove from those files and append to /etc/bash.bashrc:
 
-    cat /etc/bashrc
-    #
-    # No FSL environmental variables in /etc/bashrc ? Add them by pasting these lines into the terminal:
+    # No FSL environmental variables in /etc/bash.bashrc ? Add them by pasting these lines into the terminal:
     #
     #    WARNING: note the \${escapedVariables} below, which
     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
@@ -239,23 +239,22 @@ After the install completes, confirm whether the file /etc/bash.bashrc received 
     #------------------------------------------
     # on ${editDate} at ${editTime}, $USER 
     # added some FSL setup:
-    . /etc/fsl/5.0/fsl.sh
+    . /etc/fsl/fsl.sh
     #------------------------------------------
     EOF
     #
-    cat /etc/bashrc 
+    cat /etc/bash.bashrc 
 
 
 
 Install and run FSL test suite ("FEEDS"):
 ---------------------------------------------------------------
 
-Download [FEEDS from FSL > 270 MB](http://fsl.fmrib.ox.ac.uk/fsldownloads/)
-OR neurodebian can download via command:
+Download [FEEDS from FSL (> 270 MB)](http://fsl.fmrib.ox.ac.uk/fsldownloads/), or neurodebian can download via command:
 
     sudo apt-get install fsl-feeds
 
-[Run FEEDS](http://fsl.fmrib.ox.ac.uk/fsl/feeds/doc/):
+Extract and [run FEEDS](http://fsl.fmrib.ox.ac.uk/fsl/feeds/doc/) :
 
     # (on neurodebian, this is all replaced by command fsl-selftest or /usr/bin/time fsl-selftest)
     # 2013 i7 imac:  971.77 real  951.78 user 22.83 sys
@@ -264,7 +263,6 @@ OR neurodebian can download via command:
     tar -zxvf fsl-*-feeds.tar.gz
     cd feeds
     /usr/bin/time ./RUN all
-
 
 
 AFNI
