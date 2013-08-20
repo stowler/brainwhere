@@ -2,7 +2,7 @@ setupNeuroimagingEnvironment.md
 ==========
 
 stowler@gmail.com
-updated: 20130818
+updated: 20130820
 
 
 My neuroimaging scripts and documentation refer to these open-source neuroimaging resources:
@@ -757,23 +757,54 @@ Then install imagej plugins (instructions below).
 Install ImageJ plugins:
 -----------------------------------------------------------------
 
-Even in 2013 imagej/fiji can't open .nii.gz files without a plugin (though .nii's work).
-Download and install the [imagej nifti plugin](http://rsb.info.nih.gov/ij/plugins/nifti.html):
+The location of the system-wide destination for imagej plugins differs by platform:
 
-    cd ~/Downloads
-    curl -O http://rsb.info.nih.gov/ij/plugins/download/jars/nifti_io.jar
-    cp nifti_io.jar /Applications/Fiji.app/plugins/      # ...for OS X . Adapt for linux.
+```
+# for Fiji on OS X mountain/lion:
+imagejSystemWidePluginDir=/Applications/Fiji.app/plugins
+# for ImageJ on neurodebian ubuntu 12.04:
+imagejSystemWidePluginDir=/usr/share/imagej/plugins
 
-* Re-open imagej/fiji. Opening nii.gz files should now work (drag & drop, or File->Open).
-* Also should now see five new commands in imagej/fiji:  
- * File/Import/NIfTI-Analyze, 
- * File/Save As/Analyze (NIfTI-1), 
- * File/Save As/NIfTI-1, 
- * File/Save As/Analyze 7.5 and 
- * Analyze/Tools/Coordinate Viewer.
+```
 
+I always install this basic set of neuroimaging plugins for imagej:
 
+* Even in 2013, imagej/fiji can't open .nii.gz files without a plugin.
+Download and install the [imagej nifti plugin](http://rsb.info.nih.gov/ij/plugins/nifti.html) :
 
+  ```
+  cd ~/Downloads
+  curl -O http://rsb.info.nih.gov/ij/plugins/download/jars/nifti_io.jar
+  sudo mv nifti_io.jar ${imagejSystemWidePluginDir}/
+  ```
+
+   * Re-open imagej/fiji. Opening nii.gz files should now work via drag & drop, or File->Import->Nifti/Analyze.
+   * Also should now see five new commands in imagej/fiji:  
+     * File/Import/NIfTI-Analyze, 
+     * File/Save As/Analyze (NIfTI-1), 
+     * File/Save As/NIfTI-1, 
+     * File/Save As/Analyze 7.5 and 
+     * Analyze/Tools/Coordinate Viewer
+
+* The [Tudor DICOM](http://santec.tudor.lu/project/dicom) plugin provides a number of DICOM-related functions, including the ability to parse a DICOMDIR
+file and inspect its images interactively. It can also act as a DICOM receiver.
+
+   * Download the file [tudordicom_plugin_*.zip](http://www.santec.lu/project/dicom/download)
+   * `cd ~/Downloads`
+   * `unzip tudordicom_plugin_*.zip  # (...which creates a child directory called plugins)`
+   * `sudo mv plugins/TudorDICOM* ${imagejSystemWidePluginDir}/`
+   * `rmdir plugins`
+   * restart imagej/fiji
+   * The imagej/fiji should now have two new submenus: Plugins/TudorDICOM submenu and Plugins/TudorDICOMLibs
+   * Some additional 3D components may need to be installed system-wide:
+   		* Launch imagej/fiji as an administrative user (e.g., sudo imagej)
+   		* Select menu item Plugins -> TudorDICOMLibs -> 3D Viewer
+   		* If java 3D is not already installed, will display message "Java 3D seems not to be installed. Auto-install?"
+   		* Allow installation. Shouldn't ask about destination.
+   		* Restart imagej/fiji as a normal user and attempt to open 3D viewer again. Should not produce message about java 3D installation.
+  
+
+  
 
 SPM (Mountain Lion)
 =========================
