@@ -320,15 +320,16 @@ TEST: Open a new terminal window and test your afni install by issuing the comma
 
 
 
-Installing AFNI on Ubuntu 12.04 or Debian 7.0 Wheezy Neurodebian VM::
------------------------------------------------------------------
-
-I'm currently happy with the version in the neurodebian repos:
+Installing AFNI on Neurodebian (Ubuntu 12.04 or the Debian 7.0 Wheezy Neurodebian VM):
+----------------------------------------------------------------
+I'm currently happy with the version in the neurodebian repos. Install with:
 
     sudo apt-get install afni afni-atlases
 
 ...then execute `man afni` to see instructions for setting environmental variables.
-You may be instructed to source an AFNI setup script from /etc/bash.bashrc , like this:
+You may be instructed to source an AFNI setup script from `/etc/bash.bashrc` . 
+I recommend doing so as follows, so that every new terminal window contains a message about 
+what version of AFNI is active:
 
     #    WARNING: note the \${escapedVariables} below, which
     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
@@ -359,20 +360,38 @@ You may be instructed to source an AFNI setup script from /etc/bash.bashrc , lik
     #
     cat /etc/bash.bashrc
 
+The `cat /etc/bash.bashrc` command above is just a reminder to visually inspect the final changes to the file.
+To activate those changes just type `source /etc/bash.bashrc`, or open a new terminal window.
+
 In the event that the Neurodebian version of AFNI is broken/old/whatever 
-you may want to substitute an alternative binary version from outside of Neurodebian. Two steps to do that:
+you may want to substitute an alternative binary version from outside of Neurodebian. Here is one way to manage
+parallel installations:
 
 
-1. Download the correct AFNI archive, unpack, and move to a reasonable destination (not overwriting Neurodebian's AFNI in the process):
+1. Download the correct AFNI archive, unpack it, and move it to a reasonable destination (not overwriting Neurodebian's AFNI in the process):
 
     ```
+    # For 64-bit linux download linux_xorg7_64.tgz, or for 32-bit linux, linux_xorg7.tgz:
     curl -O http://afni.nimh.nih.gov/pub/dist/tgz/linux_xorg7_64.tgz  # (> 600 MB)
-    tar -zxvf linux_xorg7_64.tgz    # ...results in directory called linux_xorg7_64
-    mv linux_xorg7_64 /opt/abin     # ...simultaneous move and rename of directory
+    
+    tar -zxvf linux_xorg7_64.tgz                  # ...results in directory called linux_xorg7_64
+    linux_xorg7_64/afni -ver                      # ...note the compile date at the end, and use it in the next command:
+    afniDate=YYYYMMDD                             # ...assign that compile date to a variable in format YYYYMMDD
+    sudo mv linux_xorg7_64 /opt/abin-${afniDate}  # ...simultaneous moving and renaming the directory
+    sudo rm /opt/abin                             # ...remove existing /opt/abin alias
+    sudo ln -s /opt/abin-${afniDate} /opt/abin    # ...create a link to that directory from a standard location
+    rm linux_xorg7_64.tgz                    # ...no need to keep this file around
     ```
     
-2. Download and edit these scripts to switch between the neurodebian repository version of afni and this alternative version: 
-[/opt/afniSwitchFromRepo.sh](http://goo.gl/LVrpaj) and [/opt/afniSwitchToRepo.sh](http://goo.gl/hx8JVF).
+2. Download and edit my short AFNI switching scripts: [/opt/afniSwitchFromRepo.sh](http://goo.gl/LVrpaj) and [/opt/afniSwitchToRepo.sh](http://goo.gl/hx8JVF).
+
+3. Type `source /opt/afniSwitchFromRepo.sh` to switch the current terminal's AFNI version 
+to the fresh one installed in `/opt/abin/` instead of the default version from the Neurodebian repository. 
+The change only applies to the current terminal window, and only until it is closed.
+
+4. If you need to switch this terminal back to the Neurodebian version of AFNI, just type `source /opt/afniSwitchToRepo.sh`.
+ 
+
 
 
 
@@ -439,37 +458,41 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
 2. unpack and install bxh/xcede:
 
      ```
-     # ...first declare the bxh version as it appears in the download filename:
+     # ...first declare the bxh version and architecture as they appear in the download filename:
      bxhVersion=1.10.7
+     bxhArch=lsb31.i386
      
      # ...then unpack and install:
      cd ~/Downloads
-     tar -zxvf bxh_xcede_tools-${bxhVersion}-lsb31.i386.tgz
-     sudo mv bxh_xcede_tools-${bxhVersion}-lsb31.i386 /opt/
-     sudo ln -s /opt/bxh_xcede_tools-${bxhVersion}-lsb31.i386 /opt/bxh
+     tar -zxvf bxh_xcede_tools-${bxhVersion}-${bxhArch}.tgz
+     sudo mv bxh_xcede_tools-${bxhVersion}-${bxhArch} /opt/
+     sudo rm /opt/bxh
+     sudo ln -s /opt/bxh_xcede_tools-${bxhVersion}-${bxhArch} /opt/bxh
      ```
      
 3. For system-wide access, configure the environment via /etc/bash.bashrc :
 
-     ```
-     #    WARNING: note the \${escapedVariables} below, which
-     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
-     #    Un-escape them if manually typing into a text editor.
-     #    Otherwise, just paste these lines to your bash prompt
-     #    (up to and including "EOF" line):
-     #
-     editDate=`/bin/date +%Y%m%d`
-     editTime=$(date +%k%M)
-     sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
-     #------------------------------------------
-     # on ${editDate} at ${editTime}, $USER 
-     # added some BXH/XCEDE environment statements:
-     BXHDIR=/opt/bxh
-     PATH=\${BXHDIR}/bin:\${PATH}
-     export BXHDIR PATH
-     #------------------------------------------
-     EOF
-     ```
+    ```
+    #    WARNING: note the \${escapedVariables} below, which
+    #    are escaped for heredoc (http://goo.gl/j3HMJ). 
+    #    Un-escape them if manually typing into a text editor.
+    #    Otherwise, just paste these lines to your bash prompt
+    #    (up to and including "EOF" line):
+    #
+    editDate=`/bin/date +%Y%m%d`
+    editTime=$(date +%k%M)
+    sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
+    #-------------------------------------------
+    # on ${editDate} at ${editTime}, $USER 
+    # added some BXH/XCEDE environment statements:
+    BXHDIR=/opt/bxh
+    PATH=\${BXHDIR}/bin:\${PATH}
+    export BXHDIR PATH
+    #------------------------------------------
+    EOF
+    #
+    cat /etc/bash.bashrc
+    ```
 
 4. Either log out and back in again, or issue this terminal command:
 
