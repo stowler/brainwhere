@@ -631,32 +631,32 @@ Installing FreeSurfer on Ubuntu 12.04 :
 
 2. This can also be done from the commandline instead of the webpage:
 
-      ```
-      fsFtpDir="ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/5.2.0"
-      fsFtpFilename="freesurfer-Linux-centos4_x86_64-stable-pub-v5.2.0.tar.gz"
-      cd ~/Downloads
-      wget ${fsFtpDir}/${fsFtpFilename}
+    ```
+    fsFtpDir="ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/5.2.0"
+    fsFtpFilename="freesurfer-Linux-centos4_x86_64-stable-pub-v5.2.0.tar.gz"
+    cd ~/Downloads
+    wget ${fsFtpDir}/${fsFtpFilename}
         
-      # …and to resume a failed download:
-      curl -C - -o ${fsFtpFilename} ${fsFtpDir}/${fsFtpFilename}
-      ```
+    # …and to resume a failed download:
+    curl -C - -o ${fsFtpFilename} ${fsFtpDir}/${fsFtpFilename}
+    ```
  
 3. Confirm that the download is valid:
 
-      ```
-      sh <<EOF
-      curl -s -o freesurfer_md5sums.txt http://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/md5sum.txt
-      echo ""
-      echo "expected md5 sum:"
-      grep ${fsFtpFilename} freesurfer_md5sums.txt
-      echo ""
-      echo "md5sum of downloaded ${fsFtpFilename}:"
-      md5 ${fsFtpFilename}
-      echo ""
-      echo "(re-download if they don't match)"
-      echo ""
-      EOF
-      ```
+    ```
+    sh <<EOF
+    curl -s -o freesurfer_md5sums.txt http://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/md5sum.txt
+    echo ""
+    echo "expected md5 sum:"
+    grep ${fsFtpFilename} freesurfer_md5sums.txt
+    echo ""
+    echo "md5sum of downloaded ${fsFtpFilename}:"
+    md5 ${fsFtpFilename}
+    echo ""
+    echo "(re-download if they don't match)"
+    echo ""
+    EOF
+    ```
 
 ITK-SNAP
 ====================
