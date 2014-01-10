@@ -48,7 +48,7 @@ In prepreation for installing applications and using the VM, first import the VM
  * 2048 MB of RAM (Settings -> System -> Motherboard)
  * one or two CPU's (Settings -> System -> Processor)
  * >= 64 MB video RAM (Settings -> Display -> Video)
- * no 3D or 2D accelleration (Settings -> sudo Display -> Video)
+ * no 3D or 2D accelleration (Settings -> Display -> Video)
  * create a shared folder that the guest sees as "host, and set to automount (Shared Folders)
 
 5. Boot the VM and follow the NeuroDebian Setuup Wizard to completion:
@@ -73,6 +73,7 @@ In prepreation for installing applications and using the VM, first import the VM
 notice that the currently installed virtualbox guest additions are older than your version of virtualbox: 
     ```
     sudo lsmod | grep -io vboxguest | xargs sudo modinfo
+    (compare to version of VirtualBox: mouse to Virtualbox VM -> About Virtualbox VM
     ```
 9. Find the installed packages that currently supply those older guest additions:
     ```
@@ -208,7 +209,7 @@ For instructions on how to configure those environmental variables, see the neur
 
 
 
-Install FSL on Debian 7.0 Wheezy Neurodebian VM:
+Install FSL on Debian 7.2.0 Wheezy Neurodebian VM:
 ------------------------------------------------------------
 
 I am currently happy with the version in the neurodebian repos:
