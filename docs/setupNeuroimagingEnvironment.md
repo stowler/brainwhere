@@ -2,7 +2,7 @@ setupNeuroimagingEnvironment.md
 ==========
 
 stowler@gmail.com
-updated: 20130820
+updated: 20140109
 
 
 My neuroimaging scripts and documentation refer to these open-source neuroimaging resources:
@@ -20,18 +20,18 @@ My neuroimaging scripts and documentation refer to these open-source neuroimagin
 
 This document describes how to deploy these resources in the three computing environments I currently use:
 
-* OS X Mountain Lion + MacPorts
+* OS X Mavericks + MacPorts
 * Neurodebian on Ubuntu 12.04 on 64-bit processors
-* Neurodebian VM, running Debian 7.0 wheezy 32-bit on VirtualBox
+* Neurodebian VM, running Debian 7.2.0 wheezy 32-bit on VirtualBox
 
-[This basic set of system utilities](http://goo.gl/ncbZD) must be installed prior to following these instructions.
+[This basic set of system utilities](http://j.mp/setupScripting) must be installed prior to following these instructions.
 
-Once these neuroimaging packages have been installed and tested you could also follow [these instructions](http://goo.gl/gwZCv) to install my personal repository of neuroimaging scripts.
+Once these neuroimaging packages have been installed and tested you could also follow [these instructions](http://j.mp/brainwhereREADME) to install my personal repository of neuroimaging scripts.
 
 
 Neurodebian Virtual Machine (VM)
 ===================================
-At the time of writing, the neurodebian virtual machine (VM) is built on Debian stable 7.0 "wheezy". 
+At the time of writing, the neurodebian virtual machine (VM) is built on Debian stable 7.2.0 "wheezy". 
 In prepreation for installing applications and using the VM, first import the VM and update its guest additions:
 
 
@@ -40,16 +40,16 @@ In prepreation for installing applications and using the VM, first import the VM
 2. Download the [neurodebian VM .ova/.ovf](http://neuro.debian.net/):
  * click "Get Neurodebian"
  * Select operating system: Mac or Windows
- * Download the Debian 7.0 .ova or zip/ovf file (I prefer the 32-bit version. Easier to distribute to heterogeneous hardware).
+ * Download the Debian 7.2.0 .ova or zip/ovf file (I prefer the 32-bit version. Easier to distribute to heterogeneous hardware).
 
 3. Import the virtual machine by following the neurodebian [install instructions](http://neuro.debian.net/vm.html#chap-vm), which they support with a [youtube video](http://www.youtube.com/watch?v=eqfjKV5XaTE).
 
 4. Before booting the VM, confirm a few settings that will help avoid initial errors:
- * 2048 MB of RAM
- * single CPU
- * 64 MB video RAM
- * no 3D or 2D accelleration
- * create a shared folder that the guest sees as "host"
+ * 2048 MB of RAM (Settings -> System -> Motherboard)
+ * one or two CPU's (Settings -> System -> Processor)
+ * >= 64 MB video RAM (Settings -> Display -> Video)
+ * no 3D or 2D accelleration (Settings -> sudo Display -> Video)
+ * create a shared folder that the guest sees as "host, and set to automount (Shared Folders)
 
 5. Boot the VM and follow the NeuroDebian Setuup Wizard to completion:
  * answer "Yes" to system update
@@ -90,15 +90,15 @@ notice that the currently installed virtualbox guest additions are older than yo
     ```
     sudo apt-get install build-essential module-assistant
     sudo m-a prepare
-    (use the mouse in the virutalbox GUI to choose Device -> Install Guest Additions)
+    (then mouse to Virtualbox GUI menu: Device -> Insert Guest Additions CD image... )
     sudo mount /media/cdrom0
     ls /media/cdrom0
     sudo sh /media/cdrom0/VBoxLinuxAdditions.run
     ```
-13. Shutdown the VM (not reboot).
-14. Enable 3D accelleration.
+13. Shutdown the VM (not reboot, but "shutdown -h now").
+14. Enable 3D accelleration (Settings -> Display -> Enable 3D Acceleration)
 15. Boot the guest.
-16. `sudo aptitude` and git rid of the queued items ("g", "-")
+16. `sudo aptitude` and git rid of the queued items (`g`, `-`, `q`)
 17. Install support for 3D operations and the impending R installation:
     ```
     sudo apt-get install xorg-dev libx11-dev libglu1-mesa-dev libxml2-dev libopenmpi-dev mesa-utils glew-utils
@@ -107,7 +107,7 @@ notice that the currently installed virtualbox guest additions are older than yo
 18. Reboot the guest.
 19. Test 3D support by running `glxgears`.
 
-If everything is stable, the VM is now ready to receive [this basic set of system utilities](http://goo.gl/ncbZD), followed by the neuroimaging apps listed below.  
+If everything is stable, the VM is now ready to receive [this basic set of system utilities](http://j.mp/setupScripting), followed by the neuroimaging apps listed below.  
 
 
 FSL
