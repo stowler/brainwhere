@@ -84,7 +84,13 @@ notice that the currently installed virtualbox guest additions are older than yo
 
 10. Uninstall those outdated guest additions: 
     ```
-    sudo apt-get purge virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11 virtualbox-ose-guest-dkms virtualbox-ose-guest-utils virtualbox-ose-guest-x11
+    sudo apt-get purge         \
+    virtualbox-guest-dkms      \
+    virtualbox-guest-utils     \
+    virtualbox-guest-x11       \
+    virtualbox-ose-guest-dkms  \
+    virtualbox-ose-guest-utils \
+    virtualbox-ose-guest-x11
     ```
 
 11. Reboot the guest, and confirm that the modules from those old guest additions are no longer present: 
@@ -96,7 +102,9 @@ notice that the currently installed virtualbox guest additions are older than yo
     ```
     sudo apt-get install build-essential module-assistant
     sudo m-a prepare
+
     (mouse: Virtualbox GUI menu: Device -> Insert Guest Additions CD image... )
+    
     sudo mount /media/cdrom0
     ls /media/cdrom0
     sudo sh /media/cdrom0/VBoxLinuxAdditions.run
@@ -108,9 +116,14 @@ notice that the currently installed virtualbox guest additions are older than yo
 16. `sudo aptitude` and git rid of the queued items (`g`, `-`, `q`)
 17. Install support for 3D operations and the impending R installation:
     ```
-    sudo apt-get install xorg-dev libx11-dev libglu1-mesa-dev libxml2-dev libopenmpi-dev mesa-utils glew-utils
-    sudo apt-get install cdbs debhelper tcl-tclreadline tk8.5-dev unixodbc-dev
+    sudo apt-get install \
+    xorg-dev libx11-dev libglu1-mesa-dev \
+    libxml2-dev libopenmpi-dev mesa-utils glew-utils
+
+    sudo apt-get install \
+    cdbs debhelper tcl-tclreadline tk8.5-dev unixodbc-dev
     ```
+
 18. Reboot the guest.
 19. Test 3D support by running `glxgears`.
 
