@@ -75,18 +75,23 @@ notice that the currently installed virtualbox guest additions are older than yo
     sudo lsmod | grep -io vboxguest | xargs sudo modinfo
     (compare to version of VirtualBox: mouse to Virtualbox VM -> About Virtualbox VM
     ```
+
 9. Find the installed packages that currently supply those older guest additions:
+
     ```
     dpkg -l | grep virtualbox
     ```
+
 10. Uninstall those outdated guest additions: 
     ```
     sudo apt-get purge virtualbox-guest-dkms virtualbox-guest-utils virtualbox-guest-x11 virtualbox-ose-guest-dkms virtualbox-ose-guest-utils virtualbox-ose-guest-x11
     ```
+
 11. Reboot the guest, and confirm that the modules from those old guest additions are no longer present: 
     ```
     sudo lsmod | grep -io vboxguest | xargs sudo modinfo
     ```
+
 12. Install the guest additions that match your current version of virutalbox:
     ```
     sudo apt-get install build-essential module-assistant
@@ -96,6 +101,7 @@ notice that the currently installed virtualbox guest additions are older than yo
     ls /media/cdrom0
     sudo sh /media/cdrom0/VBoxLinuxAdditions.run
     ```
+
 13. Shutdown the VM (not reboot, but "shutdown -h now").
 14. Enable 3D accelleration (Settings -> Display -> Enable 3D Acceleration)
 15. Boot the guest.
