@@ -91,7 +91,7 @@ notice that the currently installed virtualbox guest additions are older than yo
     ```
     sudo apt-get install build-essential module-assistant
     sudo m-a prepare
-    (then mouse to Virtualbox GUI menu: Device -> Insert Guest Additions CD image... )
+    (mouse: Virtualbox GUI menu: Device -> Insert Guest Additions CD image... )
     sudo mount /media/cdrom0
     ls /media/cdrom0
     sudo sh /media/cdrom0/VBoxLinuxAdditions.run
