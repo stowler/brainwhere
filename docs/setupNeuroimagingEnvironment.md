@@ -49,7 +49,7 @@ In prepreation for installing applications and using the VM, first import the VM
  * one or two CPU's (Settings -> System -> Processor)
  * >= 64 MB video RAM (Settings -> Display -> Video)
  * no 3D or 2D accelleration (Settings -> Display -> Video)
- * create a shared folder that the guest sees as "host, and set to automount (Shared Folders)
+ * create a shared folder that the guest sees as "host", and set to automount (Settings -> Shared Folders)
 
 5. Boot the VM and follow the NeuroDebian Setuup Wizard to completion:
  * answer "Yes" to system update
@@ -126,6 +126,14 @@ notice that the currently installed virtualbox guest additions are older than yo
 
 18. Reboot the guest.
 19. Test 3D support by running `glxgears`.
+20. Grant the user named brain access the host's shared folder established in step 2 above:
+    ```
+    sudo usermod -a -G vboxsf brain
+    (reboot the VM)
+    ls -al /media/sf_host
+    ls -al ~/host  
+    (you should see that /home/brain/host is just a symlink to /media/sf_host)
+    ```
 
 If everything is stable, the VM is now ready to receive [this basic set of system utilities](http://j.mp/setupScripting), followed by the neuroimaging apps listed below.  
 
