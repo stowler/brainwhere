@@ -129,7 +129,9 @@ notice that the currently installed virtualbox guest additions are older than yo
 20. Grant the user named brain access the host's shared folder established in step 2 above:
     ```
     sudo usermod -a -G vboxsf brain
+
     (reboot the VM)
+    
     ls -al /media/sf_host
     ls -al ~/host  
     (you should see that /home/brain/host is just a symlink to /media/sf_host)
