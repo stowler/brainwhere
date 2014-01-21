@@ -170,15 +170,8 @@ There are multiple ways to install (as of May 2013). I get mixed results with th
     python fslinstaller.py -d ${fslDestDir} -f ${fslDownload} -C ${fslMD5}
     ```
 
-3. After the install completes, confirm that the file /etc/bashrc received a block of FSL environmental variables (below). If not, the install program may have added it to your personal ~/.profile or ~/.bash_profile instead.
+3. After the install completes, confirm that the file /etc/bashrc received a block of FSL environmental variables (below). If not, the install program may have added it to your personal ~/.profile or ~/.bash_profile instead. For system-wide installation, remove from those files and append to /etc/bashrc . First cache your sudo credentials with the command `sudo cat /var/log/auth.log`  (ignore the output from this command, it's just a way to put in your sudo password). Then copy this block of lines and paste it into the terminal:
 
-For system-wide installation, remove from those files and append to /etc/bashrc . First cache your sudo credentials (ignore the output from this command, it's just a way to put in your sudo password):
-
-    ```
-    sudo cat /var/log/auth.log
-    ```
-
-Then copy this block of lines and paste it into the terminal:
 
     #    WARNING: note the \${escapedVariables} below, which
     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
