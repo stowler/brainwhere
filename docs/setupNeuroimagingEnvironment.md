@@ -146,7 +146,7 @@ FSL
 Install FSL on Mac OS X Mountain/Lion:
 ----------------------------------------------------------------
 
-Before installing FSL, freesurfer, or  AFNI on Mountain/Lion be doulbe-sure you have installed [XQuartz](http://xquartz.macosforge.org), and loged out and then back in.
+Before installing FSL, freesurfer, or  AFNI on Mountain/Lion be double-sure you have installed [XQuartz](http://xquartz.macosforge.org), and logged out and then back in.
 
 
 Google "FSL install" and [follow instructions](http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation/MacOsX#Downloading_the_install_file_without_installing_the_software)
@@ -170,9 +170,10 @@ There are multiple ways to install (as of May 2013). I get mixed results with th
     python fslinstaller.py -d ${fslDestDir} -f ${fslDownload} -C ${fslMD5}
     ```
 
-3. After the install completes, confirm that the file /etc/bashrc received a block of FSL environmental variables (below). If not, the install program may have added it to your personal ~/.profile or ~/.bash_profile instead. For system-wide installation, remove from those files and append to /etc/bashrc . First cache your sudo credentials with the command `sudo cat /var/log/auth.log`  (ignore the output from this command, it's just a way to put in your sudo password). Then copy this block of lines and paste it into the terminal:
+3. After the install completes, confirm that the file /etc/bashrc received a block of FSL environmental variables (below). If not, the install program may have added it to your personal ~/.profile or ~/.bash_profile instead. For system-wide installation, remove from those files and append to /etc/bashrc . Do this by first caching your sudo credentials via the command `sudo tail /var/log/auth.log`  (ignore the output from this command, it is just an excluse to give your password to sudo). Then immediately copy this block of lines and paste it into the terminal:
 
 
+    ```
     #    WARNING: note the \${escapedVariables} below, which
     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
     #    Un-escape them if manually typing into a text editor.
@@ -191,8 +192,9 @@ There are multiple ways to install (as of May 2013). I get mixed results with th
     . \${FSLDIR}/etc/fslconf/fsl.sh
     #------------------------------------------
     EOF
+    #
     cat /etc/bashrc 
- 
+    ```
 
 Either log out and back in again, or issue this terminal command:
 
@@ -240,19 +242,15 @@ For instructions on how to configure those environmental variables, see the neur
 Install FSL on Debian 7.2.0 Wheezy Neurodebian VM:
 ------------------------------------------------------------
 
-I am currently happy with the version in the neurodebian repos:
+I am currently using the version in the neurodebian repos, but during installation it needs some hand-holding to avoid installation of GPU-related components. I demonstrate installation during minutes 28:20 through 34:01 of [my screencast on neurodebian wheezy 3D support.](http://j.mp/neurodebianVM3D)
 
-    sudo apt-get install fsl-complete fsl-feeds
-
-...but previous to fsl-completed, you needed to apt-get install separate packages:
-
-    sudo apt-get install fsl-atlases fsl-feeds fsl-first-data fslview and fsl-feeds
-    
-After installation of the packages, get instructions for environmental variables (e.g., may need to source AFNI/FSL script from /etc/bash.bashrc)
+After installation of the fsl packages, check for instructions on configuring environmental variables (e.g., you may need to source FSL's setup script from `/etc/bash.bashrc`):
 
     man fsl
 
-After the install completes, confirm whether the file /etc/bash.bashrc received a block of FSL environmental variables (below). If not, the install program may have added it to your personal ~/.profile or ~/.bash_profile instead. For system-wide installation, remove from those files and append to /etc/bash.bashrc:
+For system-wide installation, confirm that the file `/etc/bash.bashrc` received a block of FSL environmental variables (below). If not, the install program may have added it to your personal `~/.profile` or `~/.bash_profile` instead. For system-wide installation, remove the lines from those files and append to `/etc/bash.bashrc`. 
+
+Do this by first caching your sudo credentials via the command `sudo tail /var/log/auth.log` (ignore the output from this command, it is just an excluse to give your password to sudo). Then immediately copy this block of lines and paste it into the terminal:
 
     # No FSL environmental variables in /etc/bash.bashrc ? Add them by pasting these lines into the terminal:
     #
@@ -268,11 +266,19 @@ After the install completes, confirm whether the file /etc/bash.bashrc received 
     #------------------------------------------
     # on ${editDate} at ${editTime}, $USER 
     # added some FSL setup:
-    . /etc/fsl/fsl.sh
+    . /etc/fsl/5.0/fsl.sh
     #------------------------------------------
     EOF
     #
     cat /etc/bash.bashrc 
+
+Either log out and back in again, or issue this terminal command:
+
+     . /etc/bash.bashrc
+
+TEST: did the environmental variable $FSLDIR get exported correctly? The command `echo $FSLDIR` should return something like `/usr/share/fsl/X.X`
+
+TEST: can the shell environment find the FSL binaries? The command `fslinfo` issued without an image filename should produce something like `Usage: /usr/lib/fsl/X.X/fslinfo <filename>`.
 
 
 
