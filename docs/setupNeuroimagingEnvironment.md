@@ -116,12 +116,19 @@ notice that the currently installed virtualbox guest additions are older than yo
 16. `sudo aptitude` and git rid of the queued items (`g`, `-`, `q`)
 17. Install support for 3D operations and the impending R installation:
     ```
+    # The lsb package listed below isn't required for 3D and R, but it has
+    # the potential to affect 3D and R install so I include it here, prior
+    # to the 3D and R testing that follows later:
     sudo apt-get install \
     xorg-dev libx11-dev libglu1-mesa-dev \
-    libxml2-dev libopenmpi-dev mesa-utils glew-utils
+    libxml2-dev libopenmpi-dev mesa-utils glew-utils lsb
 
     sudo apt-get install \
     cdbs debhelper tcl-tclreadline tk8.5-dev unixodbc-dev
+    
+    # If this is a 64-bit virtual machine, install 32-bit support:
+    # (libc6-i386 seems to have replaced ia32-libs in wheezy)
+    sudo apt-get install libc6-i386
     ```
 
 18. Reboot the guest.
@@ -184,7 +191,7 @@ There are multiple ways to install (as of May 2013). I get mixed results with th
     editTime=$(date +%k%M)
     sudo tee -a /etc/bashrc >/dev/null <<EOF
     #------------------------------------------
-    # on ${editDate} at ${editTime}, $USER 
+    # on ${editDate} at ${editTime}, user $USER 
     # added some FSL setup:
     FSLDIR=/usr/local/fsl
     PATH=\${FSLDIR}/bin:\${PATH}
@@ -244,7 +251,7 @@ Install FSL on Debian 7.2.0 Wheezy Neurodebian VM:
 
 I am currently using the version in the neurodebian repos, but during installation it needs some hand-holding to avoid installation of GPU-related components. I demonstrate installation during minutes 28:20 through 34:01 of [my screencast on neurodebian wheezy 3D support.](http://j.mp/neurodebianVM3D)
 
-After installation of the fsl packages, check for instructions on configuring environmental variables (e.g., you may need to source FSL's setup script from `/etc/bash.bashrc`):
+After following those instructions to install the fsl packages, check for instructions on configuring environmental variables (e.g., you may need to source FSL's setup script from `/etc/bash.bashrc`):
 
     man fsl
 
@@ -264,7 +271,7 @@ Do this by first caching your sudo credentials via the command `sudo tail /var/l
     editTime=$(date +%k%M)
     sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
     #------------------------------------------
-    # on ${editDate} at ${editTime}, $USER 
+    # on ${editDate} at ${editTime}, user $USER 
     # added some FSL setup:
     . /etc/fsl/5.0/fsl.sh
     #------------------------------------------
@@ -327,7 +334,7 @@ Add AFNI's new location to the path in /etc/bashrc :
     editTime=$(date +%k%M)
     sudo tee -a /etc/bashrc >/dev/null <<EOF
     #------------------------------------------
-    # on ${editDate} at ${editTime}, $USER  
+    # on ${editDate} at ${editTime}, user $USER  
     # added some AFNI environmental variables:
     export PATH=/usr/local/abin:${PATH}
     export AFNI_ENFORCE_ASPECT=YES
@@ -376,7 +383,7 @@ what version of AFNI is active:
     editTime=$(date +%k%M)
     sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
     #------------------------------------------
-    # on ${editDate} at ${editTime}, $USER 
+    # on ${editDate} at ${editTime}, user $USER 
     # added some AFNI setup:
     . /etc/afni/afni.sh
     echo ""
@@ -483,14 +490,20 @@ I wrote an installation script that [describes the problem](http://goo.gl/Nalzn)
 Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
 -----------------------------------------------------------------
 
-1. manualy download most recent bxh/xcede release from nitrc: http://www.nitrc.org/projects/bxh_xcede_tools
+1. Install lsb if it isn't already installed:
+
+    ```
+    sudo apt-get install lsb
+    ```
+
+2. manualy download most recent bxh/xcede release from nitrc: http://www.nitrc.org/projects/bxh_xcede_tools
 
      ```
      $ ls -l ~/Downloads/bxh_xcede_tools-*.tgz
      bxh_xcede_tools-1.10.7-lsb31.i386.tgz
      ```
      
-2. unpack and install bxh/xcede:
+3. unpack and install bxh/xcede:
 
      ```
      # ...first declare the bxh version and architecture as they appear in the download filename:
@@ -501,11 +514,11 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
      cd ~/Downloads
      tar -zxvf bxh_xcede_tools-${bxhVersion}-${bxhArch}.tgz
      sudo mv bxh_xcede_tools-${bxhVersion}-${bxhArch} /opt/
-     sudo rm /opt/bxh
+     sudo rm -f /opt/bxh
      sudo ln -s /opt/bxh_xcede_tools-${bxhVersion}-${bxhArch} /opt/bxh
      ```
      
-3. For system-wide access, configure the environment via /etc/bash.bashrc :
+4. For system-wide access, configure the environment via `/etc/bash.bashrc`.  Do this by first caching your sudo credentials via the command `sudo tail /var/log/auth.log`  (ignore the output from this command, it is just an excluse to give your password to sudo). Then immediately copy this block of lines and paste it into the terminal:
 
     ```
     #    WARNING: note the \${escapedVariables} below, which
@@ -518,7 +531,7 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
     editTime=$(date +%k%M)
     sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
     #-------------------------------------------
-    # on ${editDate} at ${editTime}, $USER 
+    # on ${editDate} at ${editTime}, user $USER 
     # added some BXH/XCEDE environment statements:
     BXHDIR=/opt/bxh
     PATH=\${BXHDIR}/bin:\${PATH}
@@ -529,16 +542,16 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
     cat /etc/bash.bashrc
     ```
 
-4. Either log out and back in again, or issue this terminal command:
+5. Either log out and back in again, or issue this terminal command:
 
      ```
-     . /etc/bashrc
+     . /etc/bash.bashrc
      ```
      
-5. TEST: did $BXHDIR get exported correctly? This should return a listing of bxh programs :
+6. TEST: did $BXHDIR get exported correctly? This should return a listing of bxh programs :
 
       ```
-      ls $BXHDIR
+      ls ${BXHDIR}/bin
       ```
 
 FreeSurfer
@@ -608,7 +621,7 @@ and FSL (b/c FS's install will detect location of FSL).
      . \${FREESURFER_HOME}/SetUpFreeSurfer.sh
      #------------------------------------------
      EOF
-     
+     #
      cat /etc/bashrc 
      ```
 
