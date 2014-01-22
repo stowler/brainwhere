@@ -553,6 +553,20 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
       ```
       ls ${BXHDIR}/bin
       ```
+      
+7. TEST: does the command `bxhabsorb` (no arguments) produce its help message? If not, and instead there is a system message about command not found, there may be a problem with the lsb package.
+
+
+8. Because the `convert` and `montage` imagemagick programs included with the bxh download often produce font errors, replace them wtih the system-wide convert and montage programs:
+
+    ```
+    sudo mv ${BXHDIR}/bin/convert ${BXHDIR}/bin/orig_convert
+    sudo mv ${BXHDIR}/bin/montage ${BXHDIR}/bin/orig_montage
+    sudo ln -s /usr/bin/convert ${BXHDIR}/bin/convert
+    sudo ln -s /usr/bin/montage ${BXHDIR}/bin/montage
+    ls -l ${BXHDIR}/bin/convert
+    ls -l ${BXHDIR}/bin/montage 
+    ```
 
 FreeSurfer
 ===============
