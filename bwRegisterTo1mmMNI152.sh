@@ -178,8 +178,8 @@ fxnProcessInvocation() {
 	      -o)   outDir="${2}"; shift 2 ;;
 	      -l)   lesion="${2}"; shift 2 ;;
 	      -e)   epi="${2}"; shift 2 ;;
-	      -c)   integerVolumes="${integerVolumes} ${2}"; shift ;;
-	      -b)   decimalVolumes="${decimalVolumes} ${2}"; shift ;;
+	      -c)   integerVolumes="${integerVolumes} ${2}"; shift 2 ;;
+	      -b)   decimalVolumes="${decimalVolumes} ${2}"; shift 2 ;;
 	      --)   shift; break ;;
 	      -*)   echo >&2 "Error in invocation. See usage note" ; fxnPrintUsage ;  exit 1 ;;
 	       *)   echo "Error in arguments to ${scriptName}" ; fxnPrintUsage ; exit 1 ;;		# terminate while loop
