@@ -2,65 +2,73 @@ setupNeuroimagingEnvironment.md
 ==========
 
 stowler@gmail.com
-updated: 20140109
+updated: 20140730
 
 
 My neuroimaging scripts and documentation refer to these open-source neuroimaging resources:
 
 * neurodebian virtual machine
+* itksnap
 * fsl
 * afni
 * BXH/XCEDE tools (from FBIRN)
 * freesurfer
-* itksnap
 * mricron
 * mricrogl
 * imagej/fiji
 * spm
 
-This document describes how to deploy these resources in the three computing environments I currently use:
+This document describes how to deploy these resources in the computing environments I currently use:
 
-* OS X Mavericks + MacPorts
-* Neurodebian on Ubuntu 12.04 on 64-bit processors
-* Neurodebian VM, running Debian 7.2.0 wheezy 32-bit on VirtualBox
+* OS X Mavericks 10.9.4 + MacPorts
+* 64-bit Debian Wheezy 7.4.0 with Neurodebian repositories, as:
+    * custom wheezy deployments to physical CPUs, and
+    * Neurodebian-built VM (7.4.20140423_amd64) running under VirtualBox 4.3.14 r95030)
 
-[This basic set of system utilities](http://j.mp/setupScripting) must be installed prior to following these instructions.
+I'm in the process of deprecating a third platform (Neurodebian on Ubuntu 12.04 on 64-bit processors), and will gradually remove its documentation.
 
-Once these neuroimaging packages have been installed and tested you could also follow [these instructions](http://j.mp/brainwhereREADME) to install my personal repository of neuroimaging scripts.
+
+Before and after installation
+======================
+Before following the instructions below make sure that you have functional installs of [this basic set of system utilities](http://j.mp/setupScripting).
+
+After installing and testing the neuroimaging packages below you could also follow [these instructions](http://j.mp/brainwhereREADME) to install my personal repository of miscellaneous neuroimaging scripts.
 
 
 Neurodebian Virtual Machine (VM)
 ===================================
-At the time of writing, the neurodebian virtual machine (VM) is built on Debian stable 7.2.0 "wheezy". 
+At the time of writing, the Neurodebian virtual machine (VM) is built on Debian stable 7.4.0 "wheezy". 
 In prepreation for installing applications and using the VM, first import the VM and update its guest additions:
 
 
 1. Download and install the latest [VirtualBox binaries](https://www.virtualbox.org/wiki/Downloads).
- 
+
 2. Download the [neurodebian VM .ova/.ovf](http://neuro.debian.net/):
- * click "Get Neurodebian"
- * Select operating system: Mac or Windows
- * Download the Debian 7.2.0 .ova or zip/ovf file (I prefer the 32-bit version. Easier to distribute to heterogeneous hardware).
+	* click "Get Neurodebian"
+	* Select operating system: Mac or Windows
+	* Download the latest Debian .ova or zip/ovf file 
 
 3. Import the virtual machine by following the neurodebian [install instructions](http://neuro.debian.net/vm.html#chap-vm), which they support with a [youtube video](http://www.youtube.com/watch?v=eqfjKV5XaTE).
 
 4. Before booting the VM, confirm a few settings that will help avoid initial errors:
- * 2048 MB of RAM (Settings -> System -> Motherboard)
- * one or two CPU's (Settings -> System -> Processor)
- * >= 64 MB video RAM (Settings -> Display -> Video)
- * no 3D or 2D accelleration (Settings -> Display -> Video)
- * create a shared folder that the guest sees as "host", and set to automount (Settings -> Shared Folders)
+	* 2048 MB of RAM (Settings -> System -> Motherboard)
+	* one or two CPU's (Settings -> System -> Processor)
+	* \>= 64 MB video RAM (Settings -> Display -> Video)
+	* no 3D or 2D accelleration (Settings -> Display -> Video)
+	* create a shared folder that the guest sees as "host", and set to automount (Settings -> Shared Folders)
 
-5. Boot the VM and follow the NeuroDebian Setuup Wizard to completion:
- * answer "Yes" to system update
- * answer "Yes" to safe upgrades
- * close the Update Manager once complete
- * participate in the package popularity contest
- * answer "Yes" to custom environment ("Packages, such as AFNI and FSL, provide large collections of command line tools...")
- * select no items from the list of additional components, and click "OK"
- * allow the wizard to close
+5. Boot the VM and follow the Neurodebian Setup Wizard to completion:
+	1. Answer "Yes" to the system update question.
+	1. Answer "Yes" to "Do you want to proceed with updating the system?"
+	1. Click "Install Updates" button in the Update Manger.
+		1. Allow updates to complete, ending in message "Your system is up-to-date".
+		1. Click "Close" to close the update manager.
+	1. Answer yes to the questions about participating in the package popularity contest.
+	1. Answer "Yes" to custom environment question ("Packages, such as AFNI and FSL, provide large collections of command line tools...").
+	1. De-select all items from the list of additional components, and click "OK".
+	1. Allow the wizard to close.
 
-6. Reboot the guest to complete installation of those initial updates.
+6. Reboot the guest to complete installation of those initial updates: `sudo shutdown -r now`.
 
 7. After rebooting, update again for good measure:
     ```
