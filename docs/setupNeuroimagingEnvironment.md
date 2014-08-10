@@ -704,6 +704,7 @@ Installing FreeSurfer on Ubuntu 12.04 :
     ```
     fsFtpDir="ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/5.2.0"
     fsFtpFilename="freesurfer-Linux-centos4_x86_64-stable-pub-v5.2.0.tar.gz"
+    fsLocalDirName=`echo "$fsFtpFilename" | sed 's/\.tar\.gz//' | sed 's/\.tgz//'`
     cd ~/Downloads
     wget ${fsFtpDir}/${fsFtpFilename}
         
@@ -727,6 +728,14 @@ Installing FreeSurfer on Ubuntu 12.04 :
     echo ""
     EOF
     ```
+
+4. Unpack the download and move it to a reasonable destination:
+   ```
+   tar -zxvf ${fsFtpFilename}                            #...results in a directory called freesurfer
+   sudo mv freesurfer /opt/${fsLocalDirName}             #...simultaneously removing and renaming the directory
+   sudo rm /opt/freesurfer                               #...remove any existing /opt/freesurfer link
+   sudo ln -s /opt/${fsLocalDirName} /opt/freesurfer     #...create a standard-location link to the freesurfer directory
+   ```
 
 ITK-SNAP
 ====================
