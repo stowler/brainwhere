@@ -3,8 +3,8 @@
 # LOCATION: 	   <location including filename>
 # USAGE:          (see fxnPrintUsage() function below)
 #
-# CREATED:	      <date> by <whom>
-# LAST UPDATED:	<date> by <whom>
+# CREATED:	      ???????? by stowler@gmail.com
+# LAST UPDATED:	20140807 by stowler@gmail.com
 #
 # DESCRIPTION:
 # <description of what the script does>
