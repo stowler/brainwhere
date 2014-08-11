@@ -154,6 +154,25 @@ notice that the currently installed virtualbox guest additions are older than yo
 
 If everything is stable, the VM is now ready to receive [this basic set of system utilities](http://j.mp/setupScripting), followed by the neuroimaging apps listed below.  
 
+ITK-SNAP
+====================
+
+Install the ITK-SNAP binary on OS X Mountain/Lion:
+-----------------------------------------------------------------
+
+Download latest version from the [ITK-SNAP Downloads page](http://www.itksnap.org/pmwiki/pmwiki.php?n=Main.Downloads).
+* Choose "MacOS Binary (Intel, 64 bit, OSX 10.5+)"
+* Drag the resulting ITK-SNAP.app to /Applications folder
+
+
+Install the ITK-SNAP binary on Ubuntu 12.04:
+-----------------------------------------------------------------
+
+I'm currently happy with the version in the neurodebian repos:
+
+    sudo apt-get install itksnap
+
+
 
 FSL
 ==================
@@ -185,8 +204,15 @@ There are multiple ways to install (as of May 2013). I get mixed results with th
     python fslinstaller.py -d ${fslDestDir} -f ${fslDownload} -C ${fslMD5}
     ```
 
-3. After the install completes, confirm that the file /etc/bashrc received a block of FSL environmental variables (below). If not, the install program may have added it to your personal ~/.profile or ~/.bash_profile instead. For system-wide installation, remove from those files and append to /etc/bashrc . Do this by first caching your sudo credentials via the command `sudo tail /var/log/auth.log`  (ignore the output from this command, it is just an excluse to give your password to sudo). Then immediately copy this block of lines and paste it into the terminal:
+3. After the install completes, confirm that the file `/etc/bashrc` received a block of FSL environmental variables. If not, the install program may have added it to your personal `~/.profile` or `~/.bash_profile` instead. For system-wide installation remove the FSL variables from those personal files, and append to `/etc/bashrc` by doing this:
 
+    First cache your sudo credentials via this command (ignoring the output):
+
+    ```
+    sudo tail /var/log/auth.log
+    ```
+
+    ...then immediately copy this block of lines and paste it into the terminal:
 
     ```
     #    WARNING: note the \${escapedVariables} below, which
@@ -211,9 +237,10 @@ There are multiple ways to install (as of May 2013). I get mixed results with th
     cat /etc/bashrc 
     ```
 
-Either log out and back in again, or issue this terminal command:
-
+    Either log out and back in again, or issue this terminal command:
+    ```
      . /etc/bashrc
+    ```
 
 TEST: did $FSLDIR get exported correctly? This should return "/usr/local/fsl" (no quotes) :
 
@@ -259,16 +286,18 @@ Install FSL on Debian 7.2.0 Wheezy Neurodebian VM:
 
 I am currently using the version in the neurodebian repos, but during installation it needs some hand-holding to avoid installation of GPU-related components. I demonstrate installation during minutes 28:20 through 34:01 of [my screencast on neurodebian wheezy 3D support.](http://j.mp/neurodebianVM3D)
 
-After following those instructions to install the fsl packages, check for instructions on configuring environmental variables (e.g., you may need to source FSL's setup script from `/etc/bash.bashrc`):
+After following those instructions to install the FSL packages, check for instructions on configuring environmental variables (e.g., you may need to source FSL's setup script from `/etc/bash.bashrc`):
 
     man fsl
 
-For system-wide installation, confirm that the file `/etc/bash.bashrc` received a block of FSL environmental variables (below). If not, the install program may have added it to your personal `~/.profile` or `~/.bash_profile` instead. For system-wide installation, remove the lines from those files and append to `/etc/bash.bashrc`. 
+For system-wide installation, confirm that the file `/etc/bash.bashrc` received a block of FSL environmental variables. If not, the install program may have added it to your personal `~/.profile` or `~/.bash_profile` instead. For system-wide installation, remove the lines from those personal files and append to `/etc/bash.bashrc` by doing this: 
 
-Do this by first caching your sudo credentials via the command `sudo tail /var/log/auth.log` (ignore the output from this command, it is just an excluse to give your password to sudo). Then immediately copy this block of lines and paste it into the terminal:
+First cache your sudo credentials via this command (ignoring the output):
+ 
+    sudo tail /var/log/auth.log
 
-    # No FSL environmental variables in /etc/bash.bashrc ? Add them by pasting these lines into the terminal:
-    #
+...then immediately copy this block of lines and paste it into the terminal:
+
     #    WARNING: note the \${escapedVariables} below, which
     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
     #    Un-escape them if manually typing into a text editor.
@@ -330,7 +359,11 @@ Then download latest AFNI for Mac, unzip, and move to a reasonable location:
     tar -zxvf macosx_10.7_Intel_64.tgz
     sudo mv macosx_10.7_Intel_64 /usr/local/abin
 
-Add AFNI's new location to the path in /etc/bashrc :
+Add AFNI's new location to the path in `/etc/bashrc` by first caching your sudo credentials via this command (ignoring the output):
+ 
+    sudo tail /var/log/auth.log
+
+...then immediately copy this block of lines and paste it into the terminal:
 
     #    WARNING: note the \${escapedVariables} below, which
     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
@@ -379,7 +412,11 @@ I'm currently happy with the version in the neurodebian repos. Install with:
 ...then execute `man afni` to see instructions for setting environmental variables.
 You may be instructed to source an AFNI setup script from `/etc/bash.bashrc` . 
 I recommend doing so as follows, so that every new terminal window contains a message about 
-what version of AFNI is active:
+what version of AFNI is active. First cache your sudo credentials via this command (ignoring the output):
+
+   sudo tail /var/log/auth.log
+
+...then immediately copy this block of lines and paste into the terminal:
 
     #    WARNING: note the \${escapedVariables} below, which
     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
@@ -504,14 +541,14 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
     sudo apt-get install lsb
     ```
 
-2. manualy download most recent bxh/xcede release from nitrc: http://www.nitrc.org/projects/bxh_xcede_tools
+2. Manualy download most recent bxh/xcede release from nitrc: http://www.nitrc.org/projects/bxh_xcede_tools
 
      ```
      $ ls -l ~/Downloads/bxh_xcede_tools-*.tgz
      bxh_xcede_tools-1.10.7-lsb31.i386.tgz
      ```
      
-3. unpack and install bxh/xcede:
+3. Unpack and install bxh/xcede:
 
      ```
      # ...first declare the bxh version and architecture as they appear in the download filename:
@@ -526,29 +563,33 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
      sudo ln -s /opt/bxh_xcede_tools-${bxhVersion}-${bxhArch} /opt/bxh
      ```
      
-4. For system-wide access, configure the environment via `/etc/bash.bashrc`.  Do this by first caching your sudo credentials via the command `sudo tail /var/log/auth.log`  (ignore the output from this command, it is just an excluse to give your password to sudo). Then immediately copy this block of lines and paste it into the terminal:
+4. For system-wide access, configure the environment via `/etc/bash.bashrc`.  First cache your sudo credentials via this command (ignoring the output):
 
-    ```
-    #    WARNING: note the \${escapedVariables} below, which
-    #    are escaped for heredoc (http://goo.gl/j3HMJ). 
-    #    Un-escape them if manually typing into a text editor.
-    #    Otherwise, just paste these lines to your bash prompt
-    #    (up to and including "EOF" line):
-    #
-    editDate=`/bin/date +%Y%m%d`
-    editTime=$(date +%k%M)
-    sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
-    #-------------------------------------------
-    # on ${editDate} at ${editTime}, user $USER 
-    # added some BXH/XCEDE environment statements:
-    BXHDIR=/opt/bxh
-    PATH=\${BXHDIR}/bin:\${PATH}
-    export BXHDIR PATH
-    #------------------------------------------
-    EOF
-    #
-    cat /etc/bash.bashrc
-    ```
+        sudo tail /var/log/auth.log
+
+    ...then immediately copy this block of lines and paste it into the terminal:
+
+
+       #    WARNING: note the \${escapedVariables} below, which
+       #    are escaped for heredoc (http://goo.gl/j3HMJ). 
+       #    Un-escape them if manually typing into a text editor.
+       #    Otherwise, just paste these lines to your bash prompt
+       #    (up to and including "EOF" line):
+       #
+       editDate=`/bin/date +%Y%m%d`
+       editTime=$(date +%k%M)
+       sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
+       #-------------------------------------------
+       # on ${editDate} at ${editTime}, user $USER 
+       # added some BXH/XCEDE environment statements:
+       BXHDIR=/opt/bxh
+       PATH=\${BXHDIR}/bin:\${PATH}
+       export BXHDIR PATH
+       #------------------------------------------
+       EOF
+       #
+       cat /etc/bash.bashrc
+
 
 5. Either log out and back in again, or issue this terminal command:
 
@@ -556,7 +597,7 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
      . /etc/bash.bashrc
      ```
      
-6. TEST: did $BXHDIR get exported correctly? This should return a listing of bxh programs :
+6. TEST: did `$BXHDIR` get exported correctly? This should return a listing of bxh programs :
 
       ```
       ls ${BXHDIR}/bin
@@ -581,7 +622,7 @@ FreeSurfer
 (WARNINING: Stable 5.2 release WITHDRAWN awaiting upcoming version 5.3)
 
 If you haven't done so already, obtain a license, and copy the .license file to your 
-$FREESURFER_HOME directory per https://surfer.nmr.mgh.harvard.edu/registration.html
+`$FREESURFER_HOME` directory per https://surfer.nmr.mgh.harvard.edu/registration.html
 
 
 Installing FreeSurfer on Mac OS X Mountain/Lion:
@@ -621,12 +662,16 @@ and FSL (b/c FS's install will detect location of FSL).
  
 4. Doubleclick on the .dmg and run the .pkg installation file found inside of it. 
    [Detailed instructions](http://surfer.nmr.mgh.harvard.edu/fswiki/Installation) are available if you want them.
-   (Note the folder that this installs to, likely /Applications/freesurfer, which you will assign to $FREESURFER_HOME below.)
+   (Note the folder that this installs to, likely `/Applications/freesurfer`, which you will assign to `$FREESURFER_HOME` below.)
 
-5. add post-install config to /etc/bashrc per the bash section of the freesurfer [documentation](http://surfer.nmr.mgh.harvard.edu/fswiki/SetupConfiguration) :
+5. Add post-install config to `/etc/bashrc` per the bash section of the freesurfer [documentation](http://surfer.nmr.mgh.harvard.edu/fswiki/SetupConfiguration). First cache your sudo credentials via this command (ignoring the output):
+
+    ```
+    sudo tail /var/log/auth.log
+    ```
+    ...then immediately copy this block of lines and paste into the terminal:
 
      ```
-     #
      #    WARNING: note the \${escapedVariables} below, which
      #    are escaped for heredoc (http://goo.gl/j3HMJ). 
      #    Un-escape them if manually typing into a text editor.
@@ -696,23 +741,20 @@ and FSL (b/c FS's install will detect location of FSL).
 Installing FreeSurfer on Ubuntu 12.04 :
 ---------------------------------------------------------------
 
-1. [Download](http://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall) the latest .tar.gz binaries from the Freesurfer Wiki.
-
-
-2. This can also be done from the commandline instead of the webpage:
+1. [Download](http://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall) the latest .tar.gz binaries from the Freesurfer Wiki.  This can also be done from the commandline instead of the webpage:
 
     ```
-    fsFtpDir="ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/5.2.0"
-    fsFtpFilename="freesurfer-Linux-centos4_x86_64-stable-pub-v5.2.0.tar.gz"
+    fsFtpDir="ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/5.3.0-HCP"
+    fsFtpFilename="freesurfer-Linux-centos4_x86_64-stable-pub-v5.3.0-HCP.tar.gz"
     fsLocalDirName=`echo "$fsFtpFilename" | sed 's/\.tar\.gz//' | sed 's/\.tgz//'`
     cd ~/Downloads
-    wget ${fsFtpDir}/${fsFtpFilename}
+    curl -O ${fsFtpDir}/${fsFtpFilename}
         
     # …and to resume a failed download:
     curl -C - -o ${fsFtpFilename} ${fsFtpDir}/${fsFtpFilename}
     ```
  
-3. Confirm that the download is valid:
+2. Confirm that the download is valid:
 
     ```
     sh <<EOF
@@ -731,30 +773,80 @@ Installing FreeSurfer on Ubuntu 12.04 :
 
 4. Unpack the download and move it to a reasonable destination:
    ```
-   tar -zxvf ${fsFtpFilename}                            #...results in a directory called freesurfer
-   sudo mv freesurfer /opt/${fsLocalDirName}             #...simultaneously removing and renaming the directory
-   sudo rm /opt/freesurfer                               #...remove any existing /opt/freesurfer link
-   sudo ln -s /opt/${fsLocalDirName} /opt/freesurfer     #...create a standard-location link to the freesurfer directory
+   cd ~/Downloads
+   rm -fr freesurfer                                     #...removes any existing directory named freesurfer
+   tar -zxvf ${fsFtpFilename}                            #...results in a new directory named freesurfer
+   sudo mv freesurfer /opt/${fsLocalDirName}             #...simultaneously removes and renames the directory
+   sudo rm /opt/freesurfer                               #...removes any existing /opt/freesurfer link
+   sudo ln -s /opt/${fsLocalDirName} /opt/freesurfer     #...creates a standard-location link to the freesurfer directory
    ```
 
-ITK-SNAP
-====================
+5. Add post-install config to /etc/bashrc per the bash section of the freesurfer [documentation](http://surfer.nmr.mgh.harvard.edu/fswiki/SetupConfiguration) :
 
-Install the ITK-SNAP binary on OS X Mountain/Lion:
------------------------------------------------------------------
+     ```
+     #    WARNING: note the \${escapedVariables} below, which
+     #    are escaped for heredoc (http://goo.gl/j3HMJ). 
+     #    Un-escape them if manually typing into a text editor.
+     #    Otherwise, just paste these lines to your bash prompt
+     #    (up to and including "EOF" line):
+     #
+     editDate=`/bin/date +%Y%m%d`
+     editTime=$(date +%k%M)
+     sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
+     #------------------------------------------
+     # on ${editDate} at ${editTime}, $USER   
+     # added some freesurfer environmental variables:
+     export FREESURFER_HOME=/opt/freesurfer
+     . \${FREESURFER_HOME}/SetUpFreeSurfer.sh
+     #------------------------------------------
+     EOF
+     #
+     cat /etc/bash.bashrc 
+     ```
 
-Download latest version from the [ITK-SNAP Downloads page](http://www.itksnap.org/pmwiki/pmwiki.php?n=Main.Downloads).
-* Choose "MacOS Binary (Intel, 64 bit, OSX 10.5+)"
-* Drag the resulting ITK-SNAP.app to /Applications folder
+4. Copy the sample data to a place where users can write to it:
 
+     ```
+     cp -a $SUBJECTS_DIR /home/fs-localSubjects
+     ```
 
-Install the ITK-SNAP binary on Ubuntu 12.04:
------------------------------------------------------------------
+5. Edit ${FREESURFER_HOME}/SetUpFreeSurfer.sh to reflect the change in $SUBJECTS_DIR, then
+   either log out and back in again, or issue this terminal command:
 
-I'm currently happy with the version in the neurodebian repos:
+     ```
+     . /etc/bashrc 
+     ```
+ 
+6. TEST: open a new terminal window. You should see a number of freesurfer-related lines at the top of the new terminal window, and all the terminal windows you open after that.
 
-    sudo apt-get install itksnap
+7. TESTS: Test your installation by issuing the test commands detailed on the [Testing Freesurfer webpage](http://surfer.nmr.mgh.harvard.edu/fswiki/TestingFreeSurfer ).
 
+      ```
+      # TEST freeview:
+      freeview \
+      -v $SUBJECTS_DIR/bert/mri/norm.mgz \
+      -v $SUBJECTS_DIR/bert/mri/aseg.mgz:colormap=lut:opacity=0.2 \
+      -f $SUBJECTS_DIR/bert/surf/lh.white:edgecolor=yellow \
+      -f $SUBJECTS_DIR/bert/surf/rh.white:edgecolor=yellow \
+      -f $SUBJECTS_DIR/bert/surf/lh.pial:annot=aparc:edgecolor=red \
+      -f $SUBJECTS_DIR/bert/surf/rh.pial:annot=aparc:edgecolor=red
+        
+      # TEST tkmedit (volume viewer):
+      tkmedit bert orig.mgz
+      tkmedit bert norm.mgz -segmentation aseg.mgz $FREESURFER_HOME/FreeSurferColorLUT.txt
+       
+      # TEST tksurfer (surface viewer):
+      tksurfer bert rh pial 
+       
+      # TEST short reconstruction segment (< 30 minutes)
+      recon-all -s bert -autorecon1 
+       
+      # TEST full reconstruction (~ 24 hours)
+      # 2013 i7 iMac:
+      #     recon-all -s bert finished without error at Mon May  6 00:52:13 EDT 2013
+      #     22032.75 real     21947.85 user        60.84 sys
+      recon-all -s bert -all 
+      ```
 
 
 MRIcron
