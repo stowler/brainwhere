@@ -1,13 +1,13 @@
 #!/bin/sh
 #
-# LOCATION: 	  stowlerIncludesForMRI.sh 
-# USAGE:          (see fxnPrintUsage() function below)
+# LOCATION: 	  brainwhereCommonFunctions.sh
+# USAGE:         source brainwhereCommonFunctions.sh
 #
-# CREATED:	      	<date> by <whom>
-# LAST UPDATED:		<date> by <whom>
+# CREATED:	      	???????? by stowler@gmail.com
+# LAST UPDATED:		20140902 by stowler@gmail.com
 #
 # DESCRIPTION:
-# <description of what the script does>
+# Common functions relied upon by brainwhere scripts.
 # 
 # STYSTEM REQUIREMENTS:
 #  - awk must be installed for fxnCalc
@@ -22,38 +22,6 @@
 
 
 # ------------------------- START: fxn definitions ------------------------- #
-
-# fxnSetTempDir() {
-#    # ${tempParent}: parent dir of ${tempDir}(s) where temp files will be stored
-#    # e.g. tempParent="${blindParent}/tempProcessing"
-#    # (If tempParent or tempDir needs to include blind, remember to assign value to $blind before calling!)
-#    # EDITME: $tempParent is something that might change on a per-system, per-script, or per-experiment basis:
-#    startDateTime=`date +%Y%m%d%H%M%S`      # ...used in file and dir names
-#    hostname=`hostname -s`
-#    kernel=`uname -s`
-#    if [ $hostname = "stowler-mbp" ]; then
-#       tempParent="/Users/stowler/temp"
-#    elif [ $kernel = "Linux" ]; then
-#       tempParent="${HOME}/temp"
-#       mkdir ${tempParent} &>/dev/null                     #because not everyone will have a ~/temp to begin
-#    elif [ $kernel = "Darwin" ] && [ -d /tmp ] && [ -w /tmp ]; then
-#       tempParent="/tmp"
-#    else
-#       echo "Cannot find a suitable temp directory. Edit script's tempParent variable. Exiting."
-#       exit 1
-#    fi
-#    # e.g. tempDir="${tempParent}/${startDateTime}-from_${scriptName}.${scriptPID}"
-#    tempDir="${tempParent}/${startDateTime}-from_${scriptName}.${scriptPID}"
-#    mkdir $tempDir
-#    if [ $? -ne 0 ] ; then
-#       echo ""
-#       echo "ERROR: unable to create temporary directory $tempDir"
-#       echo "Exiting."
-#       echo ""
-#       exit 1
-#    fi
-# }
-
 
 fxnValidateImages() {
    # exists stats 1 if finds invalid or DNE images
