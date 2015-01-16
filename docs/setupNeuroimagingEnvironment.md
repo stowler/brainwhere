@@ -336,8 +336,8 @@ Download [FEEDS from FSL (> 270 MB)](http://fsl.fmrib.ox.ac.uk/fsldownloads/), o
 Extract and [run FEEDS](http://fsl.fmrib.ox.ac.uk/fsl/feeds/doc/) :
 
     # (on neurodebian, this is all replaced by command fsl-selftest or /usr/bin/time fsl-selftest)
-    # 2013 i7 imac:  971.77 real  951.78 user 22.83 sys
-    # 2012 i7 rMBP: 1108.44 real 1080.64 user 31.06 sys
+    # 2014 i7 rMBP @2.5 GHz, FEEDS 5.0.8: 1190.10 real  980.56 user 22.94 sys
+    # 2010 i5 iMac @2.8 GHz, FEEDS 5.0.8: 1711.25 real 1497.34 user 24.42 sys
     cd ~/Downloads       # (or the folder where you saved your download)
     tar -zxvf fsl-*-feeds.tar.gz
     cd feeds
@@ -377,7 +377,7 @@ Add AFNI's new location to the path in `/etc/bashrc` by first caching your sudo 
     #------------------------------------------
     # on ${editDate} at ${editTime}, user $USER  
     # added some AFNI environmental variables:
-    export PATH=/usr/local/abin:${PATH}
+    export PATH=/usr/local/abin:\${PATH}
     export AFNI_ENFORCE_ASPECT=YES
     echo ""
     echo "----------- active afni version and variables: -----------"
@@ -509,7 +509,7 @@ BXH/XCEDE FBIRN TOOLS
 Install FBIRN BXH/XCEDE tools on Mac OS X Mountain/Lion:
 -----------------------------------------------------------------
 
-As of May 2013, the shipping binaries of BXH/XCEDE tools includes imagemagick bugs on Mountain Lion.
+As of May 2013, the shipping binaries of BXH/XCEDE tools includes imagemagick bugs on Mountain Lion. (NB: 20150108: also works on Yosemite 10.10.1)
 
 I wrote an installation script that [describes the problem](http://goo.gl/Nalzn) and provides a workaround via macports.
 
@@ -528,7 +528,7 @@ I wrote an installation script that [describes the problem](http://goo.gl/Nalzn)
 3. TEST: did $BXHDIR get exported correctly? This should return a listing of bxh programs :
 
       ```
-      ls $BXHDIR
+      ls $BXHDIR/bin
       ```
 
 
