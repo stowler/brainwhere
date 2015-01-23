@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-# LOCATION: 	   $bwDir/bwRegisterTo1mmMNI152.sh
-# USAGE:           see fxnPrintUsage() function below
+# LOCATION: 	      $bwDir/bwRegisterTo1mmMNI152.sh
+# USAGE:             see fxnPrintUsage() function below
 #
-# CREATED:	   201008?? by stowler@gmail.com http://brainwhere.googlecode.com
-# LAST UPDATED:	   20130521 by stowler@gmail.com
+# CREATED:	         201008?? by stowler@gmail.com http://brainwhere.googlecode.com
+# LAST UPDATED:	   20150123 by stowler@gmail.com
 #
 # DESCRIPTION:
-# Registers T1 to the 1mm MNI152 template, along with optional lesion mask
+# Registers UNstripped T1 to the 1mm MNI152 template, along with optional lesion mask
 # deweighting. If additional images are provided, their transformation to the
 # T1 is calculated, and then combined with the T1->MNI152 xform to bring them
 # into MNI152 space.
@@ -30,8 +30,18 @@
 # - UNTESTED: interpolation methods implemented may not be best (masks: nearest neighbor, decimal values: sinc)
 #
 # TBD: 
-# - add interactive/non-interactive modes
+# - new argument for accepting skull-stripped T1?
+#     - would need to include logic to skip processing of whole-head T1
+#     - fnirt won't like this: FSL says fnirt wants whole-head t1
 # - accept HEAD/BRIK also
+# - add automatic slicesdir output
+# - add automatic std2native xforms
+# - add argument: standard-space images for xform to native T1 (mask and decimal data?)
+# - self-test: choose better input images (require FEEDS, $FEEDS_DIR ?)
+# - self-test: compare results against gold-standard and detect error if different
+# - add interactive/non-interactive modes
+# - add interactive skull-stripping
+
 #
 # READING AND CODING NOTES:
 # 
@@ -519,7 +529,7 @@ mkdir -p ${outDir}
 # display input image metadata:
 #
 echo ""
-echo "Images to be nonlinearly register to 1mmMNI152"
+echo "Images to be nonlinearly registerd to 1mmMNI152:"
 echo "- IMPORTANT: a lesion must match T1's geometry"
 echo "- IMPORTANT: images following EPI must match EPI geometry"
 echo ""
@@ -653,7 +663,7 @@ else
 	     -in ${tempDir}/${blind}_t1_brain \
 	     -omat ${tempDir}/${blind}_affine_transf.mat 
 fi
-echo "...done with linear transformatio of T1:"
+echo "...done with linear transformation of T1:"
 ls -l ${tempDir}/${blind}_affine_transf.mat
 
 
@@ -716,6 +726,12 @@ fi
 # ================================================================= #
 # calculation of nonlinear t1->mni transformation:
 #
+# It may seem unintuitive that the fnirt input image below is ${blind}_t1 instead of
+# the skull stripped ${blind}_t1_brain, but that is the recommendation from FSL's
+# documentation: "Note though that the recommended use of fnirt is to not use
+# skull-stripped data and to inform fnirt of any affine warps through the --aff
+# parameter instead of resampling the data." 
+#         -from http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FNIRT/UserGuide
 echo ""
 echo ""
 echo "nonlinear transformation of t1 to template takes about 15 minutes..."
