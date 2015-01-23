@@ -242,7 +242,8 @@ fi
 
 if [ ${headingsonly} -ne 1 ]; then
    for image in $@; do 
-      volsQty=`3dinfo "${image}" 2>/dev/null | grep "values stored at each pixel" | awk '{print $NF}'`
+      #volsQty=`3dinfo "${image}" 2>/dev/null | grep "values stored at each pixel" | awk '{print $NF}'`
+      volsQty=`3dAttribute -name DATASET_RANK "${image}" | awk '{print $4}'`
       orientation=`3dinfo "${image}" 2>/dev/null | grep "\[\-orient " | sed 's/^.*orient//' | sed 's/\]$//'`
       tilt=`3dinfo "${image}" 2>/dev/null | grep "Data Axes Tilt" | awk '{print $4}'`
       voxRL=`3dinfo "${image}" 2>/dev/null | grep R-to-L | sed 's/^.*mm//' | sed 's/^.*\[//' | sed 's/voxels\]$//'`
