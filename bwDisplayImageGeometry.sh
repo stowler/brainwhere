@@ -18,7 +18,9 @@
 #
 # OTHER ASSUMPTIONS:
 # <list or describe>
-
+#
+# TBD:
+# - create selftest to test against gold-standard output (images in $bwDir ? FEEDS data?)
 
 # ------------------------- START: fxn definitions ------------------------- #
 
