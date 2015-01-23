@@ -236,12 +236,13 @@ fxnValidateInputImages $@     # verify that all input images are actually images
 
 if [ ${headingsoff} -ne 1 ]; then 
    echo ""
-   echo "ORIENTATION TILT VoxRL VoxAP VoxIS VoxSizeRL VoxSizeAP VoxSizeSI FILE" >> ${tempDir}/unformatted.txt
-   echo "ORIENTATION TILT VoxRL VoxAP VoxIS VoxSizeRL VoxSizeAP VoxSizeSI FILE" >> ${tempDir}/unformatted_withFullPath.txt
+   echo "4D ORIENTATION TILT VoxRL VoxAP VoxIS VoxSizeRL VoxSizeAP VoxSizeSI FILE" >> ${tempDir}/unformatted.txt
+   echo "4D ORIENTATION TILT VoxRL VoxAP VoxIS VoxSizeRL VoxSizeAP VoxSizeSI FILE" >> ${tempDir}/unformatted_withFullPath.txt
 fi
 
 if [ ${headingsonly} -ne 1 ]; then
    for image in $@; do 
+      volsQty=`3dinfo "${image}" 2>/dev/null | grep "values stored at each pixel" | awk '{print $NF}'`
       orientation=`3dinfo "${image}" 2>/dev/null | grep "\[\-orient " | sed 's/^.*orient//' | sed 's/\]$//'`
       tilt=`3dinfo "${image}" 2>/dev/null | grep "Data Axes Tilt" | awk '{print $4}'`
       voxRL=`3dinfo "${image}" 2>/dev/null | grep R-to-L | sed 's/^.*mm//' | sed 's/^.*\[//' | sed 's/voxels\]$//'`
@@ -252,8 +253,8 @@ if [ ${headingsonly} -ne 1 ]; then
       pixdimIS=`3dinfo "${image}" 2>/dev/null | grep I-to-S | awk '{print $9 $10}'`
       imageShortName=`basename "${image}" 2>/dev/null`
       # would be nice to include COG (need to know that axes are relatively similar)
-      echo "$orientation $tilt $voxRL $voxAP $voxIS $pixdimRL $pixdimAP $pixdimIS ${imageShortName}" >> ${tempDir}/unformatted.txt 
-      echo "$orientation $tilt $voxRL $voxAP $voxIS $pixdimRL $pixdimAP $pixdimIS ${imageShortName}" >> ${tempDir}/unformatted_withFullPath.txt 
+      echo "$volsQty $orientation $tilt $voxRL $voxAP $voxIS $pixdimRL $pixdimAP $pixdimIS ${imageShortName}" >> ${tempDir}/unformatted.txt 
+      echo "$volsQty $orientation $tilt $voxRL $voxAP $voxIS $pixdimRL $pixdimAP $pixdimIS ${imageShortName}" >> ${tempDir}/unformatted_withFullPath.txt 
    done
 fi
 
