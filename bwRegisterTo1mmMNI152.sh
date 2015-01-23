@@ -276,10 +276,10 @@ fxnSelftest() {
 	cat <<EOF
 	SELFTEST: launching $0 using the command:
 	$0 \\
-	-s selftestParticipant \\
-	-t \${FSLDIR}/data/standard/MNI152lin_T1_1mm.nii.gz \\
-	-o \${tempDir}/selftestParticipant \\
-	-e \${FSLDIR}/data/standard/MNI152lin_T1_2mm_brain.nii.gz
+	-s selftestMoAE \\
+	-t \${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_mni.nii.gz \\
+	-o \${tempDir}/selftestMoAE \\
+	-e \${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_mni.nii.gz
 
 EOF
 
@@ -287,10 +287,10 @@ EOF
 	#exit 1
 
 	${bwDir}/${scriptName} \
-	-s selftestGoodImages \
-	-t ${FSLDIR}/data/standard/MNI152lin_T1_1mm.nii.gz \
-	-o ${tempDir}/selftestParticipant \
-	-e ${FSLDIR}/data/standard/MNI152lin_T1_2mm_brain.nii.gz
+	-s selftestMoAE \
+	-t ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_mni.nii.gz \
+	-o ${tempDir}/selftestMoAE \
+	-e ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_mni.nii.gz
 
 	# TBD: add additional self-tests:
 	# badImages, noArguments, wrongArguments, etc.	
@@ -618,7 +618,7 @@ betOptsT1="-f 0.35 -B"
 if [ "${debug}" = "1" ] ; then betOptsT1="${betOptsT1} -v"; fi 
 echo ""
 echo ""
-echo "Skull-striping T1..."
+echo "Skull-striping T1, which should take between one and twenty minutes..."
 echo "(using bet options ${betOptsT1})"
 echo ""
 bet ${tempDir}/${blind}_t1 ${tempDir}/${blind}_t1_brain ${betOptsT1}
