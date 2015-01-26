@@ -8,16 +8,8 @@ brainwhere
 
 
 ## STATUS:
-*Feb/March 2014:* final porting to github. Before April 1 the master branch will become stable, with broken daily development isolated in a dev branch. 
+*Jan/Feb 2015:* Still just for my use, still porting to github. 
 
-
-
-This codebase isn't formal enough for numbered releases, but I am maintaining two branches:
-- **master**, which passes weekly testing on my local platforms:
-	- OS X Mavericks + MacPorts
-	- Neurodebian on Ubuntu 12.04 on 64-bit processors
-	- Neurodebian VM, running Debian 7.2.0 wheezy 32-bit on VirtualBox
-- **dev**, where I make and break things daily
 
 ## INSTALLATION:
 
