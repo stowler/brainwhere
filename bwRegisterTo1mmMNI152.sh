@@ -4,7 +4,7 @@
 # USAGE:             see fxnPrintUsage() function below
 #
 # CREATED:	         201008?? by stowler@gmail.com http://brainwhere.googlecode.com
-# LAST UPDATED:	   20150123 by stowler@gmail.com
+# LAST UPDATED:	   20150204 by stowler@gmail.com
 #
 # DESCRIPTION:
 # Registers UNstripped T1 to the 1mm MNI152 template, along with optional lesion mask
@@ -37,10 +37,11 @@
 # - add automatic slicesdir output
 # - add automatic std2native xforms
 # - add argument: standard-space images for xform to native T1 (mask and decimal data?)
-# - self-test: choose better input images (require FEEDS, $FEEDS_DIR ?)
 # - self-test: compare results against gold-standard and detect error if different
-# - add interactive/non-interactive modes
-# - add interactive skull-stripping
+# - add interactive mode:
+#     - initial dis/approval of aggregate geometry table
+#     - interactive skull stripping
+#     - interactive confirmation of epi2t1 before lengthy application to all epi volumes
 
 #
 # READING AND CODING NOTES:
@@ -74,24 +75,69 @@ fxnPrintDebug() {
 
 fxnPrintUsage() {
 cat <<EOF
+   $0 - a script to register T1 and optional volumes with 1mmMNI152 template.
 
-	$0 - a script to register unstriped T1, lesion mask, EPI, and EPI-registered volumes (buck, etc.) to 1mmMNI152 space
-	Usage: registerTo1mmMNI152.sh                                 \\
-	  -z (launch self-test)                                       \\
-	  -d (turn on debug-mode)                                     \\
-	  -s <subjectID>                                              \\
-	  -t <t1.nii>                                                 \\
-	  -o <FullPathToOutdir>                                       \\
-	[ -l <lesion.nii>                                             \\ ]
-	[ -e <epi.nii>                                                \\ ]
-	[ -c <clusterMasksRegisteredToAboveEPI.nii>                   \\ ]
-	[ -c <anotherEPIregisteredCusterMask.nii>                     \\ ]
-	[ -b <buckFileOrOtherDecimalValueImage.nii>                   \\ ]
-	[ -b <anotherEPIregisteredBuckOrOtherDecimalValueImage.nii>     ]
+   The output directory will contain subdirectories with input images
+   nonlinearly registered into new space, as well as standard-space images
+   transformed into native spaces:
 
-	(specify as many -b and -c files as you like, just prepend EVERY file with -b or -c)
+      registeredTo1mmMNI152/
+      registeredToNativeSpaceT1/
+      registeredToNativeSpaceEPI/
+
+   Basic usage: registerTo1mmMNI152.sh                             \\
+	  -t <t1NotSkullStripped.nii>                                   \\
+	  -s <subjectIdForOutputNaming>                                 \\
+	  -o <fullPathToOutputDirectoryThatWillBeCreatedByThisScript>
+
+   Optional input images: no more than one of each of these special volumes:
+     -e <epi.nii>
+     -b <brainFromSkullStrippedT1.nii>   (already aligned with the -t t1 above)
+     -l <lesionMaskFromT1.nii>           (already aligned with the -t t1 above)
+
+   Optional arguments to control exectuion:
+     -z (launch internal self-test, which ignores input volumes)
+     -d (turn on debug mode)
 
 EOF
+
+# Near future additions to usage:
+#   Additional input images (below) need special handling according to:
+#      1) which image they are already aligned with: t1, epi, or standard space MNI152 template
+#      2) whether they contain discrete intensities only (e.g., masks), or continuous intensities (e.g. T1, F-stats)
+#
+#   Optional 3d inputs: volumes already aligned to your "-e <epi.nii>" image:
+#     --ed <epiAligned3dVolumesContainingDiscreteMaskIntensities.nii>
+#     --ec <epiAligned3dVolumesContainingContinuousIntensities.ni>
+#
+#   Optional 3d inputs: volumes already aligned to your "-t <t1NotSkullStripped.nii>" image:
+#     --td <t1Aligned3dVolumesContainingDiscreteMaskIntensities.nii>
+#     --tc <t1Aligned3dVolumesContainingContinuousIntensities.ni>
+#
+#   Optional 3d inputs: volumes already aligned to standard-space MNI152 image:
+#     --sd <standardSpaceAligned3dVolumeContainingDiscreteMaskIntensities.nii>
+#     --sc <standardSpaceAligned3dVolumeContainingContinuousIntensities.ni>
+#
+
+# Previous usage note:
+#
+#	$0 - a script to register unstriped T1, lesion mask, EPI, and EPI-registered volumes (buck, etc.) to 1mmMNI152 space
+#	Usage: registerTo1mmMNI152.sh                                 \\
+#	  -z (launch self-test)                                       \\
+#	  -d (turn on debug-mode)                                     \\
+#	  -s <subjectID>                                              \\
+#	  -t <t1.nii>                                                 \\
+#	  -o <FullPathToOutdir>                                       \\
+#	[ -l <lesion.nii>                                             \\ ]
+#	[ -e <epi.nii>                                                \\ ]
+#	[ -c <clusterMasksRegisteredToAboveEPI.nii>                   \\ ]
+#	[ -c <anotherEPIregisteredCusterMask.nii>                     \\ ]
+#	[ -b <buckFileOrOtherDecimalValueImage.nii>                   \\ ]
+#	[ -b <anotherEPIregisteredBuckOrOtherDecimalValueImage.nii>     ]
+#
+#	(specify as many -b and -c files as you like, just prepend EVERY file with -b or -c)
+#
+
 }
 
 
@@ -278,7 +324,7 @@ fxnSelftest() {
 	$0 \\
 	-s selftestMoAE \\
 	-t \${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_mni.nii.gz \\
-	-o \${tempDir}/selftestMoAE \\
+  	-o \${tempDir}/nominalOutDirFromSelftest \\
 	-e \${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_mni.nii.gz
 
 EOF
@@ -289,8 +335,10 @@ EOF
 	${bwDir}/${scriptName} \
 	-s selftestMoAE \
 	-t ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_mni.nii.gz \
-	-o ${tempDir}/selftestMoAE \
+  	-o ${tempDir}/nominalOutDirFromSelftest \
 	-e ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_mni.nii.gz
+
+#  	-o ${tempDir}/selftestOutput \
 
 	# TBD: add additional self-tests:
 	# badImages, noArguments, wrongArguments, etc.	
@@ -505,6 +553,18 @@ fxnProcessInvocation
 fxnSetTempDir                 # <- use internal function to create ${tempDir}
 deleteTempDirAtEndOfScript=0  # <- set to 1 to delete ${tempDir} or 0 to leave it. See end of script.
 
+# Create logical subdirectories in $tempDir:
+subdirNameSpaceT1=inNativeSpaceOfT1
+subdirNameSpaceEPI=inNativeSpaceOfEPI
+subdirNameSpaceStandard=inStandardSpaceOf1mmMNI152
+tempDirSpaceT1=${tempDir}/${subdirNameSpaceT1}
+tempDirSpaceEPI=${tempDir}/${subdirNameSpaceEPI}
+tempDirSpaceStandard=${tempDir}/${subdirNameSpaceStandard}
+mkdir -p ${tempDirSpaceT1}
+mkdir -p ${tempDirSpaceEPI}
+mkdir -p ${tempDirSpaceStandard}
+
+
 # Decide whether to launch selftest, and then subsequently whether to continue or exit:
 if [ "${launchSelftest}" = "1" ]; then
    echo ""
@@ -523,7 +583,6 @@ fxnConfirmOurInputImages
 
 # TBD: Verify that destination directories exist and are user-writable:
 mkdir -p ${outDir}
-
 
 # ================================================================= #
 # display input image metadata:
@@ -566,33 +625,36 @@ echo ""
 # copy images to $tempDir:
 #
 echo ""
-echo "Copying input images to ensure consistent naming and avoid bad datatypes:"
+echo "Creating new copies of images to ensure consistent naming and avoid bad datatypes:"
 echo ""
 
-# ...always for the t1:
+# ...t1:
 3dresample \
 -orient rpi \
--prefix ${tempDir}/${blind}_t1.nii.gz \
--inset $t1
-ls -1 ${tempDir}/${blind}_t1*
+-prefix ${tempDirSpaceT1}/${blind}_t1.nii.gz \
+-inset $t1 \
+2>/dev/null
+ls -lh ${tempDirSpaceT1}/${blind}_t1* 
 
-#...for the lesion, if provided:
+# ...lesion, if provided:
 if [ -s "`echo ${lesion}`" ]; then
-	fslmaths ${lesion} ${tempDir}/${blind}_lesion_char.nii.gz -odt char
+	fslmaths ${lesion} ${tempDirSpaceT1}/${blind}_lesion_char.nii.gz -odt char
 	3dresample \
 	-orient rpi \
-	-prefix ${tempDir}/${blind}_lesion.nii.gz \
-	-inset ${tempDir}/${blind}_lesion_char.nii.gz
-	rm -f ${tempDir}/${blind}_lesion_char.nii.gz
-	ls -1 ${tempDir}/${blind}_lesion*
+	-prefix ${tempDirSpaceT1}/${blind}_lesion.nii.gz \
+	-inset ${tempDirSpaceT1}/${blind}_lesion_char.nii.gz
+	rm -f ${tempDirSpaceT1}/${blind}_lesion_char.nii.gz
+	ls -lh ${tempDirSpaceT1}/${blind}_lesion*
 fi
-#...for the EPI, if provided:
+
+#...EPI, if provided:
 if [ -s "`echo ${epi}`" ]; then
 	3dresample \
-        -orient rpi \
-        -prefix ${tempDir}/${blind}_epi.nii.gz \
-        -inset ${epi}
-	ls -1 ${tempDir}/${blind}_epi*
+   -orient rpi \
+   -prefix ${tempDirSpaceEPI}/${blind}_epi.nii.gz \
+   -inset ${epi} \
+   2>/dev/null
+	ls -lh ${tempDirSpaceEPI}/${blind}_epi*
 fi
 # ...for any integerVolumes or decimalVolumes, if provided: 
 # the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
@@ -602,10 +664,11 @@ for image in `echo ${integerVolumes} ${decimalVolumes}`; do
                 fxnPrintDebug "3dresampling ${imageBasename} ..."
 		3dresample \
 		-orient rpi \
-		-prefix ${tempDir}/${imageBasename}.nii.gz \
-		-inset ${image}
+		-prefix ${tempDirSpaceEPI}/${imageBasename}.nii.gz \
+		-inset ${image} \
+      2>/dev/null
                 fxnPrintDebug "...done 3dresampling ${imageBasename} ."
-		ls -1 ${tempDir}/${imageBasename}.*
+		ls -lh ${tempDirSpaceEPI}/${imageBasename}.*
 	fi
 done
 
@@ -620,13 +683,11 @@ echo ""
 echo ""
 echo "Skull-striping T1, which should take between one and twenty minutes..."
 echo "(using bet options ${betOptsT1})"
-echo ""
-bet ${tempDir}/${blind}_t1 ${tempDir}/${blind}_t1_brain ${betOptsT1}
-echo ""
+
+bet ${tempDirSpaceT1}/${blind}_t1 ${tempDirSpaceT1}/${blind}_t1_brain ${betOptsT1}
+
 echo "...done skull-striping T1:"
-ls -l ${tempDir}/${blind}_t1_brain*
-echo ""
-echo ""
+ls -lh ${tempDirSpaceT1}/${blind}_t1_brain*
 
 
 
@@ -637,9 +698,11 @@ if [ -s "`echo ${lesion}`" ]; then
 	echo ""
 	echo ""
 	echo "Inverting lesion mask..."
-	fslmaths ${tempDir}/${blind}_lesion -sub 1 -abs ${tempDir}/${blind}_lesionInverted -odt char
+
+	fslmaths ${tempDirSpaceT1}/${blind}_lesion -sub 1 -abs ${tempDirSpaceT1}/${blind}_lesionInverted -odt char
+
 	echo "...done inverting lesion mask:"
-	ls -l ${tempDir}/${blind}_lesionInverted*
+	ls -lh ${tempDirSpaceT1}/${blind}_lesionInverted*
 fi
 
 
@@ -649,22 +712,24 @@ fi
 #
 echo ""
 echo ""
-echo "Linear transformation of T1 takes about two minutes..."
+echo "Calculating linear transformation of native space T1 to MNI152 template (about two minutes)..."
+
 # include -inweight if we have a lesion, don't if we don't: 
 if [ -s "`echo ${lesion}`" ]; then
 	flirt \
 	     -ref ${FSLDIR}/data/standard/MNI152_T1_2mm_brain.nii.gz \
-	     -in ${tempDir}/${blind}_t1_brain \
-	     -inweight ${tempDir}/${blind}_lesionInverted \
+	     -in ${tempDirSpaceT1}/${blind}_t1_brain \
+	     -inweight ${tempDirSpaceT1}/${blind}_lesionInverted \
 	     -omat ${tempDir}/${blind}_affine_transf.mat 
 else
 	flirt \
 	     -ref ${FSLDIR}/data/standard/MNI152_T1_2mm_brain.nii.gz \
-	     -in ${tempDir}/${blind}_t1_brain \
+	     -in ${tempDirSpaceT1}/${blind}_t1_brain \
 	     -omat ${tempDir}/${blind}_affine_transf.mat 
 fi
-echo "...done with linear transformation of T1:"
-ls -l ${tempDir}/${blind}_affine_transf.mat
+
+echo "...done:"
+ls -lh ${tempDir}/${blind}_affine_transf.mat
 
 
 
@@ -676,49 +741,49 @@ ls -l ${tempDir}/${blind}_affine_transf.mat
 if [ -s "`echo ${epi}`" ]; then
 	echo ""
 	echo ""
-	echo "Linear transformation of EPI takes about two minutes..."
+	echo "Calculating linear transformation of native space EPI to native space T1 (about two minutes)..."
+
 	# first create a 3D mean across EPI timepoints:
-	fslmaths ${tempDir}/${blind}_epi.nii.gz -Tmean ${tempDir}/${blind}_epi_averaged.nii.gz
-	# then skull-strip the averated EPI:
+	fslmaths ${tempDirSpaceEPI}/${blind}_epi.nii.gz -Tmean ${tempDirSpaceEPI}/${blind}_epi_averaged.nii.gz
+	# then skull-strip the averaged EPI:
 	betOptsAveragedEPI="-R"
 	if [ "${debug}" = "1" ] ; then betOptsAveragedEPI="${betOptsAveragedEPI} -v"; fi
-	bet ${tempDir}/${blind}_epi_averaged.nii.gz ${tempDir}/${blind}_epi_averaged_brain.nii.gz ${betOptsAveragedEPI}
+	bet ${tempDirSpaceEPI}/${blind}_epi_averaged.nii.gz ${tempDirSpaceEPI}/${blind}_epi_averaged_brain.nii.gz ${betOptsAveragedEPI}
 
 	# now use this 3D average EPI in the calculation of the transformation
 	# instead of the original EPI:
 	# TBD: put back in refweight as part of a conditional version of that that gets executed if lesion is available
-	#	-refweight ${tempDir}/${blind}_lesionInverted \
-	# TBD: was originally using "-in ${tempDir}/${blind}_epi_averaged_brain"
+	#	-refweight ${tempDirSpaceT1}/${blind}_lesionInverted \
+	# TBD: was originally using "-in ${tempDirSpaceEPI}/${blind}_epi_averaged_brain"
 	# ...but got some bad PiB registrations so trying instead:
-	# 	-in ${tempDir}/${blind}_epi_averaged \
+	# 	-in ${tempDirSpaceEPI}/${blind}_epi_averaged \
 	flirt \
-	-in ${tempDir}/${blind}_epi_averaged \
-	-ref ${tempDir}/${blind}_t1_brain \
+	-in ${tempDirSpaceEPI}/${blind}_epi_averaged \
+	-ref ${tempDirSpaceT1}/${blind}_t1_brain \
 	-dof 6 \
 	-cost corratio \
 	-usesqform \
 	-coarsesearch 20 \
 	-omat ${tempDir}/${blind}_func2struct.mat
-	echo "...done with linear transform of EPI to T1:"
-	ls -l ${tempDir}/${blind}_func2struct.mat
-	echo ""
-	echo ""
+
+	echo "...done:"
+	ls -lh ${tempDir}/${blind}_func2struct.mat
 
 	# and now apply calcuated transformtion to produce
 	# _epi_averaged_func2struct.nii.gz for easy visual verification of
 	# linear EPI-to-structural registration:
 	flirt \
-	-in ${tempDir}/${blind}_epi_averaged.nii.gz \
-	-ref ${tempDir}/${blind}_t1_brain.nii.gz \
+	-in ${tempDirSpaceEPI}/${blind}_epi_averaged.nii.gz \
+	-ref ${tempDirSpaceT1}/${blind}_t1_brain.nii.gz \
 	-applyxfm -init ${tempDir}/${blind}_func2struct.mat \
-	-out ${tempDir}/${blind}_epi_averaged_func2struct.nii.gz
+	-out ${tempDirSpaceT1}/${blind}_epi_averaged_func2struct.nii.gz
 
 	# ...and also to extracted EPI:
 	flirt \
-	-in ${tempDir}/${blind}_epi_averaged_brain.nii.gz \
-	-ref ${tempDir}/${blind}_t1_brain.nii.gz \
+	-in ${tempDirSpaceEPI}/${blind}_epi_averaged_brain.nii.gz \
+	-ref ${tempDirSpaceT1}/${blind}_t1_brain.nii.gz \
 	-applyxfm -init ${tempDir}/${blind}_func2struct.mat \
-	-out ${tempDir}/${blind}_epi_averaged_brain_func2struct.nii.gz
+	-out ${tempDirSpaceT1}/${blind}_epi_averaged_brain_func2struct.nii.gz
 fi
 
 
@@ -734,26 +799,93 @@ fi
 #         -from http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FNIRT/UserGuide
 echo ""
 echo ""
-echo "nonlinear transformation of t1 to template takes about 15 minutes..."
-echo "(ignore messages about requested tolerance...unless your transformation turns out horrible, in which case they may have been meaningful)"
-echo ""
+echo "Calculating nonlinear transformation of native space T1 to MNI152 template (about 15 minutes)..."
+#echo "(ignore messages about requested tolerance...unless your transformation turns out horrible, in which case they may have been meaningful)"
+
 if [ -s "`echo ${lesion}`" ]; then
 	fnirt \
-	     --in=${tempDir}/${blind}_t1 \
+	     --in=${tempDirSpaceT1}/${blind}_t1 \
 	     --aff=${tempDir}/${blind}_affine_transf.mat \
 	     --cout=${tempDir}/${blind}_nonlinear_transf \
 	     --config=T1_2_MNI152_2mm \
-	     --inmask=${tempDir}/${blind}_lesionInverted 
+	     --inmask=${tempDirSpaceT1}/${blind}_lesionInverted 
 else
 	fnirt \
-	     --in=${tempDir}/${blind}_t1 \
+	     --in=${tempDirSpaceT1}/${blind}_t1 \
 	     --aff=${tempDir}/${blind}_affine_transf.mat \
 	     --cout=${tempDir}/${blind}_nonlinear_transf \
 	     --config=T1_2_MNI152_2mm 
 fi
-echo ""
+
+# move fnirt-generated log file from ${tempDirSpaceT1} to ${tempDirSpace}
+mv ${tempDirSpaceT1}/*t1_to_MNI152_T1_2mm.log ${tempDir}
+
 echo "...done:"
-ls -l ${tempDir}/${blind}_nonlinear_transf*
+ls -lh ${tempDir}/${blind}_nonlinear_transf*
+
+
+# ================================================================= #
+# inversion of nonlinear t1->mni transformation:
+echo ""
+echo ""
+echo "TEST (invwarp): Inverting the nonlinear t1-to-mni transformation (about 2 minutes)..."
+
+invwarp \
+--ref=${tempDirSpaceT1}/${blind}_t1 \
+--warp=${tempDir}/${blind}_nonlinear_transf \
+--out=${tempDir}/${blind}_nonlinear_transf_mni2t1
+
+echo "...done:"
+ls -lh ${tempDir}/${blind}_nonlinear_transf_mni2t1*
+
+# ================================================================= #
+# applying nonlinear mni->t1 transformation:
+echo ""
+echo ""
+echo "TEST (applywarp): Applying the mni->t1 transformation to an atlas (about 2 minutes)..."
+
+applywarp \
+--ref=${tempDirSpaceT1}/${blind}_t1 \
+--in=$FSLDIR/data/atlases/HarvardOxford/HarvardOxford-cort-maxprob-thr25-1mm.nii.gz \
+--warp=${tempDir}/${blind}_nonlinear_transf_mni2t1 \
+--out=${tempDirSpaceT1}/test.mni2t1-HarvardOxford-cort-maxprob-thr25-1mm.nii.gz \
+--interp=nn
+
+echo "...done:"
+ls -lh ${tempDirSpaceT1}/test.mni2t1-HarvardOxford-cort-maxprob-thr25-1mm.nii.gz
+
+# ================================================================= #
+# applying nonlinear mni->t1 transformation:
+echo ""
+echo ""
+echo "TEST (applywarp): Applying the mni->t1 transformation to whole-head MNI152 template (about 2 minutes)..."
+
+applywarp \
+--ref=${tempDirSpaceT1}/${blind}_t1 \
+--in=$FSLDIR/data/standard/MNI152_T1_1mm.nii.gz \
+--warp=${tempDir}/${blind}_nonlinear_transf_mni2t1 \
+--out=${tempDirSpaceT1}/test.mni2t1-MNI152_T1_1mm.nii.gz \
+--interp=sinc
+
+echo "...done:"
+ls -lh ${tempDirSpaceT1}/test.mni2t1-MNI152_T1_1mm.nii.gz
+
+
+# ================================================================= #
+# applying nonlinear mni->t1 transformation:
+echo ""
+echo ""
+echo "TEST (applywarp): Applying the mni->t1 transformation to skull-stripped MNI152 template (about 2 minutes)..."
+
+applywarp \
+--ref=${tempDirSpaceT1}/${blind}_t1 \
+--in=$FSLDIR/data/standard/MNI152_T1_1mm_brain.nii.gz \
+--warp=${tempDir}/${blind}_nonlinear_transf_mni2t1 \
+--out=${tempDirSpaceT1}/test.mni2t1-MNI152_T1_1mm_brain.nii.gz \
+--interp=sinc
+
+echo "...done:"
+ls -lh ${tempDirSpaceT1}/test.mni2t1-MNI152_T1_1mm_brain.nii.gz
 
 
 
@@ -762,41 +894,52 @@ ls -l ${tempDir}/${blind}_nonlinear_transf*
 #
 echo ""
 echo ""
-echo "applying nonlinear warp to T1 (about 1 minute)..."
+echo "Applying nonlinear warp to T1 (about 1 minute)..."
+
 applywarp \
-     --ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
-     --in=${tempDir}/${blind}_t1 \
-     --warp=${tempDir}/${blind}_nonlinear_transf \
-     --out=${tempDir}/${blind}_t1_warped
-ls -l ${tempDir}/${blind}_t1_warped*
+--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
+--in=${tempDirSpaceT1}/${blind}_t1 \
+--warp=${tempDir}/${blind}_nonlinear_transf \
+--out=${tempDirSpaceStandard}/${blind}_t1_warped \
+--interp=sinc
+
+echo "...done:"
+ls -lh ${tempDirSpaceStandard}/${blind}_t1_warped*
 
 echo ""
 echo ""
-echo "applying nonlinear warp to skull-striped T1 (about 1 minute)..."
+echo "Applying nonlinear warp to skull-stripped T1 (about 1 minute)..."
+
 applywarp \
-     	--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
-     	--in=${tempDir}/${blind}_t1_brain \
-     	--warp=${tempDir}/${blind}_nonlinear_transf \
-     	--out=${tempDir}/${blind}_t1_brain_warped
-ls -l ${tempDir}/${blind}_t1_brain_warped*
+--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
+--in=${tempDirSpaceT1}/${blind}_t1_brain \
+--warp=${tempDir}/${blind}_nonlinear_transf \
+--out=${tempDirSpaceStandard}/${blind}_t1_brain_warped \
+--interp=sinc
+
+echo "...done:"
+ls -lh ${tempDirSpaceStandard}/${blind}_t1_brain_warped*
 
 if [ -s "`echo ${lesion}`" ]; then
 	echo ""
 	echo ""
-	echo "applying nonlinear warp to lesion (about 1 minute)..."
+	echo "Applying nonlinear warp to lesion (about 1 minute)..."
+
 	applywarp \
 	     	--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
-	     	--in=${tempDir}/${blind}_lesion \
+	     	--in=${tempDirSpaceT1}/${blind}_lesion \
 	     	--warp=${tempDir}/${blind}_nonlinear_transf \
-	     	--out=${tempDir}/${blind}_lesion_warped \
+	     	--out=${tempDirSpaceStandard}/${blind}_lesion_warped \
 	     	--interp=nn
-	ls -l ${tempDir}/${blind}_lesion_warped*
+
+   echo "...done:"
+	ls -lh ${tempDirSpaceStandard}/${blind}_lesion_warped*
 fi
 
 if [ -s "`echo ${epi}`" ]; then
 	echo ""
 	echo ""
-	echo "applying nonlinear warp to epi (about 30 minutes)..."
+	echo "Applying nonlinear warp to epi (about 30 minutes)..."
 	# temporarily disabling warp of full 4D EPI....
 	#ls -l ${tempDir}/${blind}_epi*
 	#applywarp \
@@ -808,12 +951,15 @@ if [ -s "`echo ${epi}`" ]; then
 
 	# ...in exchange for faster warp of 3D EPI average:
 	applywarp \
-		--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
-		--in=${tempDir}/${blind}_epi_averaged \
-		--warp=${tempDir}/${blind}_nonlinear_transf \
-		--premat=${tempDir}/${blind}_func2struct.mat \
-		--out=${tempDir}/${blind}_epi_averaged_warped
-	ls -l ${tempDir}/${blind}_epi*warped*
+   --ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
+   --in=${tempDirSpaceEPI}/${blind}_epi_averaged \
+   --warp=${tempDir}/${blind}_nonlinear_transf \
+   --premat=${tempDir}/${blind}_func2struct.mat \
+   --out=${tempDirSpaceStandard}/${blind}_epi_averaged_warped \
+   --interp=sinc
+
+   echo "...done:"
+	ls -lh ${tempDirSpaceStandard}/${blind}_epi*warped*
 fi
 
 # the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
@@ -823,15 +969,18 @@ for image in `echo ${integerVolumes}`; do
 		echo ""
 		echo ""
 		imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
-		echo "applying nonlinear warp to ${imageBasename} (probably 30 or fewer minutes)..."
+		echo "Applying nonlinear warp to ${imageBasename} (probably 30 or fewer minutes)..."
+
 		applywarp \
 		--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
-		--in=${tempDir}/${imageBasename} \
+		--in=${tempDirSpaceEPI}/${imageBasename} \
 		--warp=${tempDir}/${blind}_nonlinear_transf \
 		--premat=${tempDir}/${blind}_func2struct.mat \
-		--out=${tempDir}/${imageBasename}_warped.nii.gz \
+		--out=${tempDirSpaceStandard}/${imageBasename}_warped.nii.gz \
 		--interp=nn
-		ls -l ${tempDir}/${imageBasename}_warped*
+
+      echo "...done:"
+		ls -lh ${tempDirSpaceStandard}/${imageBasename}_warped*
 	fi
 done
 
@@ -842,15 +991,18 @@ for image in `echo ${decimalVolumes}`; do
 		echo ""
 		echo ""
 		imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
-		echo "applying nonlinear warp to ${imageBasename} (probably 30 or fewer minutes)..."
+		echo "Applying nonlinear warp to ${imageBasename} (probably 30 or fewer minutes)..."
+
 		applywarp \
 		--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
-		--in=${tempDir}/${imageBasename} \
+		--in=${tempDirSpaceEPI}/${imageBasename} \
 		--warp=${tempDir}/${blind}_nonlinear_transf \
 		--premat=${tempDir}/${blind}_func2struct.mat \
-		--out=${tempDir}/${imageBasename}_warped.nii.gz \
+		--out=${tempDirSpaceStandard}/${imageBasename}_warped.nii.gz \
 		--interp=sinc
-		ls -l ${tempDir}/${imageBasename}_warped*
+
+      echo "...done:"
+		ls -lh ${tempDirSpaceStandard}/${imageBasename}_warped*
 	fi
 done
 
@@ -863,11 +1015,15 @@ echo "================================================================="
 echo ""
 echo ""
 
+# cp important output from $tempDir to $outDir:
 if [ -n ${outDir} ]; then 
-	mkdir ${outDir} &> /dev/null
-	cp ${tempDir}/*.nii.gz ${outDir}/ &> /dev/null
-	cp ${tempDir}/*.nii ${outDir}/ &> /dev/null
-	cp ${tempDir}/*.mat ${outDir}/ &> /dev/null
+	mkdir -p ${outDir} &> /dev/null
+	#cp ${tempDir}/*.nii.gz ${outDir}/ &> /dev/null
+	#cp ${tempDir}/*.nii ${outDir}/ &> /dev/null
+	#cp ${tempDir}/*.mat ${outDir}/ &> /dev/null
+	cp -R ${tempDirSpaceT1}       ${outDir}/ &> /dev/null
+	cp -R ${tempDirSpaceEPI}      ${outDir}/ &> /dev/null
+	cp -R ${tempDirSpaceStandard} ${outDir}/ &> /dev/null
 	finalDir=${outDir}
 else
 	deleteTempDirAtEndOfScript=0
@@ -884,7 +1040,7 @@ fi
 
 # If a ${tempDir} was defined, remind the user about it and (optionally) delete it:
 if [ -n "${tempDir}" ]; then 
-	tempDirSize=`du -sh | awk '{print $1}'`
+	tempDirSize=`du -sh ${tempDir} | awk '{print $1}'`
 	tempDirFileCount=`find ${tempDir} | wc -l | awk '{print $1}'`
 	echo ""
 	echo ""
@@ -911,12 +1067,13 @@ fi
 # export FSLOUTPUTTYPE=${FSLOUTPUTTYPEorig}
 echo ""
 echo ""
-echo "One way to begin inspecting your output images would be this fslview command:"
+echo "One way inspect your MNI152-aligned output images in fslview would be to"
+echo "paste this block of commands into the terminal:"
 cat <<EOF
 
 standardTemplate=$FSLDIR/data/standard/MNI152_T1_1mm.nii.gz
-warpedT1=${finalDir}/${blind}_t1_brain_warped
-warpedEPI=${finalDir}/${blind}_epi_averaged_warped
+warpedT1=${finalDir}/${subdirNameSpaceStandard}/${blind}_t1_brain_warped
+warpedEPI=${finalDir}/${subdirNameSpaceStandard}/${blind}_epi_averaged_warped
 bottomLayer=\${standardTemplate}
 middleLayer=\${warpedT1}
 topLayer=\${warpedEPI}
