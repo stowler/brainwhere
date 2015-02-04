@@ -27,7 +27,7 @@
 # - erases BRIK/HEAD commandline history (applywarp not implemented in afni...yet)
 # - UNTESTED: brain extraction implementation may not be best for all brains (bet -R -v)
 # - UNTESTED: variability in brain extraction may affect registration of T1->MNI152, thereby others->MNI152
-# - UNTESTED: interpolation methods implemented may not be best (masks: nearest neighbor, decimal values: sinc)
+# - UNTESTED: interpolation methods implemented may not be best (masks: nearest neighbor, decimal values: trilinear or sinc)
 #
 # TBD: 
 # - new argument for accepting skull-stripped T1?
@@ -865,7 +865,7 @@ applywarp \
 --in=$FSLDIR/data/standard/MNI152_T1_1mm.nii.gz \
 --warp=${tempDir}/${blind}_nonlinear_transf_mni2t1 \
 --out=${tempDirSpaceT1}/test.mni2t1-MNI152_T1_1mm.nii.gz \
---interp=sinc
+--interp=trilinear
 
 echo "...done:"
 ls -lh ${tempDirSpaceT1}/test.mni2t1-MNI152_T1_1mm.nii.gz
@@ -882,7 +882,7 @@ applywarp \
 --in=$FSLDIR/data/standard/MNI152_T1_1mm_brain.nii.gz \
 --warp=${tempDir}/${blind}_nonlinear_transf_mni2t1 \
 --out=${tempDirSpaceT1}/test.mni2t1-MNI152_T1_1mm_brain.nii.gz \
---interp=sinc
+--interp=trilinear
 
 echo "...done:"
 ls -lh ${tempDirSpaceT1}/test.mni2t1-MNI152_T1_1mm_brain.nii.gz
@@ -901,7 +901,7 @@ applywarp \
 --in=${tempDirSpaceT1}/${blind}_t1 \
 --warp=${tempDir}/${blind}_nonlinear_transf \
 --out=${tempDirSpaceStandard}/${blind}_t1_warped \
---interp=sinc
+--interp=trilinear
 
 echo "...done:"
 ls -lh ${tempDirSpaceStandard}/${blind}_t1_warped*
@@ -915,7 +915,7 @@ applywarp \
 --in=${tempDirSpaceT1}/${blind}_t1_brain \
 --warp=${tempDir}/${blind}_nonlinear_transf \
 --out=${tempDirSpaceStandard}/${blind}_t1_brain_warped \
---interp=sinc
+--interp=trilinear
 
 echo "...done:"
 ls -lh ${tempDirSpaceStandard}/${blind}_t1_brain_warped*
@@ -956,7 +956,7 @@ if [ -s "`echo ${epi}`" ]; then
    --warp=${tempDir}/${blind}_nonlinear_transf \
    --premat=${tempDir}/${blind}_func2struct.mat \
    --out=${tempDirSpaceStandard}/${blind}_epi_averaged_warped \
-   --interp=sinc
+   --interp=trilinear
 
    echo "...done:"
 	ls -lh ${tempDirSpaceStandard}/${blind}_epi*warped*
@@ -999,7 +999,7 @@ for image in `echo ${decimalVolumes}`; do
 		--warp=${tempDir}/${blind}_nonlinear_transf \
 		--premat=${tempDir}/${blind}_func2struct.mat \
 		--out=${tempDirSpaceStandard}/${imageBasename}_warped.nii.gz \
-		--interp=sinc
+		--interp=trilinear
 
       echo "...done:"
 		ls -lh ${tempDirSpaceStandard}/${imageBasename}_warped*
