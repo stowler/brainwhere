@@ -7,10 +7,18 @@
 # LAST UPDATED:	   20150204 by stowler@gmail.com
 #
 # DESCRIPTION:
-# Registers UNstripped T1 to the 1mm MNI152 template, along with optional lesion mask
-# deweighting. If additional images are provided, their transformation to the
-# T1 is calculated, and then combined with the T1->MNI152 xform to bring them
-# into MNI152 space.
+#
+# Nonlinearly registers T1 (whole head, unstripped) to the 1mm MNI152 template,
+# along with optional lesion mask deweighting. If additional images are
+# provided, their transformation to the T1 is calculated, and then combined
+# with the T1->MNI152 xform to bring them into MNI152 space.
+#
+# MNI152-space images are also reverse-transformed into native T1 space.
+#
+# If EPI images are provided they will be transformed into native T1 space AND
+# MNI152 space. Native space T1 images and MNI152 standard-space images will
+# also be transformed into native EPI space.
+#
 # 
 # STYSTEM REQUIREMENTS:
 #  - afni, fsl, getopt
@@ -75,23 +83,21 @@ fxnPrintDebug() {
 
 fxnPrintUsage() {
 cat <<EOF
-   $0 - a script to register T1 and optional volumes with 1mmMNI152 template.
+   $0 - a script to nonlinearly register T1 and optional volumes with 1mmMNI152 template.
 
    The output directory will contain subdirectories with input images
-   nonlinearly registered into new space, as well as standard-space images
-   transformed into native spaces:
+   nonlinearly registered into standard space, as well as standard-space images
+   back-transformed into native spaces:
 
-      registeredTo1mmMNI152/
-      registeredToNativeSpaceT1/
-      registeredToNativeSpaceEPI/
+   Basic usage with three required arguments: 
 
-   Basic usage: registerTo1mmMNI152.sh                             \\
+     registerTo1mmMNI152.sh                                        \\
 	  -t <t1NotSkullStripped.nii>                                   \\
 	  -s <subjectIdForOutputNaming>                                 \\
 	  -o <fullPathToOutputDirectoryThatWillBeCreatedByThisScript>
 
    Optional input images: no more than one of each of these special volumes:
-     -e <epi.nii>
+     -e <epi4Dtimeseries.nii>
      -b <brainFromSkullStrippedT1.nii>   (already aligned with the -t t1 above)
      -l <lesionMaskFromT1.nii>           (already aligned with the -t t1 above)
 
@@ -117,25 +123,6 @@ EOF
 #   Optional 3d inputs: volumes already aligned to standard-space MNI152 image:
 #     --sd <standardSpaceAligned3dVolumeContainingDiscreteMaskIntensities.nii>
 #     --sc <standardSpaceAligned3dVolumeContainingContinuousIntensities.ni>
-#
-
-# Previous usage note:
-#
-#	$0 - a script to register unstriped T1, lesion mask, EPI, and EPI-registered volumes (buck, etc.) to 1mmMNI152 space
-#	Usage: registerTo1mmMNI152.sh                                 \\
-#	  -z (launch self-test)                                       \\
-#	  -d (turn on debug-mode)                                     \\
-#	  -s <subjectID>                                              \\
-#	  -t <t1.nii>                                                 \\
-#	  -o <FullPathToOutdir>                                       \\
-#	[ -l <lesion.nii>                                             \\ ]
-#	[ -e <epi.nii>                                                \\ ]
-#	[ -c <clusterMasksRegisteredToAboveEPI.nii>                   \\ ]
-#	[ -c <anotherEPIregisteredCusterMask.nii>                     \\ ]
-#	[ -b <buckFileOrOtherDecimalValueImage.nii>                   \\ ]
-#	[ -b <anotherEPIregisteredBuckOrOtherDecimalValueImage.nii>     ]
-#
-#	(specify as many -b and -c files as you like, just prepend EVERY file with -b or -c)
 #
 
 }
@@ -186,8 +173,9 @@ fxnProcessInvocation() {
 	outDir=''
 	lesion=''
 	epi=''
-	integerVolumes=''
-	decimalVolumes=''
+   inputBrain=''
+	#integerVolumes=''
+	#decimalVolumes=''
 
 	# if already set, debug must not lose its current value:
 	if [ -n ${debug} ] ; then debug=${debug} ; else debug=''; fi
@@ -205,7 +193,7 @@ fxnProcessInvocation() {
 
 	# STEP 2/3: set the getopt string:
 	eval set -- ${scriptArgsVector}
-	TEMP=`getopt -- zds:t:o:l:e:c:b: "$@"`
+	TEMP=`getopt -- zds:t:o:l:e:b: "$@"`
 	if [ $? != 0 ] ; then 
 	   echo "Terminating...could not set string for getopt. Check out the Usage note:" >&2 
 	   fxnPrintUsage 
@@ -234,13 +222,16 @@ fxnProcessInvocation() {
 	      -o)   outDir="${2}"; shift 2 ;;
 	      -l)   lesion="${2}"; shift 2 ;;
 	      -e)   epi="${2}"; shift 2 ;;
-	      -c)   integerVolumes="${integerVolumes} ${2}"; shift 2 ;;
-	      -b)   decimalVolumes="${decimalVolumes} ${2}"; shift 2 ;;
+	      -b)   inputBrain="${2}"; shift 2 ;;
 	      --)   shift; break ;;
 	      -*)   echo >&2 "Error in invocation. See usage note" ; fxnPrintUsage ;  exit 1 ;;
 	       *)   echo "Error in arguments to ${scriptName}" ; fxnPrintUsage ; exit 1 ;;		# terminate while loop
 	    esac
 	done
+
+   # deprecated:
+	#      -c)   integerVolumes="${integerVolumes} ${2}"; shift 2 ;;
+	#      -b)   decimalVolumes="${decimalVolumes} ${2}"; shift 2 ;;
 	# ...and now all command line switches have been processed.
 
   	fxnPrintDebug " "
@@ -297,8 +288,9 @@ fxnProcessInvocation() {
 	fxnPrintDebug "\${outDir} == ${outDir}"
 	fxnPrintDebug "\${lesion} == ${lesion}"
 	fxnPrintDebug "\${epi} == ${epi}"
-	fxnPrintDebug "\${integerVolumes} == ${integerVolumes}"
-	fxnPrintDebug "\${decimalVolumes} == ${decimalVolumes}"
+	fxnPrintDebug "\${inputBrain} == ${inputBrain}"
+	#fxnPrintDebug "\${integerVolumes} == ${integerVolumes}"
+	#fxnPrintDebug "\${decimalVolumes} == ${decimalVolumes}"
 	fxnPrintDebug " "
 	fxnPrintDebug "...completed fxnProcessInvocation ."
 }
@@ -317,6 +309,7 @@ fxnSelftest() {
 	fxnPrintDebug "-o FullPathToOutdir == \${outDir} == ${outDir}"
 	#fxnPrintDebug "-l lesion.nii == \${} == ${}"
 	fxnPrintDebug "-e epi.nii == \${epi} == ${epi}"
+	fxnPrintDebug "-b inputBrain.nii == \${inputBrain} == ${inputBrain}"
 	fxnPrintDebug " "
 
 	cat <<EOF
@@ -324,8 +317,8 @@ fxnSelftest() {
 	$0 \\
 	-s selftestMoAE \\
 	-t \${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_mni.nii.gz \\
-  	-o \${tempDir}/nominalOutDirFromSelftest \\
-	-e \${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_mni.nii.gz
+	-e \${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_mni.nii.gz \\
+  	-o \${tempDir}/nominalOutDirFromSelftest 
 
 EOF
 
@@ -335,10 +328,11 @@ EOF
 	${bwDir}/${scriptName} \
 	-s selftestMoAE \
 	-t ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_mni.nii.gz \
-  	-o ${tempDir}/nominalOutDirFromSelftest \
-	-e ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_mni.nii.gz
+	-e ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_mni.nii.gz \
+  	-o ${tempDir}/nominalOutDirFromSelftest 
 
-#  	-o ${tempDir}/selftestOutput \
+# easly to add a pre-extracted t1 brain to the self-test:
+#	-b ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_brain_mni.nii.gz
 
 	# TBD: add additional self-tests:
 	# badImages, noArguments, wrongArguments, etc.	
@@ -444,44 +438,60 @@ fxnConfirmOurInputImages() {
 		fi
 	fi
 
-	# the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws"
-	for image in `echo ${integerVolumes}`; do
-		fxnPrintDebug "validating integerVolume ${image}"
-		if [ ! -z ${image} ]; then
-			fxnValidateImages ${image}
-			if [ $? -eq 1 ]; then 
-				echo ""
-				echo "ERROR: $image is not a valid image"
-				echo ""
-				fxnPrintUsage
-				echo ""
-				exit 1
-			else
-				fxnPrintDebug "$image is a valid image. Yay!"
-			fi
+	if [ ! -z ${inputBrain} ]; then
+		fxnValidateImages ${inputBrain}
+		if [ $? -eq 1 ]; then 
+			echo ""
+			echo "ERROR: $inputBrain is not a valid image"
+			echo ""
+			fxnPrintUsage
+			echo ""
+			exit 1
 		fi
-	done
+	fi
+
+   # deprecated these to loops (over $integerVolumes and $decimalVolumes) in
+   # preperation for new scheme for addressing continuous- and
+   # discrete-intensity volumes aligned with t1, EPI, and standard space
 
 	# the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws"
-	for image in `echo ${decimalVolumes}`; do
-		fxnPrintDebug "validating decimalVolume ${image}"
-		if [ ! -z ${image} ]; then
-			fxnValidateImages ${image}
-			if [ $? -eq 1 ]; then 
-				echo ""
-				echo "ERROR: $image is not a valid image"
-				echo ""
-				fxnPrintUsage
-				echo ""
-				exit 1
-			else
-				fxnPrintDebug "DEBUG $image is a valid image. Yay!"
-			fi
-		fi
-	done
+	# for image in `echo ${integerVolumes}`; do
+	# 	fxnPrintDebug "validating integerVolume ${image}"
+	# 	if [ ! -z ${image} ]; then
+	# 		fxnValidateImages ${image}
+	# 		if [ $? -eq 1 ]; then 
+	# 			echo ""
+	# 			echo "ERROR: $image is not a valid image"
+	# 			echo ""
+	# 			fxnPrintUsage
+	# 			echo ""
+	# 			exit 1
+	# 		else
+	# 			fxnPrintDebug "$image is a valid image. Yay!"
+	# 		fi
+	# 	fi
+	# done
+
+	# the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws"
+	# for image in `echo ${decimalVolumes}`; do
+	# 	fxnPrintDebug "validating decimalVolume ${image}"
+	# 	if [ ! -z ${image} ]; then
+	# 		fxnValidateImages ${image}
+	# 		if [ $? -eq 1 ]; then 
+	# 			echo ""
+	# 			echo "ERROR: $image is not a valid image"
+	# 			echo ""
+	# 			fxnPrintUsage
+	# 			echo ""
+	# 			exit 1
+	# 		else
+	# 			fxnPrintDebug "DEBUG $image is a valid image. Yay!"
+	# 		fi
+	# 	fi
+	# done
 
 	fxnPrintDebug " "
-	fxnPrintDebug "Launching internal fxnConfirmOurInputImages ..." 
+	fxnPrintDebug "Completed internal fxnConfirmOurInputImages ..." 
 	fxnPrintDebug " "
 }
 
@@ -598,7 +608,8 @@ bash ${bwDir}/bwDisplayImageGeometry.sh -n ${t1} >> ${tempDir}/inputUnformatted.
 # (the following requires echo $var, not just $var for ws-sep'd values in $var
 # to be subsequently read as multiple values instead of single value containing
 # ws:)
-for image in $t1 $lesion $epi `echo ${integerVolumes} ${decimalVolumes}`; do
+for image in $t1 $lesion $inputBrain $epi; do
+   # deprecated: for image in $t1 $lesion $epi `echo ${integerVolumes} ${decimalVolumes}`; do
 	if [ -s $image ]; then
 		bash ${bwDir}/bwDisplayImageGeometry.sh -r $image >> ${tempDir}/inputUnformatted.txt
 	fi
@@ -656,38 +667,59 @@ if [ -s "`echo ${epi}`" ]; then
    2>/dev/null
 	ls -lh ${tempDirSpaceEPI}/${blind}_epi*
 fi
-# ...for any integerVolumes or decimalVolumes, if provided: 
-# the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
-for image in `echo ${integerVolumes} ${decimalVolumes}`; do
-        if [ -s "`echo ${image}`" ]; then
-                imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
-                fxnPrintDebug "3dresampling ${imageBasename} ..."
-		3dresample \
-		-orient rpi \
-		-prefix ${tempDirSpaceEPI}/${imageBasename}.nii.gz \
-		-inset ${image} \
-      2>/dev/null
-                fxnPrintDebug "...done 3dresampling ${imageBasename} ."
-		ls -lh ${tempDirSpaceEPI}/${imageBasename}.*
-	fi
-done
+
+#...skull-stripped inputBrain, if provided:
+if [ -s "`echo ${inputBrain}`" ]; then
+	3dresample \
+   -orient rpi \
+   -prefix ${tempDirSpaceT1}/${blind}_t1_brain.nii.gz \
+   -inset ${inputBrain} \
+   2>/dev/null
+	ls -lh ${tempDirSpaceT1}/${blind}_t1_brain*
+fi
+
+# Deprecated for impending continuous/discrete scheme:
+#    # ...for any integerVolumes or decimalVolumes, if provided: 
+#    # the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
+#    for image in `echo ${integerVolumes} ${decimalVolumes}`; do
+#            if [ -s "`echo ${image}`" ]; then
+#                    imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
+#                    fxnPrintDebug "3dresampling ${imageBasename} ..."
+#    		3dresample \
+#    		-orient rpi \
+#    		-prefix ${tempDirSpaceEPI}/${imageBasename}.nii.gz \
+#    		-inset ${image} \
+#          2>/dev/null
+#                    fxnPrintDebug "...done 3dresampling ${imageBasename} ."
+#    		ls -lh ${tempDirSpaceEPI}/${imageBasename}.*
+#    	fi
+#    done
 
 
 
 # ================================================================= #
-# skull-strip T1:
+# skull-strip T1 if skull-striped T1 wasn't already provided:
 #
-betOptsT1="-f 0.35 -B"
-if [ "${debug}" = "1" ] ; then betOptsT1="${betOptsT1} -v"; fi 
-echo ""
-echo ""
-echo "Skull-striping T1, which should take between one and twenty minutes..."
-echo "(using bet options ${betOptsT1})"
+if [ -z ${inputBrain} ]; then 
+   betOptsT1="-f 0.35 -B"
+   if [ "${debug}" = "1" ] ; then betOptsT1="${betOptsT1} -v"; fi 
+   echo ""
+   echo ""
+   echo "Skull-striping T1, which should take between one and twenty minutes..."
+   echo "(using bet options ${betOptsT1})"
 
-bet ${tempDirSpaceT1}/${blind}_t1 ${tempDirSpaceT1}/${blind}_t1_brain ${betOptsT1}
+   bet ${tempDirSpaceT1}/${blind}_t1 ${tempDirSpaceT1}/${blind}_t1_brain ${betOptsT1}
 
-echo "...done skull-striping T1:"
-ls -lh ${tempDirSpaceT1}/${blind}_t1_brain*
+   echo "...done skull-striping T1:"
+   ls -lh ${tempDirSpaceT1}/${blind}_t1_brain*
+else 
+   echo ""
+   echo ""
+   echo "No T1 skull-striping necessary, as user provided skull-stripped brain:"
+   ls -lh ${inputBrain}
+   ls -lh ${tempDirSpaceT1}/${blind}_t1_brain*
+fi
+   
 
 
 
@@ -962,49 +994,54 @@ if [ -s "`echo ${epi}`" ]; then
 	ls -lh ${tempDirSpaceStandard}/${blind}_epi*warped*
 fi
 
-# the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
-# integer-based volumes like cluster masks are registered with nearest neighbor interpolation:
-for image in `echo ${integerVolumes}`; do
-	if [ -s "`echo ${image}`" ]; then
-		echo ""
-		echo ""
-		imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
-		echo "Applying nonlinear warp to ${imageBasename} (probably 30 or fewer minutes)..."
 
-		applywarp \
-		--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
-		--in=${tempDirSpaceEPI}/${imageBasename} \
-		--warp=${tempDir}/${blind}_nonlinear_transf \
-		--premat=${tempDir}/${blind}_func2struct.mat \
-		--out=${tempDirSpaceStandard}/${imageBasename}_warped.nii.gz \
-		--interp=nn
+# deprecated these to loops (over $integerVolumes and $decimalVolumes) in
+# preperation for new scheme for addressing continuous- and
+# discrete-intensity volumes aligned with t1, EPI, and standard space:
 
-      echo "...done:"
-		ls -lh ${tempDirSpaceStandard}/${imageBasename}_warped*
-	fi
-done
-
-# the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
-# decimal-based volumes like stats are registered with fancier interpolation:
-for image in `echo ${decimalVolumes}`; do
-	if [ -s "`echo ${image}`" ]; then
-		echo ""
-		echo ""
-		imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
-		echo "Applying nonlinear warp to ${imageBasename} (probably 30 or fewer minutes)..."
-
-		applywarp \
-		--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
-		--in=${tempDirSpaceEPI}/${imageBasename} \
-		--warp=${tempDir}/${blind}_nonlinear_transf \
-		--premat=${tempDir}/${blind}_func2struct.mat \
-		--out=${tempDirSpaceStandard}/${imageBasename}_warped.nii.gz \
-		--interp=trilinear
-
-      echo "...done:"
-		ls -lh ${tempDirSpaceStandard}/${imageBasename}_warped*
-	fi
-done
+#    # the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
+#    # integer-based volumes like cluster masks are registered with nearest neighbor interpolation:
+#    for image in `echo ${integerVolumes}`; do
+#    	if [ -s "`echo ${image}`" ]; then
+#    		echo ""
+#    		echo ""
+#    		imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
+#    		echo "Applying nonlinear warp to ${imageBasename} (probably 30 or fewer minutes)..."
+#    
+#    		applywarp \
+#    		--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
+#    		--in=${tempDirSpaceEPI}/${imageBasename} \
+#    		--warp=${tempDir}/${blind}_nonlinear_transf \
+#    		--premat=${tempDir}/${blind}_func2struct.mat \
+#    		--out=${tempDirSpaceStandard}/${imageBasename}_warped.nii.gz \
+#    		--interp=nn
+#    
+#          echo "...done:"
+#    		ls -lh ${tempDirSpaceStandard}/${imageBasename}_warped*
+#    	fi
+#    done
+#    
+#    # the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
+#    # decimal-based volumes like stats are registered with fancier interpolation:
+#    for image in `echo ${decimalVolumes}`; do
+#    	if [ -s "`echo ${image}`" ]; then
+#    		echo ""
+#    		echo ""
+#    		imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
+#    		echo "Applying nonlinear warp to ${imageBasename} (probably 30 or fewer minutes)..."
+#    
+#    		applywarp \
+#    		--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
+#    		--in=${tempDirSpaceEPI}/${imageBasename} \
+#    		--warp=${tempDir}/${blind}_nonlinear_transf \
+#    		--premat=${tempDir}/${blind}_func2struct.mat \
+#    		--out=${tempDirSpaceStandard}/${imageBasename}_warped.nii.gz \
+#    		--interp=trilinear
+#    
+#          echo "...done:"
+#    		ls -lh ${tempDirSpaceStandard}/${imageBasename}_warped*
+#    	fi
+#    done
 
 echo ""
 echo ""
