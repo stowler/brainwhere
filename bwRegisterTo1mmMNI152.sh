@@ -38,14 +38,14 @@
 # - UNTESTED: interpolation methods implemented may not be best (masks: nearest neighbor, decimal values: trilinear or sinc)
 #
 # TBD: 
-# - add mni2func (inversion of func2mni)
-# - add lesion masking everywhere possible
+# - test lesion masking everywhere possible
 # - add teaching note: notice that interpolated outputs ("+space2space.nii.gz") images are never inputs
 # - add new arguments (see comments at end of fxnPrintUsage)
 # - copy self (and log?) to tempDir and outDir
+# - test for EPI: bet -F, and for func2anat 7dof
 # - accept HEAD/BRIK input
-# - add automatic slicesdir output
-# - add self-test: compare results against gold-standard and detect error if different
+# - add automatic slicesdir output to visualize regs and skull-strips
+# - add self-test: compare results against gold-standard prior and detect error if different
 # - add automatic testing of geometry compatibility:
 #     - t1 with lesion, inputBrain, other alleged t1-aligend inputs
 #     - epi with alleged epi-aligend inputs
@@ -54,7 +54,7 @@
 #     - initial dis/approval of aggregate geometry table
 #     - interactive skull stripping
 #     - interactive confirmation of epi2t1 before lengthy application to all epi volumes
-# - add subdirectory for xforms (and make xform names more consistent?) 
+# - add subdirectory for xforms
 # - address lack of xforms for 4D epi (func2anat and func2mni)
 #     - can corrupt timeseries pretty significantly
 
@@ -647,7 +647,8 @@ echo ""
 # copy images to $tempDir:
 #
 echo ""
-echo "Creating new copies of images to ensure consistent naming and avoid bad datatypes:"
+echo "Creating new copies of input images to ensure consistent naming, "
+echo "consistent spatial orientation, and to avoid bad datatypes:"
 echo ""
 
 cp ${FSLDIR}/data/standard/MNI152_T1_1mm.nii.gz \
@@ -656,7 +657,7 @@ cp ${FSLDIR}/data/standard/MNI152_T1_1mm.nii.gz \
    ${tempDirSpaceStandard}/
 
 # Below I'm using 3dresample instead of fslreorient2std to allow for the later
-# possibility of allowing AFNI BRIK/HEAD images as input:
+# possibility that AFNI BRIK/HEAD images may be used as input:
 
 # ...import t1:
 3dresample \
@@ -840,11 +841,14 @@ if [ -s "`echo ${epi}`" ]; then
 	echo ""
 	echo "anat2func: inverting from func2anat, applying to T1-aligned images (about two minutes)..."
 
-   # First invert the func2anat xform:
-   convert_xfm -omat ${tempDir}/${blind}_anat2func.mat -inverse ${tempDir}/${blind}_func2anat.mat
+   # invert the func2anat xform, producing anat2func.mat:
+   convert_xfm \
+   -omat ${tempDir}/${blind}_anat2func.mat \
+   -inverse \
+   ${tempDir}/${blind}_func2anat.mat
    du -h ${tempDir}/${blind}_anat2func.mat
 
-   # apply to t1:
+   # apply anat2func to whole-head t1:
 	flirt \
 	-in ${tempDirSpaceT1}/${blind}_t1 \
 	-ref ${tempDirSpaceEPI}/${blind}_epi_averaged.nii.gz \
@@ -852,7 +856,7 @@ if [ -s "`echo ${epi}`" ]; then
 	-out  ${tempDirSpaceEPI}/${blind}_t1+anat2func
    du -h ${tempDirSpaceEPI}/${blind}_t1+anat2func*
 
-   # apply to t1_brain:
+   # apply anat2func to t1_brain:
 	flirt \
 	-in ${tempDirSpaceT1}/${blind}_t1_brain \
 	-ref ${tempDirSpaceEPI}/${blind}_epi_averaged.nii.gz \
@@ -860,7 +864,7 @@ if [ -s "`echo ${epi}`" ]; then
 	-out  ${tempDirSpaceEPI}/${blind}_t1_brain+anat2func
    du -h ${tempDirSpaceEPI}/${blind}_t1_brain+anat2func*
 
-   # apply to lesion, if lesion was provided:
+   # apply anat2func to t1-aligned lesion, if lesion was provided:
    if [ -s "`echo ${lesion}`" ]; then
       flirt \
       -in ${tempDirSpaceT1}/${blind}_lesion \
@@ -908,15 +912,15 @@ if [ -s "`echo ${lesion}`" ]; then
 	     -ref ${FSLDIR}/data/standard/MNI152_T1_2mm_brain.nii.gz \
 	     -in ${tempDirSpaceT1}/${blind}_t1_brain \
 	     -inweight ${tempDirSpaceT1}/${blind}_lesionInverted \
-	     -omat ${tempDir}/${blind}_affine_transf.mat 
+	     -omat ${tempDir}/${blind}_anat2mni.mat 
 else
 	flirt \
 	     -ref ${FSLDIR}/data/standard/MNI152_T1_2mm_brain.nii.gz \
 	     -in ${tempDirSpaceT1}/${blind}_t1_brain \
-	     -omat ${tempDir}/${blind}_affine_transf.mat 
+	     -omat ${tempDir}/${blind}_anat2mni.mat 
 fi
 
-du -h ${tempDir}/${blind}_affine_transf.mat 
+du -h ${tempDir}/${blind}_anat2mni.mat 
 
 
 # Now estimate the nonlinear transform, using the linear xform as the --aff argument:
@@ -932,19 +936,19 @@ du -h ${tempDir}/${blind}_affine_transf.mat
 if [ -s "`echo ${lesion}`" ]; then
 	fnirt \
 	     --in=${tempDirSpaceT1}/${blind}_t1 \
-	     --aff=${tempDir}/${blind}_affine_transf.mat \
-	     --cout=${tempDir}/${blind}_nonlinear_transf \
+	     --aff=${tempDir}/${blind}_anat2mni.mat \
+	     --cout=${tempDir}/${blind}_warp_anat2mni \
 	     --config=T1_2_MNI152_2mm \
 	     --inmask=${tempDirSpaceT1}/${blind}_lesionInverted 
 else
 	fnirt \
 	     --in=${tempDirSpaceT1}/${blind}_t1 \
-	     --aff=${tempDir}/${blind}_affine_transf.mat \
-	     --cout=${tempDir}/${blind}_nonlinear_transf \
+	     --aff=${tempDir}/${blind}_anat2mni.mat \
+	     --cout=${tempDir}/${blind}_warp_anat2mni \
 	     --config=T1_2_MNI152_2mm 
 fi
 
-du -h ${tempDir}/${blind}_nonlinear_transf* 
+du -h ${tempDir}/${blind}_warp_anat2mni* 
 
 # move fnirt-generated log file from ${tempDirSpaceT1} to ${tempDir}
 mv ${tempDirSpaceT1}/*t1_to_MNI152_T1_2mm.log ${tempDir}
@@ -954,7 +958,7 @@ mv ${tempDirSpaceT1}/*t1_to_MNI152_T1_2mm.log ${tempDir}
 applywarp \
 --ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
 --in=${tempDirSpaceT1}/${blind}_t1 \
---warp=${tempDir}/${blind}_nonlinear_transf \
+--warp=${tempDir}/${blind}_warp_anat2mni \
 --interp=trilinear \
 --out=${tempDirSpaceStandard}/${blind}_t1+anat2mni
 du -h ${tempDirSpaceStandard}/${blind}_t1+anat2mni*
@@ -963,7 +967,7 @@ du -h ${tempDirSpaceStandard}/${blind}_t1+anat2mni*
 applywarp \
 --ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
 --in=${tempDirSpaceT1}/${blind}_t1_brain \
---warp=${tempDir}/${blind}_nonlinear_transf \
+--warp=${tempDir}/${blind}_warp_anat2mni \
 --interp=trilinear \
 --out=${tempDirSpaceStandard}/${blind}_t1_brain+anat2mni
 du -h ${tempDirSpaceStandard}/${blind}_t1_brain+anat2mni*
@@ -973,14 +977,14 @@ if [ -s "`echo ${lesion}`" ]; then
    applywarp \
 	     	--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
 	     	--in=${tempDirSpaceT1}/${blind}_lesion \
-	     	--warp=${tempDir}/${blind}_nonlinear_transf \
+	     	--warp=${tempDir}/${blind}_warp_anat2mni \
 	     	--interp=nn \
 	     	--out=${tempDirSpaceStandard}/${blind}_lesion+anat2mni
 	     	du -h ${tempDirSpaceStandard}/${blind}_lesion+anat2mni*
    applywarp \
 	     	--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
 	     	--in=${tempDirSpaceT1}/${blind}_lesionInverted \
-	     	--warp=${tempDir}/${blind}_nonlinear_transf \
+	     	--warp=${tempDir}/${blind}_warp_anat2mni \
 	     	--interp=nn \
 	     	--out=${tempDirSpaceStandard}/${blind}_lesionInverted+anat2mni
 	     	du -h ${tempDirSpaceStandard}/${blind}_lesionInverted+anat2mni*
@@ -998,16 +1002,16 @@ echo "mni2anat: inverting from anat2mni linear+nonlinear, applying to mni152-ali
 # invert anat2mni to mni2anat:
 invwarp \
 --ref=${tempDirSpaceT1}/${blind}_t1 \
---warp=${tempDir}/${blind}_nonlinear_transf \
---out=${tempDir}/${blind}_nonlinear_transf_mni2t1
-du -h ${tempDir}/${blind}_nonlinear_transf_mni2t1*
+--warp=${tempDir}/${blind}_warp_anat2mni \
+--out=${tempDir}/${blind}_warp_mni2anat
+du -h ${tempDir}/${blind}_warp_mni2anat*
 
 
 # apply to H-O cortical atlas:
 applywarp \
 --ref=${tempDirSpaceT1}/${blind}_t1 \
 --in=$FSLDIR/data/atlases/HarvardOxford/HarvardOxford-cort-maxprob-thr25-1mm.nii.gz \
---warp=${tempDir}/${blind}_nonlinear_transf_mni2t1 \
+--warp=${tempDir}/${blind}_warp_mni2anat \
 --interp=nn \
 --out=${tempDirSpaceT1}/HarvardOxford-cort-maxprob-thr25-1mm+mni2anat
 du -h ${tempDirSpaceT1}/HarvardOxford-cort-maxprob-thr25-1mm+mni2anat*
@@ -1017,7 +1021,7 @@ du -h ${tempDirSpaceT1}/HarvardOxford-cort-maxprob-thr25-1mm+mni2anat*
 applywarp \
 --ref=${tempDirSpaceT1}/${blind}_t1 \
 --in=$FSLDIR/data/standard/MNI152_T1_1mm.nii.gz \
---warp=${tempDir}/${blind}_nonlinear_transf_mni2t1 \
+--warp=${tempDir}/${blind}_warp_mni2anat \
 --interp=trilinear \
 --out=${tempDirSpaceT1}/MNI152_T1_1mm+mni2anat
 du -h ${tempDirSpaceT1}/MNI152_T1_1mm+mni2anat*
@@ -1027,7 +1031,7 @@ du -h ${tempDirSpaceT1}/MNI152_T1_1mm+mni2anat*
 applywarp \
 --ref=${tempDirSpaceT1}/${blind}_t1 \
 --in=$FSLDIR/data/standard/MNI152_T1_1mm_brain.nii.gz \
---warp=${tempDir}/${blind}_nonlinear_transf_mni2t1 \
+--warp=${tempDir}/${blind}_warp_mni2anat \
 --interp=trilinear \
 --out=${tempDirSpaceT1}/MNI152_T1_1mm_brain+mni2anat
 du -h ${tempDirSpaceT1}/MNI152_T1_1mm_brain+mni2anat*
@@ -1053,20 +1057,11 @@ if [ -s "`echo ${epi}`" ]; then
 	echo ""
 	echo ""
 	echo "func2mni: applying combined xform to epi-aligned images (about two minutes)..."
-	# temporarily disabling warp of full 4D EPI....
-	#ls -l ${tempDir}/${blind}_epi*
-	#applywarp \
-	#     --ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
-	#     --in=${tempDir}/${blind}_epi \
-	#     --warp=${tempDir}/${blind}_nonlinear_transf \
-	#     --premat=${tempDir}/${blind}_func2anat.mat \
-	#     --out=${tempDir}/${blind}_epi_warped
 
-	# ...in exchange for faster warp of 3D EPI average:
 	applywarp \
    --ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
    --in=${tempDirSpaceEPI}/${blind}_epi_averaged \
-   --warp=${tempDir}/${blind}_nonlinear_transf \
+   --warp=${tempDir}/${blind}_warp_anat2mni \
    --premat=${tempDir}/${blind}_func2anat.mat \
    --interp=trilinear \
    --out=${tempDirSpaceStandard}/${blind}_epi_averaged+func2mni
@@ -1075,13 +1070,52 @@ if [ -s "`echo ${epi}`" ]; then
 	applywarp \
    --ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
    --in=${tempDirSpaceEPI}/${blind}_epi_averaged_brain \
-   --warp=${tempDir}/${blind}_nonlinear_transf \
+   --warp=${tempDir}/${blind}_warp_anat2mni \
    --premat=${tempDir}/${blind}_func2anat.mat \
    --interp=trilinear \
    --out=${tempDirSpaceStandard}/${blind}_epi_averaged_brain+func2mni
 	du -h ${tempDirSpaceStandard}/${blind}_epi_averaged_brain+func2mni*
 
    echo "...done."
+
+
+	echo ""
+	echo ""
+	echo "mni2func: applying inverted xforms to MNI-aligned images (about two minutes)..."
+
+
+   # create mni2func version of skull-stripped MNI template:
+   applywarp \
+   --ref=${tempDirSpaceEPI}/${blind}_epi_averaged \
+   --in=${FSLDIR}/data/standard/MNI152_T1_1mm_brain \
+   --warp=${tempDir}/${blind}_warp_mni2anat \
+   --postmat=${tempDir}/${blind}_anat2func.mat \
+   --interp=trilinear \
+   --out=${tempDirSpaceEPI}/MNI152_T1_1mm_brain+mni2func
+   du -h ${tempDirSpaceEPI}/MNI152_T1_1mm_brain+mni2func*
+
+   # create mni2func version of un-skull-stripped MNI template:
+   applywarp \
+   --ref=${tempDirSpaceEPI}/${blind}_epi_averaged \
+   --in=${FSLDIR}/data/standard/MNI152_T1_1mm \
+   --warp=${tempDir}/${blind}_warp_mni2anat \
+   --postmat=${tempDir}/${blind}_anat2func.mat \
+   --interp=trilinear \
+   --out=${tempDirSpaceEPI}/MNI152_T1_1mm+mni2func
+   du -h ${tempDirSpaceEPI}/MNI152_T1_1mm+mni2func*
+
+   # create mni2func version of discrete H-O cortical atlas:
+   applywarp \
+   --ref=${tempDirSpaceEPI}/${blind}_epi_averaged \
+   --in=${FSLDIR}/data/atlases/HarvardOxford/HarvardOxford-cort-maxprob-thr25-1mm.nii.gz \
+   --warp=${tempDir}/${blind}_warp_mni2anat \
+   --postmat=${tempDir}/${blind}_anat2func.mat \
+   --interp=nn \
+   --out=${tempDirSpaceEPI}/HarvardOxford-cort-maxprob-thr25-1mm+mni2func
+   du -h ${tempDirSpaceEPI}/HarvardOxford-cort-maxprob-thr25-1mm+mni2func*
+
+   echo "...done."
+
 fi
 
 
@@ -1101,7 +1135,7 @@ fi
 #    		applywarp \
 #    		--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
 #    		--in=${tempDirSpaceEPI}/${imageBasename} \
-#    		--warp=${tempDir}/${blind}_nonlinear_transf \
+#    		--warp=${tempDir}/${blind}_warp_anat2mni \
 #    		--premat=${tempDir}/${blind}_func2anat.mat \
 #    		--out=${tempDirSpaceStandard}/${imageBasename}_warped.nii.gz \
 #    		--interp=nn
@@ -1123,7 +1157,7 @@ fi
 #    		applywarp \
 #    		--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
 #    		--in=${tempDirSpaceEPI}/${imageBasename} \
-#    		--warp=${tempDir}/${blind}_nonlinear_transf \
+#    		--warp=${tempDir}/${blind}_warp_anat2mni \
 #    		--premat=${tempDir}/${blind}_func2anat.mat \
 #    		--out=${tempDirSpaceStandard}/${imageBasename}_warped.nii.gz \
 #    		--interp=trilinear
@@ -1132,6 +1166,7 @@ fi
 #    		ls -lh ${tempDirSpaceStandard}/${imageBasename}_warped*
 #    	fi
 #    done
+
 
 echo ""
 echo ""
