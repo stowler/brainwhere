@@ -108,6 +108,10 @@ cat <<EOF
      -b <brainFromSkullStrippedT1.nii>   (already aligned with the -t t1 above)
      -l <lesionMaskFromT1.nii>           (already aligned with the -t t1 above)
 
+   Optional 3d inputs: volumes already aligned to standard-space MNI152 image:
+     --sd <standardSpaceAligned3dVolumeContainingDiscreteMaskIntensities.nii>
+     --sc <standardSpaceAligned3dVolumeContainingContinuousIntensities.ni>
+
    Optional arguments to control exectuion:
      -z (launch internal self-test, which ignores input volumes)
      -d (turn on debug mode)
@@ -127,9 +131,6 @@ EOF
 #     --td <t1Aligned3dVolumesContainingDiscreteMaskIntensities.nii>
 #     --tc <t1Aligned3dVolumesContainingContinuousIntensities.ni>
 #
-#   Optional 3d inputs: volumes already aligned to standard-space MNI152 image:
-#     --sd <standardSpaceAligned3dVolumeContainingDiscreteMaskIntensities.nii>
-#     --sc <standardSpaceAligned3dVolumeContainingContinuousIntensities.ni>
 #
 
 }
@@ -181,6 +182,8 @@ fxnProcessInvocation() {
 	lesion=''
 	epi=''
    inputBrain=''
+   sd=''
+   sc=''
 	#integerVolumes=''
 	#decimalVolumes=''
 
@@ -200,7 +203,9 @@ fxnProcessInvocation() {
 
 	# STEP 2/3: set the getopt string:
 	eval set -- ${scriptArgsVector}
-	TEMP=`getopt -- zds:t:o:l:e:b: "$@"`
+	TEMP=`getopt -o zds:t:o:l:e:b: --long sd:,sc: -- "$@"`
+# worked before adding long options:
+#	TEMP=`getopt -- zds:t:o:l:e:b: "$@"`
 	if [ $? != 0 ] ; then 
 	   echo "Terminating...could not set string for getopt. Check out the Usage note:" >&2 
 	   fxnPrintUsage 
@@ -230,6 +235,8 @@ fxnProcessInvocation() {
 	      -l)   lesion="${2}"; shift 2 ;;
 	      -e)   epi="${2}"; shift 2 ;;
 	      -b)   inputBrain="${2}"; shift 2 ;;
+         --sd) sd="${sd} ${2}"; shift 2 ;;
+         --sc) sc="${sc} ${2}"; shift 2 ;;
 	      --)   shift; break ;;
 	      -*)   echo >&2 "Error in invocation. See usage note" ; fxnPrintUsage ;  exit 1 ;;
 	       *)   echo "Error in arguments to ${scriptName}" ; fxnPrintUsage ; exit 1 ;;		# terminate while loop
@@ -296,6 +303,8 @@ fxnProcessInvocation() {
 	fxnPrintDebug "\${lesion} == ${lesion}"
 	fxnPrintDebug "\${epi} == ${epi}"
 	fxnPrintDebug "\${inputBrain} == ${inputBrain}"
+	fxnPrintDebug "\${sd} == ${sd}"
+	fxnPrintDebug "\${sc} == ${sc}"
 	#fxnPrintDebug "\${integerVolumes} == ${integerVolumes}"
 	#fxnPrintDebug "\${decimalVolumes} == ${decimalVolumes}"
 	fxnPrintDebug " "
@@ -314,9 +323,11 @@ fxnSelftest() {
 	fxnPrintDebug "-s subjectID == \${blind} == ${blind}"
 	fxnPrintDebug "-t t1 == \${t1} == ${t1}"
 	fxnPrintDebug "-o FullPathToOutdir == \${outDir} == ${outDir}"
-	#fxnPrintDebug "-l lesion.nii == \${} == ${}"
+	fxnPrintDebug "-l lesion.nii == \${lesion} == ${lesion}"
 	fxnPrintDebug "-e epi.nii == \${epi} == ${epi}"
 	fxnPrintDebug "-b inputBrain.nii == \${inputBrain} == ${inputBrain}"
+	fxnPrintDebug "--sd standardDiscrete.nii == \${sd} == ${sd}"
+	fxnPrintDebug "--sc standardContinuous.nii == \${sc} == ${sc}"
 	fxnPrintDebug " "
 
 	cat <<EOF
@@ -333,11 +344,18 @@ EOF
 	-e ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_mni.nii.gz \
  	-b ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_brain_mni.nii.gz \
  	-l ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_lesionT1LeftSloppyHG_mni.nii.gz \
+   --sd ${FSLDIR}/data/atlases/HarvardOxford/HarvardOxford-sub-maxprob-thr25-1mm.nii.gz  \
+   --sc ${FSLDIR}/data/standard/FMRIB58_FA_1mm.nii.gz \
   	-o ${tempDir}/nominalOutDirFromSelftest 
 
 # easly to add a pre-extracted t1 brain and lesion to the self-test:
-#	-b ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_brain_mni.nii.gz
+#	-b ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_brain_mni.nii.gz \
 # 	-l ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_lesionT1LeftSloppyHG_mni.nii.gz \
+
+# easy to add standard-space discrete- and continuous-intensity volumes to the self test:
+#  --sd ${FSLDIR}/data/atlases/HarvardOxford/HarvardOxford-sub-maxprob-thr25-1mm.nii.gz  \
+#  --sc ${FSLDIR}/data/standard/FMRIB58_FA_1mm.nii.gz \
+
 
 	# TBD: add additional self-tests:
 	# badImages, noArguments, wrongArguments, etc.	
@@ -456,7 +474,27 @@ fxnConfirmOurInputImages() {
 		fi
 	fi
 
-   # deprecated these to loops (over $integerVolumes and $decimalVolumes) in
+#	the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
+	for image in `echo ${sd} ${sc}`; do
+		fxnPrintDebug "validating standard-space image ${image}"
+		if [ ! -z ${image} ]; then
+			fxnValidateImages ${image}
+			if [ $? -eq 1 ]; then 
+				echo ""
+				echo "ERROR: $image is not a valid image"
+				echo ""
+				fxnPrintUsage
+				echo ""
+				exit 1
+			else
+				fxnPrintDebug "$image is a valid image. Yay!"
+			fi
+		fi
+	done
+
+
+
+   # deprecated these two loops (over $integerVolumes and $decimalVolumes) in
    # preperation for new scheme for addressing continuous- and
    # discrete-intensity volumes aligned with t1, EPI, and standard space
 
@@ -614,7 +652,7 @@ bash ${bwDir}/bwDisplayImageGeometry.sh -n ${t1} >> ${tempDir}/inputUnformatted.
 # (the following requires echo $var, not just $var for ws-sep'd values in $var
 # to be subsequently read as multiple values instead of single value containing
 # ws:)
-for image in $t1 $lesion $inputBrain $epi; do
+for image in $t1 $lesion $inputBrain $epi `echo ${sd} ${sc}`; do
    # deprecated: for image in $t1 $lesion $epi `echo ${integerVolumes} ${decimalVolumes}`; do
 	if [ -s $image ]; then
 		bash ${bwDir}/bwDisplayImageGeometry.sh -r $image >> ${tempDir}/inputUnformatted.txt
@@ -699,22 +737,22 @@ if [ -s "`echo ${epi}`" ]; then
 	du -h ${tempDirSpaceEPI}/${blind}_epi*
 fi
 
-# Deprecated for impending continuous/discrete scheme:
-#    # ...for any integerVolumes or decimalVolumes, if provided: 
-#    # the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
-#    for image in `echo ${integerVolumes} ${decimalVolumes}`; do
-#            if [ -s "`echo ${image}`" ]; then
-#                    imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
-#                    fxnPrintDebug "3dresampling ${imageBasename} ..."
-#    		3dresample \
-#    		-orient rpi \
-#    		-prefix ${tempDirSpaceEPI}/${imageBasename}.nii.gz \
-#    		-inset ${image} \
-#          2>/dev/null
-#                    fxnPrintDebug "...done 3dresampling ${imageBasename} ."
-#    		ls -lh ${tempDirSpaceEPI}/${imageBasename}.*
-#    	fi
-#    done
+
+# ...for any standard-space discrete- or continuous-intensity voluems, if provided: 
+# the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
+for image in `echo ${sd} ${sc}`; do
+        if [ -s "`echo ${image}`" ]; then
+                imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
+                fxnPrintDebug "3dresampling ${imageBasename} ..."
+		3dresample \
+		-orient rpi \
+		-prefix ${tempDirSpaceStandard}/${imageBasename}.nii.gz \
+		-inset ${image} \
+      2>/dev/null
+                fxnPrintDebug "...done 3dresampling ${imageBasename} ."
+		du -h ${tempDirSpaceStandard}/${imageBasename}.*
+	fi
+done
 
 
 
@@ -1036,9 +1074,38 @@ applywarp \
 --out=${tempDirSpaceT1}/MNI152_T1_1mm_brain+mni2anat
 du -h ${tempDirSpaceT1}/MNI152_T1_1mm_brain+mni2anat*
 
+# apply mni2anat to standard-space discrete-intensity (mask) images
+# the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
+for image in `echo ${sd}`; do
+	if [ -s "`echo ${image}`" ]; then
+		imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
+		applywarp \
+		--ref=${tempDirSpaceT1}/${blind}_t1 \
+		--in=${tempDirSpaceStandard}/${imageBasename} \
+		--warp=${tempDir}/${blind}_warp_mni2anat \
+		--interp=nn \
+		--out=${tempDirSpaceT1}/${imageBasename}+mni2anat
+		du -h ${tempDirSpaceT1}/${imageBasename}+mni2anat*
+	fi
+done
+
+# apply mni2anat to standard-space continuous-intensity (non-mask) images
+# the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
+for image in `echo ${sc}`; do
+	if [ -s "`echo ${image}`" ]; then
+		imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
+		applywarp \
+		--ref=${tempDirSpaceT1}/${blind}_t1 \
+		--in=${tempDirSpaceStandard}/${imageBasename} \
+		--warp=${tempDir}/${blind}_warp_mni2anat \
+		--interp=trilinear \
+		--out=${tempDirSpaceT1}/${imageBasename}+mni2anat
+		du -h ${tempDirSpaceT1}/${imageBasename}+mni2anat*
+	fi
+done
+
+
 echo "...done."
-
-
 
 
 
