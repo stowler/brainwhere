@@ -1075,7 +1075,10 @@ applywarp \
 du -h ${tempDirSpaceT1}/MNI152_T1_1mm_brain+mni2anat*
 
 # apply mni2anat to standard-space discrete-intensity (mask) images
-# the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
+#
+#    NB: the following requires echo $var, not just $var for ws-sep'd values in
+#    $var to be subsequently read as multiple values instead of single value
+#    containing ws:
 for image in `echo ${sd}`; do
 	if [ -s "`echo ${image}`" ]; then
 		imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
@@ -1090,7 +1093,10 @@ for image in `echo ${sd}`; do
 done
 
 # apply mni2anat to standard-space continuous-intensity (non-mask) images
-# the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
+#
+#    NB: the following requires echo $var, not just $var for ws-sep'd values in
+#    $var to be subsequently read as multiple values instead of single value
+#    containing ws:
 for image in `echo ${sc}`; do
 	if [ -s "`echo ${image}`" ]; then
 		imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
@@ -1181,58 +1187,50 @@ if [ -s "`echo ${epi}`" ]; then
    --out=${tempDirSpaceEPI}/HarvardOxford-cort-maxprob-thr25-1mm+mni2func
    du -h ${tempDirSpaceEPI}/HarvardOxford-cort-maxprob-thr25-1mm+mni2func*
 
+
+   # apply mni2func to standard-space discrete-intensity (mask) images
+   #
+   #    NB: the following requires echo $var, not just $var for ws-sep'd values in
+   #    $var to be subsequently read as multiple values instead of single value
+   #    containing ws:
+   for image in `echo ${sd}`; do
+   	if [ -s "`echo ${image}`" ]; then
+   		imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
+   		applywarp \
+   		--ref=${tempDirSpaceEPI}/${blind}_epi_averaged \
+   		--in=${tempDirSpaceStandard}/${imageBasename} \
+   		--warp=${tempDir}/${blind}_warp_mni2anat \
+         --postmat=${tempDir}/${blind}_anat2func.mat \
+   		--interp=nn \
+   		--out=${tempDirSpaceEPI}/${imageBasename}+mni2func
+   		du -h ${tempDirSpaceEPI}/${imageBasename}+mni2func*
+   	fi
+   done
+   
+   # apply mni2func to standard-space continuous-intensity (non-mask) images
+   #
+   #    NB: the following requires echo $var, not just $var for ws-sep'd values in
+   #    $var to be subsequently read as multiple values instead of single value
+   #    containing ws:
+   for image in `echo ${sc}`; do
+   	if [ -s "`echo ${image}`" ]; then
+   		imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
+   		applywarp \
+   		--ref=${tempDirSpaceEPI}/${blind}_epi_averaged \
+   		--in=${tempDirSpaceStandard}/${imageBasename} \
+   		--warp=${tempDir}/${blind}_warp_mni2anat \
+         --postmat=${tempDir}/${blind}_anat2func.mat \
+   		--interp=trilinear \
+   		--out=${tempDirSpaceEPI}/${imageBasename}+mni2func
+   		du -h ${tempDirSpaceEPI}/${imageBasename}+mni2func*
+   	fi
+   done
+
+
    echo "...done."
 
 fi
 
-
-# deprecated these to loops (over $integerVolumes and $decimalVolumes) in
-# preperation for new scheme for addressing continuous- and
-# discrete-intensity volumes aligned with t1, EPI, and standard space:
-
-#    # the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
-#    # integer-based volumes like cluster masks are registered with nearest neighbor interpolation:
-#    for image in `echo ${integerVolumes}`; do
-#    	if [ -s "`echo ${image}`" ]; then
-#    		echo ""
-#    		echo ""
-#    		imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
-#    		echo "Applying nonlinear warp to ${imageBasename} (probably 30 or fewer minutes)..."
-#    
-#    		applywarp \
-#    		--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
-#    		--in=${tempDirSpaceEPI}/${imageBasename} \
-#    		--warp=${tempDir}/${blind}_warp_anat2mni \
-#    		--premat=${tempDir}/${blind}_func2anat.mat \
-#    		--out=${tempDirSpaceStandard}/${imageBasename}_warped.nii.gz \
-#    		--interp=nn
-#    
-#          echo "...done:"
-#    		ls -lh ${tempDirSpaceStandard}/${imageBasename}_warped*
-#    	fi
-#    done
-#    
-#    # the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
-#    # decimal-based volumes like stats are registered with fancier interpolation:
-#    for image in `echo ${decimalVolumes}`; do
-#    	if [ -s "`echo ${image}`" ]; then
-#    		echo ""
-#    		echo ""
-#    		imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
-#    		echo "Applying nonlinear warp to ${imageBasename} (probably 30 or fewer minutes)..."
-#    
-#    		applywarp \
-#    		--ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
-#    		--in=${tempDirSpaceEPI}/${imageBasename} \
-#    		--warp=${tempDir}/${blind}_warp_anat2mni \
-#    		--premat=${tempDir}/${blind}_func2anat.mat \
-#    		--out=${tempDirSpaceStandard}/${imageBasename}_warped.nii.gz \
-#    		--interp=trilinear
-#    
-#          echo "...done:"
-#    		ls -lh ${tempDirSpaceStandard}/${imageBasename}_warped*
-#    	fi
-#    done
 
 
 echo ""
