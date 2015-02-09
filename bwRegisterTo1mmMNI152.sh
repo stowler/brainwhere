@@ -1206,6 +1206,7 @@ if [ -s "`echo ${epi}`" ]; then
 	echo ""
 	echo "func2mni: applying combined xform to epi-aligned images (about two minutes)..."
 
+   # apply func2mni to temporal mean of EPI:
 	applywarp \
    --ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
    --in=${tempDirSpaceEPI}/${blind}_epi_averaged \
@@ -1215,6 +1216,7 @@ if [ -s "`echo ${epi}`" ]; then
    --out=${tempDirSpaceStandard}/${blind}_epi_averaged+func2mni
 	du -h ${tempDirSpaceStandard}/${blind}_epi_averaged+func2mni*
 
+   # apply func2mni to skull-stripped temporal mean of EPI:
 	applywarp \
    --ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
    --in=${tempDirSpaceEPI}/${blind}_epi_averaged_brain \
@@ -1223,6 +1225,46 @@ if [ -s "`echo ${epi}`" ]; then
    --interp=trilinear \
    --out=${tempDirSpaceStandard}/${blind}_epi_averaged_brain+func2mni
 	du -h ${tempDirSpaceStandard}/${blind}_epi_averaged_brain+func2mni*
+
+
+   # apply func2mni to EPI-aligned discrete-intensity (mask) images
+   #
+   #    NB: the following requires echo $var, not just $var for ws-sep'd values in
+   #    $var to be subsequently read as multiple values instead of single value
+   #    containing ws:
+   for image in `echo ${ed}`; do
+      if [ -s "`echo ${image}`" ]; then
+         imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
+         applywarp \
+         --ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
+         --in=${tempDirSpaceEPI}/${imageBasename} \
+         --warp=${tempDir}/${blind}_warp_anat2mni \
+         --premat=${tempDir}/${blind}_func2anat.mat \
+         --interp=nn \
+         --out=${tempDirSpaceStandard}/${imageBasename}+func2mni
+         du -h ${tempDirSpaceStandard}/${imageBasename}+func2mni*
+      fi
+   done
+
+   # apply func2mni to EPI-aligned continuous-intensity (non-mask) images
+   #
+   #    NB: the following requires echo $var, not just $var for ws-sep'd values in
+   #    $var to be subsequently read as multiple values instead of single value
+   #    containing ws:
+   for image in `echo ${ec}`; do
+      if [ -s "`echo ${image}`" ]; then
+         imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
+         applywarp \
+         --ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
+         --in=${tempDirSpaceEPI}/${imageBasename} \
+         --warp=${tempDir}/${blind}_warp_anat2mni \
+         --premat=${tempDir}/${blind}_func2anat.mat \
+         --interp=trilinear \
+         --out=${tempDirSpaceStandard}/${imageBasename}+func2mni
+         du -h ${tempDirSpaceStandard}/${imageBasename}+func2mni*
+      fi
+   done
+
 
    echo "...done."
 
