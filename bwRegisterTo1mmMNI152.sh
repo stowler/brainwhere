@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# LOCATION: 	      $bwDir/bwRegisterTo1mmMNI152.sh
+# LOCATION: 	      $bwDir/bwFnirtBot.sh
 # USAGE:             see fxnPrintUsage() function below
 #
 # CREATED:	         201008?? by stowler@gmail.com http://brainwhere.googlecode.com
@@ -40,7 +40,7 @@
 # TBD: 
 # - test lesion masking everywhere possible
 # - add teaching note: notice that interpolated outputs ("+space2space.nii.gz") images are never inputs
-# - add new arguments (see comments at end of fxnPrintUsage)
+# - add new td/tc arguments (see comments at end of fxnPrintUsage)
 # - copy self (and log?) to tempDir and outDir
 # - test for EPI: bet -F, and for func2anat 7dof
 # - accept HEAD/BRIK input
@@ -90,18 +90,60 @@ fxnPrintDebug() {
 
 fxnPrintUsage() {
 cat <<EOF
-   $0 - a script to nonlinearly register T1 and optional volumes with 1mmMNI152 template.
+   bwFnirtBot.sh - automated all-way registration of T1 images, EPI images, and 1mmMNI152 images.
 
-   The output directory will contain subdirectories with input images
-   nonlinearly registered into standard space, as well as standard-space images
-   back-transformed into native spaces:
+   At minumum this script receives a whole-head T1 as input and uses FSL's
+   flirt and fnirt to estimate and apply linear+nonlinear transformation
+   (anat2mni), as well its inverse (mni2anat).
 
+   If the user also provides a 3D or 4D EPI image, the script will estimate and
+   apply additional transformations:
+
+   - anat2func, and its inverse func2anat (linear)
+   - func2mni,  and its inverse mni2func  (linear+nonlinear)
+   
+   --------------------------------------------------------------
+   Input images:
+   --------------------------------------------------------------
+
+   - mandatory whole-head T1 
+   - optional T1-space images already aligned with input T1
+   - optional EPI and EPI-aligned images from the same participant
+   - optional 1mmMNI152-aligned images
+
+   --------------------------------------------------------------
+   Output images:
+   --------------------------------------------------------------
+
+   1) subdirectory "inNativeSpaceOfT1", containing:
+      - native-T1-registered versions of all input images (*+mni2anat.nii.gz , *+func2anat.nii.gz)
+      - native-T1-registered versions of some MNI standard images (e.g., MNI* , HarvardOxford*+mni2anat.nii.gz)
+      - native-T1-registered skull-stripped version of input T1 (*t1_brain.nii.gz)
+      - copies of the original user-provided input images that were already T1-aligned
+
+   2) subdirectory "inNativeSpaceOfEPI", containing:
+      - native-EPI-registered versions of all input images (*+anat2func.nii.gz , *+mni2func.nii.gz)
+      - native-EPI-registered versions of some MNI standard images (e.g., MNI* , HarvardOxford*+mni2func.nii.gz)
+      - native-EPI-registered EPI temporal mean (*epi_averaged.nii.gz)
+      - native-EPI-registered EPI temporal mean skull-stripped (*epi_averaged_brain.nii.gz)
+      - copies of the original user-provided input images that were already EPI-aligned
+
+   3) subdirectory "inStandardSpaceOf1mmMNI152", containing:
+      - 1mmMNI152-registered versions of all input images (*+anat2mni.nii.gz , *+func2mni.nii.gz)
+      - copies of the original user-provided input images that were already 1mmMNI152-aligned
+
+   --------------------------------------------------------------
    Basic usage with three required arguments: 
+   --------------------------------------------------------------
 
-     registerTo1mmMNI152.sh                                        \\
-	  -t <t1NotSkullStripped.nii>                                   \\
-	  -s <subjectIdForOutputNaming>                                 \\
-	  -o <fullPathToOutputDirectoryThatWillBeCreatedByThisScript>
+     bwFnirtBot.sh                                               \\
+     -t <t1NotSkullStripped.nii>                                 \\
+     -s <subjectIdForOutputNaming>                               \\
+     -o <fullPathToOutputDirectoryThatWillBeCreatedByThisScript>
+
+   --------------------------------------------------------------
+   Optional input images:
+   --------------------------------------------------------------
 
    Optional input images: no more than one of each of these special volumes:
      -e <epi4Dtimeseries.nii>
@@ -117,8 +159,73 @@ cat <<EOF
      --sc <standardSpaceAlignedVolumeContainingContinuousIntensities.ni>
 
    Optional arguments to control exectuion:
-     -z (launch internal self-test, which ignores input volumes)
+     -z (launch internal self-test, which ignores any input volumes)
      -d (turn on debug mode)
+
+   --------------------------------------------------------------
+   Examples:
+   --------------------------------------------------------------
+
+   Example 1: run internal self-test (no input images required):
+
+     bwFnirtBot.sh -z
+
+   Example 2: execute with minimum inputs required for anat2mni and mni2anat
+   transformations:
+   
+     bwFnirtBot.sh             \\
+     -t s01_wholeHead.nii.gz   \\
+     -s s01                    \\
+     -o ~/s01mniCoreg
+
+   Example 3: same as example 2, but provide a carefully skull-stripped T1
+   instead of allowing bwFnirtBot to perform the skull-stripping:
+
+     bwFnirtBot.sh                           \\
+     -t s01_wholeHead.nii.gz                 \\
+     -s s01                                  \\
+     -b s01_handheldBrainExtraction.nii.gz   \\
+     -o ~/s01mniCoregCarefulBet              
+
+   Example 4: execute with the minium inputs required for func2anat/anat2func
+   and func2mni/mni2func transformations:
+
+     bwFnirtBot.sh                         \\
+     -t s01_wholeHead.nii.gz               \\
+     -s s01                                \\
+     -e s01_housesFaces_run1.nii.gz        \\
+     -o ~/s01mniCoregWithEPI
+
+   Example 5: same as example 4, but include EPI-derived images that are already
+   aligned with the native-space EPI:
+
+     bwFnirtBot.sh                         \\
+     -t s01_wholeHead.nii.gz               \\
+     -s s01                                \\
+     -e s01_housesFaces_run1.nii.gz        \\
+     --ed s01_clustersForHouses.nii.gz     \\
+     --ed s01_clustersForFaces.nii.gz      \\
+     --ec s01_fstatsForHouses.nii.gz       \\
+     --ec s01_fstatsForFaces.nii.gz        \\
+     -o ~/s01mniCoregWithEPI
+
+   Example 6: same as example 5, but also include 1mmMNI152-aligned images that
+   need to be transformed into native T1 and native EPI spaces:
+
+     bwFnirtBot.sh                            \\
+     -t s01_wholeHead.nii.gz                  \\
+     -s s01                                   \\
+     -e s01_housesFaces_run1.nii.gz           \\
+     --ed s01_clustersForHouses.nii.gz        \\
+     --ed s01_clustersForFaces.nii.gz         \\
+     --ec s01_fstatsForHouses.nii.gz          \\
+     --ec s01_fstatsForFaces.nii.gz           \\
+     --sd mniFusiformFaceArea.nii.gz          \\
+     --sc mniGrayMatterProbabilityMap.nii.gz  \\
+     -o ~/s01mniCoregWithEPI
+
+
+
 
 EOF
 
