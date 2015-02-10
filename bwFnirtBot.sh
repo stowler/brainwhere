@@ -449,10 +449,10 @@ EOF
 
 	${bwDir}/${scriptName} \
 	-s selftestMoAE \
-	-t ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_mni.nii.gz \
-	-e ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_mni.nii.gz \
- 	-b ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_brain_mni.nii.gz \
- 	-l ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_lesionT1LeftSloppyHG_mni.nii.gz \
+	-t ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1.nii.gz \
+	-e ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi.nii.gz \
+ 	-b ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_brain.nii.gz \
+ 	-l ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_lesionT1LeftSloppyHG.nii.gz \
    --sd ${FSLDIR}/data/atlases/HarvardOxford/HarvardOxford-sub-maxprob-thr25-1mm.nii.gz  \
    --sc ${FSLDIR}/data/standard/FMRIB58_FA_1mm.nii.gz \
    --ed ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_funcROI.nii.gz \
@@ -460,8 +460,8 @@ EOF
   	-o ${tempDir}/nominalOutDirFromSelftest 
 
 # easly to add a pre-extracted t1 brain and lesion to the self-test:
-#	-b ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_brain_mni.nii.gz \
-# 	-l ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_lesionT1LeftSloppyHG_mni.nii.gz \
+#	-b ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_brain.nii.gz \
+# 	-l ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_lesionT1LeftSloppyHG.nii.gz \
 
 # easy to add standard-space discrete- and continuous-intensity volumes to the self test:
 #  --sd ${FSLDIR}/data/atlases/HarvardOxford/HarvardOxford-sub-maxprob-thr25-1mm.nii.gz  \
