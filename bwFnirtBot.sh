@@ -444,19 +444,16 @@ fxnSelftest() {
 
 EOF
 
-	#fxnPrintDebug "DEBUG: Intentionally exiting fxnSelftest before launching $0."
-	#exit 1
-
 	${bwDir}/${scriptName} \
-	-s selftestMoAE \
-	-t ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1.nii.gz \
-	-e ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi.nii.gz \
+   -s selftestMoAE \
+   -t ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1.nii.gz \
  	-b ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_t1_brain.nii.gz \
- 	-l ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_lesionT1LeftSloppyHG.nii.gz \
-   --sd ${FSLDIR}/data/atlases/HarvardOxford/HarvardOxford-sub-maxprob-thr25-1mm.nii.gz  \
-   --sc ${FSLDIR}/data/standard/FMRIB58_FA_1mm.nii.gz \
+  	-l ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_lesionT1LeftSloppyHG.nii.gz \
+   -e ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi.nii.gz \
    --ed ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_funcROI.nii.gz \
    --ec ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_tstd.nii.gz \
+   --sd ${FSLDIR}/data/atlases/HarvardOxford/HarvardOxford-sub-maxprob-thr25-1mm.nii.gz  \
+   --sc ${FSLDIR}/data/standard/FMRIB58_FA_1mm.nii.gz \
   	-o ${tempDir}/nominalOutDirFromSelftest 
 
 # easly to add a pre-extracted t1 brain and lesion to the self-test:
@@ -467,11 +464,10 @@ EOF
 #  --sd ${FSLDIR}/data/atlases/HarvardOxford/HarvardOxford-sub-maxprob-thr25-1mm.nii.gz  \
 #  --sc ${FSLDIR}/data/standard/FMRIB58_FA_1mm.nii.gz \
 
-# easy to add EPI-aligned discrete- and continuous-intensity volumes to the self test:
-#   --ed ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_funcROI.nii.gz \
-#   --ec ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_tstd.nii.gz \
-
-
+# easy to add EPI, as well as EPI-aligned discrete- and continuous-intensity volumes to the self test:
+#  -e ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi.nii.gz \
+#  --ed ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_funcROI.nii.gz \
+#  --ec ${bwDir}/utilitiesAndData/imagesFromSPM/MoAE_epi_tstd.nii.gz \
 
 	# TBD: add additional self-tests:
 	# badImages, noArguments, wrongArguments, etc.	
@@ -713,37 +709,85 @@ fxnConfirmOurInputImages
 # TBD: Verify that destination directories exist and are user-writable:
 mkdir -p ${outDir}
 
+
 # ================================================================= #
-# display input image metadata:
+# confirm input image metadata:
 #
-echo ""
-echo "Images to be nonlinearly registerd to 1mmMNI152:"
-echo "- IMPORTANT: a lesion must match T1's geometry"
-echo "- IMPORTANT: images following EPI must match EPI geometry"
-echo ""
-# ...first just create the header row:
-bash ${bwDir}/bwDisplayImageGeometry.sh -n ${t1} >> ${tempDir}/inputUnformatted.txt
-# ...then create the per-image rows:
-# (the following requires echo $var, not just $var for ws-sep'd values in $var
-# to be subsequently read as multiple values instead of single value containing
-# ws:)
-for image in $t1 $lesion $inputBrain $epi `echo ${sd} ${sc} ${ed} ${ec}`; do
-	if [ -s $image ]; then
-		bash ${bwDir}/bwDisplayImageGeometry.sh -r $image >> ${tempDir}/inputUnformatted.txt
-	fi
-done
-cat ${tempDir}/inputUnformatted.txt | column -t
-echo ""
-rm -f ${tempDir}/inputUnformatted.txt
+# TBD: fix bwDisplayImageGeometry.sh so that it doesn't need an input image to print header row
+
+
+# Geometry check for T1-aligned images if user provided more than just the T1:
+if [ -n "${lesion}" ] || [ -n "${inputBrain}" ]; then
+   echo ""
+   echo "All T1-aligned input images must have consistent 3D geometry:"
+   echo ""
+   # Create the header row for the geometry table:
+   bash ${bwDir}/bwDisplayImageGeometry.sh -n ${t1} >> ${tempDir}/inputUnformatted.txt
+   # Create the per-image rows:
+   for image in ${t1} ${lesion} ${inputBrain}; do
+      if [ -s ${image} ]; then
+         bash ${bwDir}/bwDisplayImageGeometry.sh -r ${image} >> ${tempDir}/inputUnformatted.txt
+      fi
+   done
+   cat ${tempDir}/inputUnformatted.txt | column -t
+   echo ""
+   rm -f ${tempDir}/inputUnformatted.txt
+fi
+
+
+# Geometry check for EPI-aligned images if user provided more than just the EPI:
+if [ -n "${ed}" ] || [ -n "${ec}" ]; then
+   echo ""
+   echo "All EPI-aligned input images must have consistent 3D geometry:"
+   echo ""
+   # Create the header row for the geometry table:
+   bash ${bwDir}/bwDisplayImageGeometry.sh -n ${t1} >> ${tempDir}/inputUnformatted.txt
+   # Create the per-image rows:
+   #    NB: the following requires echo $var, not just $var for ws-sep'd values in $var
+   #    to be subsequently read as multiple values instead of single value containing
+   #    ws.
+   for image in ${epi} `echo ${ed} ${ec}`; do
+      if [ -s ${image} ]; then
+         bash ${bwDir}/bwDisplayImageGeometry.sh -r ${image} >> ${tempDir}/inputUnformatted.txt
+      fi
+   done
+   cat ${tempDir}/inputUnformatted.txt | column -t
+   echo ""
+   rm -f ${tempDir}/inputUnformatted.txt
+fi
+
+
+# Geometry check for 1mmMNI152-aligned images if user provided any:
+if [ -n "${sd}"  ] || [ -n "${sc}" ]; then
+   echo ""
+   echo "All 1mmMNI152-aligned input images must match the 3D geometry of FSL's MNI152_T1_1mm standard template:"
+   echo ""
+   # Create the header row for the geometry table:
+   bash ${bwDir}/bwDisplayImageGeometry.sh -n ${t1} >> ${tempDir}/inputUnformatted.txt
+   # Create the per-image rows:
+   #    NB: the following requires echo $var, not just $var for ws-sep'd values in $var
+   #    to be subsequently read as multiple values instead of single value containing
+   #    ws.
+   for image in ${FSLDIR}/data/standard/MNI152_T1_1mm.nii.gz `echo ${sd} ${sc}`; do
+      if [ -s ${image} ]; then
+         bash ${bwDir}/bwDisplayImageGeometry.sh -r ${image} >> ${tempDir}/inputUnformatted.txt
+      fi
+   done
+   cat ${tempDir}/inputUnformatted.txt | column -t
+   echo ""
+   rm -f ${tempDir}/inputUnformatted.txt
+fi
+
 # TBD: handle switch b/t non/interactive modes:
 #echo "DEBUG: Happy? (Return to continue, ctrl-c to exit)"
 #read
+
 
 echo ""
 echo ""
 echo "================================================================="
 echo "START: nonlinear registration of ${blind} to 1mmMNI152"
-echo "(about 20 minutes, or about 60 minutes if also applying warp to epi)"
+echo "(typically < 30 minutes)"
       date
 echo "================================================================="
 echo ""
@@ -814,7 +858,7 @@ if [ -s "`echo ${epi}`" ]; then
 fi
 
 
-# ...for any standard-space discrete- or continuous-intensity volumes, if provided: 
+# ...import any standard-space discrete- or continuous-intensity volumes, if provided: 
 #
 #    NB: the following requires echo $var, not just $var for ws-sep'd values in
 #    $var to be subsequently read as multiple values instead of single value
@@ -833,7 +877,7 @@ for image in `echo ${sd} ${sc}`; do
 	fi
 done
 
-# ...for any EPI-aligned discrete- or continuous-intensity volumes, if provided: 
+# ...import any EPI-aligned discrete- or continuous-intensity volumes, if provided: 
 #
 #    NB: the following requires echo $var, not just $var for ws-sep'd values in
 #    $var to be subsequently read as multiple values instead of single value
@@ -853,6 +897,7 @@ for image in `echo ${ed} ${ec}`; do
 done
 
 echo "...done. (`date`)"
+
 
 # ================================================================= #
 # skull-strip T1 if skull-striped T1 wasn't already provided:
@@ -898,7 +943,7 @@ fi
 # ================================================================= #
 # If epi was provided, linearly register epi to t1_brain:
 #
-# TBD: experimenting to try to get better func2anat registrations
+# TBD: experimenting to try to get better func2anat registrations (maybe including motion-correction)
 # TBD: create an option for skull-striping EPI or not
 # TBD: create verification of func2anat results
 #
@@ -909,7 +954,7 @@ if [ -s "`echo ${epi}`" ]; then
 	if [ "${debug}" = "1" ] ; then betOptsAveragedEPI="${betOptsAveragedEPI} -v"; fi
    echo ""
    echo ""
-   echo "Skull-stripping mean EPI (between one and twenty minutes)..."
+   echo "Skull-stripping mean EPI (typically < 10 minutes)..."
    echo "(using bet options ${betOptsAveragedEPI})"
 
 	# First create a 3D mean across EPI timepoints:
@@ -994,7 +1039,6 @@ if [ -s "`echo ${epi}`" ]; then
    for image in `echo ${ec}`; do
       if [ -s "`echo ${image}`" ]; then
          imageBasename="`echo ${image} | xargs basename | xargs ${FSLDIR}/bin/remove_ext`"
-
          flirt \
          -in ${tempDirSpaceEPI}/${imageBasename} \
          -ref ${tempDirSpaceT1}/${blind}_t1_brain.nii.gz \
@@ -1013,7 +1057,7 @@ if [ -s "`echo ${epi}`" ]; then
    # into EPI space:
 	echo ""
 	echo ""
-	echo "anat2func: inverting from func2anat, applying to T1-aligned images (about two minutes)..."
+	echo "anat2func: inverting from func2anat, applying to T1-aligned images (typically < 1 minute)..."
 
    # invert the func2anat xform, producing anat2func.mat:
    convert_xfm \
@@ -1076,7 +1120,7 @@ echo "-----------------------------------------------------------------"
 # calculate linear+nonlinear transformation of t1_brain to template brain:
 echo ""
 echo ""
-echo "anat2mni: estimating, and applying to T1-aligned images (about 15 minutes)..."
+echo "anat2mni: estimating, and applying to T1-aligned images (typically < 15 minutes)..."
 
 # Estimate linear transformation first, specifying -inweight if we have a lesion:
 if [ -s "`echo ${lesion}`" ]; then
@@ -1105,6 +1149,7 @@ du -h ${tempDir}/${blind}_anat2mni.mat
 #         -from http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FNIRT/UserGuide
 # NB: ignore messages about requested tolerance...unless your transformation turns out horrible, in which case they may have been meaningful)
 
+# TBD: maybe calculate lesionInverted in new space rather than transforming it?
 if [ -s "`echo ${lesion}`" ]; then
 	fnirt \
 	     --in=${tempDirSpaceT1}/${blind}_t1 \
@@ -1169,7 +1214,7 @@ echo "...done. (`date`)"
 # inversion of nonlinear t1->mni transformation:
 echo ""
 echo ""
-echo "mni2anat: inverting from anat2mni linear+nonlinear, applying to mni152-aligned images (about two minutes)..."
+echo "mni2anat: inverting from anat2mni linear+nonlinear, applying to mni152-aligned images (typically < 2 minutes)..."
 
 # invert anat2mni to mni2anat:
 invwarp \
@@ -1262,7 +1307,7 @@ if [ -s "`echo ${epi}`" ]; then
 
 	echo ""
 	echo ""
-	echo "func2mni: applying combined transforms to epi-aligned images (about two minutes)..."
+	echo "func2mni: applying combined transforms to epi-aligned images (typically < 2 minutes)..."
 
    # apply func2mni to temporal mean of EPI:
 	applywarp \
@@ -1329,7 +1374,7 @@ if [ -s "`echo ${epi}`" ]; then
 
 	echo ""
 	echo ""
-	echo "mni2func: applying inverted transforms to MNI-aligned images (about two minutes)..."
+	echo "mni2func: applying inverted transforms to MNI-aligned images (typically < 2 minutes)..."
 
 
    # create mni2func version of skull-stripped MNI template:
