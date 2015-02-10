@@ -35,7 +35,7 @@
 # - erases BRIK/HEAD commandline history (applywarp equivalent not implemented in afni...yet)
 # - UNTESTED: brain extraction implementation may not be best for all brains (bet -R -v)
 # - UNTESTED: variability in brain extraction may affect registration of T1->MNI152, thereby others->MNI152
-# - UNTESTED: interpolation methods implemented may not be best (masks: nearest neighbor, decimal values: trilinear or sinc)
+# - UNTESTED: interpolation methods implemented may not be best (masks: nearest neighbor, decimal values: trilinear)
 #
 # TBD: 
 # - test lesion masking everywhere possible
@@ -187,8 +187,6 @@ fxnProcessInvocation() {
    sc=''
    ed=''
    ec=''
-	#integerVolumes=''
-	#decimalVolumes=''
 
 	# if already set, debug must not lose its current value:
 	if [ -n ${debug} ] ; then debug=${debug} ; else debug=''; fi
@@ -248,9 +246,6 @@ fxnProcessInvocation() {
 	    esac
 	done
 
-   # deprecated:
-	#      -c)   integerVolumes="${integerVolumes} ${2}"; shift 2 ;;
-	#      -b)   decimalVolumes="${decimalVolumes} ${2}"; shift 2 ;;
 	# ...and now all command line switches have been processed.
 
   	fxnPrintDebug " "
@@ -312,8 +307,6 @@ fxnProcessInvocation() {
 	fxnPrintDebug "\${sc} == ${sc}"
 	fxnPrintDebug "\${ed} == ${ed}"
 	fxnPrintDebug "\${ec} == ${ec}"
-	#fxnPrintDebug "\${integerVolumes} == ${integerVolumes}"
-	#fxnPrintDebug "\${decimalVolumes} == ${decimalVolumes}"
 	fxnPrintDebug " "
 	fxnPrintDebug "...completed fxnProcessInvocation ."
 }
@@ -492,7 +485,7 @@ fxnConfirmOurInputImages() {
 
 #	the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws:
 	for image in `echo ${sd} ${sc} ${ed} ${ec}`; do
-		fxnPrintDebug "validating standard-space image ${image}"
+		fxnPrintDebug "validating image ${image}"
 		if [ ! -z ${image} ]; then
 			fxnValidateImages ${image}
 			if [ $? -eq 1 ]; then 
@@ -507,48 +500,6 @@ fxnConfirmOurInputImages() {
 			fi
 		fi
 	done
-
-
-
-   # deprecated these two loops (over $integerVolumes and $decimalVolumes) in
-   # preperation for new scheme for addressing continuous- and
-   # discrete-intensity volumes aligned with t1, EPI, and standard space
-
-	# the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws"
-	# for image in `echo ${integerVolumes}`; do
-	# 	fxnPrintDebug "validating integerVolume ${image}"
-	# 	if [ ! -z ${image} ]; then
-	# 		fxnValidateImages ${image}
-	# 		if [ $? -eq 1 ]; then 
-	# 			echo ""
-	# 			echo "ERROR: $image is not a valid image"
-	# 			echo ""
-	# 			fxnPrintUsage
-	# 			echo ""
-	# 			exit 1
-	# 		else
-	# 			fxnPrintDebug "$image is a valid image. Yay!"
-	# 		fi
-	# 	fi
-	# done
-
-	# the following requires echo $var, not just $var for ws-sep'd values in $var to be subsequently read as multiple values instead of single value containing ws"
-	# for image in `echo ${decimalVolumes}`; do
-	# 	fxnPrintDebug "validating decimalVolume ${image}"
-	# 	if [ ! -z ${image} ]; then
-	# 		fxnValidateImages ${image}
-	# 		if [ $? -eq 1 ]; then 
-	# 			echo ""
-	# 			echo "ERROR: $image is not a valid image"
-	# 			echo ""
-	# 			fxnPrintUsage
-	# 			echo ""
-	# 			exit 1
-	# 		else
-	# 			fxnPrintDebug "DEBUG $image is a valid image. Yay!"
-	# 		fi
-	# 	fi
-	# done
 
 	fxnPrintDebug " "
 	fxnPrintDebug "Completed internal fxnConfirmOurInputImages ..." 
@@ -675,6 +626,7 @@ for image in $t1 $lesion $inputBrain $epi `echo ${sd} ${sc} ${ed} ${ec}`; do
 done
 cat ${tempDir}/inputUnformatted.txt | column -t
 echo ""
+rm -f ${tempDir}/inputUnformatted.txt
 # TBD: handle switch b/t non/interactive modes:
 #echo "DEBUG: Happy? (Return to continue, ctrl-c to exit)"
 #read
@@ -791,6 +743,7 @@ for image in `echo ${ed} ${ec}`; do
 	fi
 done
 
+echo "...done. (`date`)"
 
 # ================================================================= #
 # skull-strip T1 if skull-striped T1 wasn't already provided:
@@ -805,12 +758,12 @@ if [ -z ${inputBrain} ]; then
 
    bet ${tempDirSpaceT1}/${blind}_t1 ${tempDirSpaceT1}/${blind}_t1_brain ${betOptsT1}
 
-   echo "...done skull-striping T1:"
    du -h ${tempDirSpaceT1}/${blind}_t1_brain*
+   echo "...done. (`date`)"
 else 
    echo ""
    echo ""
-   echo "No T1 skull-striping necessary, as user provided skull-stripped brain:"
+   echo "No need to skull-strip T1, as user provided a previously skull-stripped T1:"
    du -h ${inputBrain}
    du -h ${tempDirSpaceT1}/${blind}_t1_brain*
 fi
@@ -827,9 +780,8 @@ if [ -s "`echo ${lesion}`" ]; then
 	echo "Inverting lesion mask..."
 
 	fslmaths ${tempDirSpaceT1}/${blind}_lesion -sub 1 -abs ${tempDirSpaceT1}/${blind}_lesionInverted -odt char
-
-	echo "...done inverting lesion mask:"
 	du -h ${tempDirSpaceT1}/${blind}_lesionInverted*
+	echo "...done. (`date`)"
 fi
 
 
@@ -857,7 +809,7 @@ if [ -s "`echo ${epi}`" ]; then
 	bet ${tempDirSpaceEPI}/${blind}_epi_averaged.nii.gz ${tempDirSpaceEPI}/${blind}_epi_averaged_brain.nii.gz ${betOptsAveragedEPI}
 
    du -h ${tempDirSpaceEPI}/${blind}_epi_averaged*
-   echo "...done skull-striping EPI."
+   echo "...done. (`date`)"
 
 
    echo ""
@@ -945,7 +897,7 @@ if [ -s "`echo ${epi}`" ]; then
    done
 
 
-	echo "...done."
+	echo "...done. (`date`)"
 
 
    # Now invert the func2anat xform and use it to bring t1-registered images
@@ -995,7 +947,7 @@ if [ -s "`echo ${epi}`" ]; then
       du -h ${tempDirSpaceEPI}/${blind}_lesionInverted+anat2func*
    fi
 
-	echo "...done."
+	echo "...done. (`date`)"
 
 fi
 
@@ -1005,21 +957,19 @@ echo ""
 echo ""
 echo ""
 echo "-----------------------------------------------------------------"
-echo "1) estimating linear+nonlinear xform:    anat2mni"
-echo "2) inverting to:                         mni2anat"
+echo "1) estimating linear+nonlinear transform:    anat2mni"
+echo "2) inverting to:                             mni2anat"
 echo "-----------------------------------------------------------------"
 
 
 
 # ================================================================= #
 # calculate linear+nonlinear transformation of t1_brain to template brain:
-# (but don't apply it yet...we're delaying interpolation)
 echo ""
 echo ""
-echo "anat2mni: estimating linear+nonlinear transformation of native space T1 to MNI152 template,"
-echo "          and applying to T1-aligned images (about 15 minutes)..."
+echo "anat2mni: estimating, and applying to T1-aligned images (about 15 minutes)..."
 
-# Estimate linear transformation first, # specifying -inweight if we have a lesion:
+# Estimate linear transformation first, specifying -inweight if we have a lesion:
 if [ -s "`echo ${lesion}`" ]; then
 	flirt \
 	     -ref ${FSLDIR}/data/standard/MNI152_T1_2mm_brain.nii.gz \
@@ -1076,7 +1026,7 @@ applywarp \
 --out=${tempDirSpaceStandard}/${blind}_t1+anat2mni
 du -h ${tempDirSpaceStandard}/${blind}_t1+anat2mni*
 
-# apply to t1_blind:
+# apply to t1_brain:
 applywarp \
 --ref=${FSLDIR}/data/standard/MNI152_T1_1mm \
 --in=${tempDirSpaceT1}/${blind}_t1_brain \
@@ -1103,14 +1053,14 @@ if [ -s "`echo ${lesion}`" ]; then
 	     	du -h ${tempDirSpaceStandard}/${blind}_lesionInverted+anat2mni*
 fi
 
-echo "...done."
+echo "...done. (`date`)"
 
 
 # ================================================================= #
 # inversion of nonlinear t1->mni transformation:
 echo ""
 echo ""
-echo "mni2anat: inverting from anat2mni linear+nonlinear, applying to mni152-aligned images"
+echo "mni2anat: inverting from anat2mni linear+nonlinear, applying to mni152-aligned images (about two minutes)..."
 
 # invert anat2mni to mni2anat:
 invwarp \
@@ -1186,7 +1136,7 @@ for image in `echo ${sc}`; do
 done
 
 
-echo "...done."
+echo "...done. (`date`)"
 
 
 
@@ -1194,8 +1144,8 @@ echo ""
 echo ""
 echo ""
 echo "-----------------------------------------------------------------"
-echo "1) apply combined xforms as:          func2mni"
-echo "2) invert to:                         mni2func"
+echo "1) apply combined transforms as:          func2mni"
+echo "2) invert to:                             mni2func"
 echo "-----------------------------------------------------------------"
 
 
@@ -1204,7 +1154,7 @@ echo "-----------------------------------------------------------------"
 if [ -s "`echo ${epi}`" ]; then
 	echo ""
 	echo ""
-	echo "func2mni: applying combined xform to epi-aligned images (about two minutes)..."
+	echo "func2mni: applying combined transform to epi-aligned images (about two minutes)..."
 
    # apply func2mni to temporal mean of EPI:
 	applywarp \
@@ -1266,12 +1216,12 @@ if [ -s "`echo ${epi}`" ]; then
    done
 
 
-   echo "...done."
+   echo "...done. (`date`)"
 
 
 	echo ""
 	echo ""
-	echo "mni2func: applying inverted xforms to MNI-aligned images (about two minutes)..."
+	echo "mni2func: applying inverted transforms to MNI-aligned images (about two minutes)..."
 
 
    # create mni2func version of skull-stripped MNI template:
@@ -1344,7 +1294,7 @@ if [ -s "`echo ${epi}`" ]; then
    done
 
 
-   echo "...done."
+   echo "...done. (`date`)"
 
 fi
 
@@ -1409,21 +1359,46 @@ fi
 
 # Did we change any environmental variables? It would be polite to set them to their original values:
 # export FSLOUTPUTTYPE=${FSLOUTPUTTYPEorig}
-echo ""
-echo ""
-echo "One way to inspect your MNI152-aligned output images in fslview would be to"
-echo "paste this block of commands into the terminal:"
-cat <<EOF
 
-standardTemplate=$FSLDIR/data/standard/MNI152_T1_1mm.nii.gz
-warpedT1=${finalDir}/${subdirNameSpaceStandard}/${blind}_t1_brain_warped
-warpedEPI=${finalDir}/${subdirNameSpaceStandard}/${blind}_epi_averaged_brain_warped
-bottomLayer=\${standardTemplate}
-middleLayer=\${warpedT1}
-topLayer=\${warpedEPI}
-fslview -m ortho \${bottomLayer} -l Green \${middleLayer} -l Pink \${topLayer} -l Greyscale &
+
+# give advice on inspecting output:
+# (TBD: make this automatic if interactive mode is enabled)
+
+echo ""
+echo ""
+echo "To inspect some of your MNI152-aligned output images in fslview with"
+echo "reasonable color choices, paste this block of commands into the terminal:"
+
+if [ -s "`echo ${epi}`" ]; then
+   cat <<EOF
+
+   standardTemplate=$FSLDIR/data/standard/MNI152_T1_1mm
+   warpedT1=${finalDir}/${subdirNameSpaceStandard}/${blind}_t1_brain+anat2mni
+   warpedEPI=${finalDir}/${subdirNameSpaceStandard}/${blind}_epi_averaged_brain+func2mni
+   atlas=${FSLDIR}/data/atlases/HarvardOxford/HarvardOxford-cort-maxprob-thr25-1mm.nii.gz
+   bottomLayer=\${standardTemplate}
+   middleLayer=\${warpedT1}
+   topLayer=\${warpedEPI}
+   atlasLayer=\${atlas}
+   fslview -m ortho \${bottomLayer} -l Green \${middleLayer} -l Pink \${topLayer} -l Greyscale \${atlasLayer} -l MGH-Cortical -t 0.5 &
 
 EOF
+
+else
+   cat <<EOF
+
+   standardTemplate=$FSLDIR/data/standard/MNI152_T1_1mm
+   warpedT1=${finalDir}/${subdirNameSpaceStandard}/${blind}_t1_brain+anat2mni
+   atlas=${FSLDIR}/data/atlases/HarvardOxford/HarvardOxford-cort-maxprob-thr25-1mm.nii.gz
+   bottomLayer=\${standardTemplate}
+   middleLayer=\${warpedT1}
+   atlasLayer=\${atlas}
+   fslview -m ortho \${bottomLayer} -l Green \${middleLayer} -l Pink \${atlasLayer} -l MGH-Cortical -t 0.5 &
+
+EOF
+
+fi
+
 
 echo ""
 echo "#################################################################"
