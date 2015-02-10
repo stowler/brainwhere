@@ -689,8 +689,9 @@ tempDirSpaceT1=${tempDir}/${subdirNameSpaceT1}
 tempDirSpaceEPI=${tempDir}/${subdirNameSpaceEPI}
 tempDirSpaceStandard=${tempDir}/${subdirNameSpaceStandard}
 mkdir -p ${tempDirSpaceT1}
-mkdir -p ${tempDirSpaceEPI}
 mkdir -p ${tempDirSpaceStandard}
+# NB: delaying creation of $tempDirSpaceEPI until we know whether user provided a valid EPI image
+#mkdir -p ${tempDirSpaceEPI}
 
 
 # Decide whether to launch selftest, and then subsequently whether to continue or exit:
@@ -803,6 +804,7 @@ fi
 
 #...import EPI, if provided:
 if [ -s "`echo ${epi}`" ]; then
+   mkdir -p ${tempDirSpaceEPI}
 	3dresample \
    -orient rpi \
    -prefix ${tempDirSpaceEPI}/${blind}_epi.nii.gz \
@@ -1246,22 +1248,21 @@ done
 echo "...done. (`date`)"
 
 
-
-echo ""
-echo ""
-echo ""
-echo "-----------------------------------------------------------------"
-echo "1) apply combined transforms as:          func2mni"
-echo "2) invert to:                             mni2func"
-echo "-----------------------------------------------------------------"
-
-
-
-
+# if epi was provided, apply combined transforms to create func2mni and mni2func images:
 if [ -s "`echo ${epi}`" ]; then
+
+   echo ""
+   echo ""
+   echo ""
+   echo "-----------------------------------------------------------------"
+   echo "1) apply combined transforms as:          func2mni"
+   echo "2) invert to:                             mni2func"
+   echo "-----------------------------------------------------------------"
+
+
 	echo ""
 	echo ""
-	echo "func2mni: applying combined transform to epi-aligned images (about two minutes)..."
+	echo "func2mni: applying combined transforms to epi-aligned images (about two minutes)..."
 
    # apply func2mni to temporal mean of EPI:
 	applywarp \
