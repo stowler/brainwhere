@@ -352,12 +352,16 @@ Installing AFNI on Mac OS X Mountain/Lion:
 
 Before installing FSL, freesurfer, or  AFNI on Mountain/Lion be sure to install [XQuartz](http://xquartz.macosforge.org), and logout and then back in. 
 
+AFNI also requires netpbm:
+
+    sudo port install netpbm
+
 Then download latest AFNI for Mac, unzip, and move to a reasonable location: 
 
     cd ~/Downloads
-    curl -O http://afni.nimh.nih.gov/pub/dist/tgz/macosx_10.7_Intel_64.tgz
-    tar -zxvf macosx_10.7_Intel_64.tgz
-    sudo mv macosx_10.7_Intel_64 /usr/local/abin
+    curl -O http://afni.nimh.nih.gov/pub/dist/tgz/macosx_10.8_gcc.tgz
+    tar -zxvf macosx_10.8_gcc.tgz
+    sudo mv macosx_10.8_gcc /usr/local/abin
 
 Add AFNI's new location to the path in `/etc/bashrc` by first caching your sudo credentials via this command (ignoring the output):
  
