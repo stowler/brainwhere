@@ -1,0 +1,398 @@
+[04:12:50]-[stowler]-at-[Stephens-MacBook]-in-[~/ports]
+$ sudo port install melview +pyside
+--->  Computing dependencies for melview
+--->  Dependencies to be installed: py27-configobj py27-matplotlib py27-cairo cairo libpixman xorg-xcb-util xrender xorg-renderproto py27-dateutil py27-six py27-tz py27-numpy libgcc cctools llvm-3.5 libcxx llvm_select gcc_select isl ld64 ld64-latest libmpc mpfr py27-cython cython_select py27-nose nosetests_select py27-setuptools py27-parsing py27-pyobjc-cocoa py27-pyobjc py27-py2app py27-macholib py27-modulegraph py27-altgraph py27-pyside py27-shiboken qt4-mac dbus libmng lcms sparsehash py27-tornado py27-backports-ssl_match_hostname py27-backports py27-certifi py27-nibabel py27-pyface py27-traits py27-traitsui
+--->  Fetching archive for py27-configobj
+--->  Attempting to fetch py27-configobj-4.7.2_0.darwin_14.noarch.tbz2 from http://packages.macports.org/py27-configobj
+--->  Attempting to fetch py27-configobj-4.7.2_0.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/py27-configobj
+--->  Installing py27-configobj @4.7.2_0
+--->  Activating py27-configobj @4.7.2_0
+--->  Cleaning py27-configobj
+--->  Fetching archive for libpixman
+--->  Attempting to fetch libpixman-0.32.6_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/libpixman
+--->  Attempting to fetch libpixman-0.32.6_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/libpixman
+--->  Installing libpixman @0.32.6_0
+--->  Activating libpixman @0.32.6_0
+--->  Cleaning libpixman
+--->  Fetching archive for xorg-xcb-util
+--->  Attempting to fetch xorg-xcb-util-0.4.0_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/xorg-xcb-util
+--->  Attempting to fetch xorg-xcb-util-0.4.0_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/xorg-xcb-util
+--->  Installing xorg-xcb-util @0.4.0_0
+--->  Activating xorg-xcb-util @0.4.0_0
+--->  Cleaning xorg-xcb-util
+--->  Fetching archive for xorg-renderproto
+--->  Attempting to fetch xorg-renderproto-0.11.1_0.darwin_14.noarch.tbz2 from http://packages.macports.org/xorg-renderproto
+--->  Attempting to fetch xorg-renderproto-0.11.1_0.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/xorg-renderproto
+--->  Installing xorg-renderproto @0.11.1_0
+--->  Activating xorg-renderproto @0.11.1_0
+--->  Cleaning xorg-renderproto
+--->  Fetching archive for xrender
+--->  Attempting to fetch xrender-0.9.8_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/xrender
+--->  Attempting to fetch xrender-0.9.8_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/xrender
+--->  Installing xrender @0.9.8_0
+--->  Activating xrender @0.9.8_0
+--->  Cleaning xrender
+--->  Fetching archive for cairo
+--->  Attempting to fetch cairo-1.14.2_1+quartz+x11.darwin_14.x86_64.tbz2 from http://packages.macports.org/cairo
+--->  Attempting to fetch cairo-1.14.2_1+quartz+x11.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/cairo
+--->  Installing cairo @1.14.2_1+quartz+x11
+--->  Activating cairo @1.14.2_1+quartz+x11
+--->  Cleaning cairo
+--->  Fetching archive for py27-cairo
+--->  Attempting to fetch py27-cairo-1.10.0_3.darwin_14.x86_64.tbz2 from http://packages.macports.org/py27-cairo
+--->  Attempting to fetch py27-cairo-1.10.0_3.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/py27-cairo
+--->  Installing py27-cairo @1.10.0_3
+--->  Activating py27-cairo @1.10.0_3
+--->  Cleaning py27-cairo
+--->  Fetching archive for py27-six
+--->  Attempting to fetch py27-six-1.9.0_0.darwin_14.noarch.tbz2 from http://packages.macports.org/py27-six
+--->  Attempting to fetch py27-six-1.9.0_0.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/py27-six
+--->  Installing py27-six @1.9.0_0
+--->  Activating py27-six @1.9.0_0
+--->  Cleaning py27-six
+--->  Fetching archive for py27-tz
+--->  Attempting to fetch py27-tz-2015.4_0.darwin_14.noarch.tbz2 from http://packages.macports.org/py27-tz
+--->  Attempting to fetch py27-tz-2015.4_0.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/py27-tz
+--->  Installing py27-tz @2015.4_0
+--->  Activating py27-tz @2015.4_0
+--->  Cleaning py27-tz
+--->  Fetching archive for py27-dateutil
+--->  Attempting to fetch py27-dateutil-2.4.2_0.darwin_14.noarch.tbz2 from http://packages.macports.org/py27-dateutil
+--->  Attempting to fetch py27-dateutil-2.4.2_0.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/py27-dateutil
+--->  Installing py27-dateutil @2.4.2_0
+--->  Activating py27-dateutil @2.4.2_0
+--->  Cleaning py27-dateutil
+--->  Fetching archive for libcxx
+--->  Attempting to fetch libcxx-3.6.0_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/libcxx
+--->  Attempting to fetch libcxx-3.6.0_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/libcxx
+--->  Installing libcxx @3.6.0_0
+--->  Activating libcxx @3.6.0_0
+--->  Cleaning libcxx
+--->  Fetching archive for llvm_select
+--->  Attempting to fetch llvm_select-1.0_0.darwin_14.noarch.tbz2 from http://packages.macports.org/llvm_select
+--->  Attempting to fetch llvm_select-1.0_0.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/llvm_select
+--->  Installing llvm_select @1.0_0
+--->  Activating llvm_select @1.0_0
+--->  Cleaning llvm_select
+--->  Fetching archive for llvm-3.5
+--->  Attempting to fetch llvm-3.5-3.5.2_4.darwin_14.x86_64.tbz2 from http://packages.macports.org/llvm-3.5
+--->  Attempting to fetch llvm-3.5-3.5.2_4.darwin_14.x86_64.tbz2 from http://lil.fr.packages.macports.org/llvm-3.5
+--->  Attempting to fetch llvm-3.5-3.5.2_4.darwin_14.x86_64.tbz2 from http://nue.de.packages.macports.org/macports/packages/llvm-3.5
+--->  Fetching distfiles for llvm-3.5
+--->  Attempting to fetch llvm-3.5.2.src.tar.xz from http://llvm.org/releases/3.5.2
+--->  Verifying checksums for llvm-3.5
+--->  Extracting llvm-3.5
+--->  Applying patches to llvm-3.5
+--->  Configuring llvm-3.5
+--->  Building llvm-3.5
+--->  Staging llvm-3.5 into destroot
+--->  Installing llvm-3.5 @3.5.2_4
+--->  Activating llvm-3.5 @3.5.2_4
+--->  Cleaning llvm-3.5
+--->  Fetching archive for cctools
+--->  Attempting to fetch cctools-862_1+llvm35.darwin_14.x86_64.tbz2 from http://packages.macports.org/cctools
+--->  Attempting to fetch cctools-862_1+llvm35.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/cctools
+--->  Installing cctools @862_1+llvm35
+--->  Activating cctools @862_1+llvm35
+--->  Cleaning cctools
+--->  Fetching archive for gcc_select
+--->  Attempting to fetch gcc_select-0.1_8.darwin_14.noarch.tbz2 from http://packages.macports.org/gcc_select
+--->  Attempting to fetch gcc_select-0.1_8.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/gcc_select
+--->  Installing gcc_select @0.1_8
+--->  Activating gcc_select @0.1_8
+--->  Cleaning gcc_select
+--->  Fetching archive for isl
+--->  Attempting to fetch isl-0.14.1_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/isl
+--->  Attempting to fetch isl-0.14.1_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/isl
+--->  Installing isl @0.14.1_0
+--->  Activating isl @0.14.1_0
+--->  Cleaning isl
+--->  Fetching archive for ld64-latest
+--->  Attempting to fetch ld64-latest-241.9_0+llvm35.darwin_14.x86_64.tbz2 from http://packages.macports.org/ld64-latest
+--->  Attempting to fetch ld64-latest-241.9_0+llvm35.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/ld64-latest
+--->  Installing ld64-latest @241.9_0+llvm35
+--->  Activating ld64-latest @241.9_0+llvm35
+--->  Cleaning ld64-latest
+--->  Fetching archive for ld64
+--->  Attempting to fetch ld64-2_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/ld64
+--->  Attempting to fetch ld64-2_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/ld64
+--->  Installing ld64 @2_0
+--->  Activating ld64 @2_0
+--->  Cleaning ld64
+--->  Fetching archive for mpfr
+--->  Attempting to fetch mpfr-3.1.3_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/mpfr
+--->  Attempting to fetch mpfr-3.1.3_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/mpfr
+--->  Installing mpfr @3.1.3_0
+--->  Activating mpfr @3.1.3_0
+--->  Cleaning mpfr
+--->  Fetching archive for libmpc
+--->  Attempting to fetch libmpc-1.0.3_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/libmpc
+--->  Attempting to fetch libmpc-1.0.3_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/libmpc
+--->  Installing libmpc @1.0.3_0
+--->  Activating libmpc @1.0.3_0
+--->  Cleaning libmpc
+--->  Fetching archive for libgcc
+--->  Attempting to fetch libgcc-5.1.0_1.darwin_14.x86_64.tbz2 from http://packages.macports.org/libgcc
+--->  Attempting to fetch libgcc-5.1.0_1.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/libgcc
+--->  Installing libgcc @5.1.0_1
+--->  Activating libgcc @5.1.0_1
+--->  Cleaning libgcc
+--->  Fetching archive for cython_select
+--->  Attempting to fetch cython_select-0.1_0.darwin_14.noarch.tbz2 from http://packages.macports.org/cython_select
+--->  Attempting to fetch cython_select-0.1_0.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/cython_select
+--->  Installing cython_select @0.1_0
+--->  Activating cython_select @0.1_0
+--->  Cleaning cython_select
+--->  Fetching archive for py27-cython
+--->  Attempting to fetch py27-cython-0.22.1_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/py27-cython
+--->  Attempting to fetch py27-cython-0.22.1_0.darwin_14.x86_64.tbz2 from http://lil.fr.packages.macports.org/py27-cython
+--->  Attempting to fetch py27-cython-0.22.1_0.darwin_14.x86_64.tbz2 from http://nue.de.packages.macports.org/macports/packages/py27-cython
+--->  Fetching distfiles for py27-cython
+--->  Attempting to fetch Cython-0.22.1.tar.gz from https://pypi.python.org/packages/source/C/Cython/
+--->  Verifying checksums for py27-cython
+--->  Extracting py27-cython
+--->  Configuring py27-cython
+--->  Building py27-cython
+--->  Staging py27-cython into destroot
+--->  Installing py27-cython @0.22.1_0
+--->  Activating py27-cython @0.22.1_0
+
+To make the Python 2.7 version of Cython the one that is run when you execute
+the commands without a version suffix, e.g. 'cython', run:
+
+port select --set cython cython27
+
+--->  Cleaning py27-cython
+--->  Fetching archive for nosetests_select
+--->  Attempting to fetch nosetests_select-0.1_0.darwin_14.noarch.tbz2 from http://packages.macports.org/nosetests_select
+--->  Attempting to fetch nosetests_select-0.1_0.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/nosetests_select
+--->  Installing nosetests_select @0.1_0
+--->  Activating nosetests_select @0.1_0
+--->  Cleaning nosetests_select
+--->  Fetching archive for py27-setuptools
+--->  Attempting to fetch py27-setuptools-18.0.1_0.darwin_14.noarch.tbz2 from http://packages.macports.org/py27-setuptools
+--->  Attempting to fetch py27-setuptools-18.0.1_0.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/py27-setuptools
+--->  Installing py27-setuptools @18.0.1_0
+--->  Activating py27-setuptools @18.0.1_0
+--->  Cleaning py27-setuptools
+--->  Fetching archive for py27-nose
+--->  Attempting to fetch py27-nose-1.3.1_1.darwin_14.noarch.tbz2 from http://packages.macports.org/py27-nose
+--->  Attempting to fetch py27-nose-1.3.1_1.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/py27-nose
+--->  Installing py27-nose @1.3.1_1
+--->  Activating py27-nose @1.3.1_1
+--->  Cleaning py27-nose
+--->  Fetching archive for py27-numpy
+--->  Attempting to fetch py27-numpy-1.9.2_0+gfortran.darwin_14.x86_64.tbz2 from http://packages.macports.org/py27-numpy
+--->  Attempting to fetch py27-numpy-1.9.2_0+gfortran.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/py27-numpy
+--->  Installing py27-numpy @1.9.2_0+gfortran
+--->  Activating py27-numpy @1.9.2_0+gfortran
+--->  Cleaning py27-numpy
+--->  Fetching archive for py27-parsing
+--->  Attempting to fetch py27-parsing-2.0.3_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/py27-parsing
+--->  Attempting to fetch py27-parsing-2.0.3_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/py27-parsing
+--->  Installing py27-parsing @2.0.3_0
+--->  Activating py27-parsing @2.0.3_0
+--->  Cleaning py27-parsing
+--->  Fetching archive for py27-altgraph
+--->  Attempting to fetch py27-altgraph-0.12_0.darwin_14.noarch.tbz2 from http://packages.macports.org/py27-altgraph
+--->  Attempting to fetch py27-altgraph-0.12_0.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/py27-altgraph
+--->  Installing py27-altgraph @0.12_0
+--->  Activating py27-altgraph @0.12_0
+--->  Cleaning py27-altgraph
+--->  Fetching archive for py27-modulegraph
+--->  Attempting to fetch py27-modulegraph-0.12.1_0.darwin_14.noarch.tbz2 from http://packages.macports.org/py27-modulegraph
+--->  Attempting to fetch py27-modulegraph-0.12.1_0.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/py27-modulegraph
+--->  Installing py27-modulegraph @0.12.1_0
+--->  Activating py27-modulegraph @0.12.1_0
+--->  Cleaning py27-modulegraph
+--->  Fetching archive for py27-macholib
+--->  Attempting to fetch py27-macholib-1.7_1.darwin_14.noarch.tbz2 from http://packages.macports.org/py27-macholib
+--->  Attempting to fetch py27-macholib-1.7_1.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/py27-macholib
+--->  Installing py27-macholib @1.7_1
+--->  Activating py27-macholib @1.7_1
+--->  Cleaning py27-macholib
+--->  Fetching archive for py27-py2app
+--->  Attempting to fetch py27-py2app-0.9_1.darwin_14.x86_64.tbz2 from http://packages.macports.org/py27-py2app
+--->  Attempting to fetch py27-py2app-0.9_1.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/py27-py2app
+--->  Installing py27-py2app @0.9_1
+--->  Activating py27-py2app @0.9_1
+--->  Cleaning py27-py2app
+--->  Fetching archive for py27-pyobjc
+--->  Attempting to fetch py27-pyobjc-3.0.1_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/py27-pyobjc
+--->  Attempting to fetch py27-pyobjc-3.0.1_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/py27-pyobjc
+--->  Installing py27-pyobjc @3.0.1_0
+--->  Activating py27-pyobjc @3.0.1_0
+--->  Cleaning py27-pyobjc
+--->  Fetching archive for py27-pyobjc-cocoa
+--->  Attempting to fetch py27-pyobjc-cocoa-3.0.1_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/py27-pyobjc-cocoa
+--->  Attempting to fetch py27-pyobjc-cocoa-3.0.1_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/py27-pyobjc-cocoa
+--->  Installing py27-pyobjc-cocoa @3.0.1_0
+--->  Activating py27-pyobjc-cocoa @3.0.1_0
+--->  Cleaning py27-pyobjc-cocoa
+--->  Fetching archive for dbus
+--->  Attempting to fetch dbus-1.8.16_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/dbus
+--->  Attempting to fetch dbus-1.8.16_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/dbus
+--->  Installing dbus @1.8.16_0
+--->  Activating dbus @1.8.16_0
+
+############################################################################
+# Startup items have been generated that will aid in
+# starting dbus with launchd. They are disabled
+# by default. Execute the following commands to start them,
+# and to cause them to launch at startup:
+#
+# sudo launchctl load -w
+/Library/LaunchDaemons/org.freedesktop.dbus-system.plist
+# launchctl load -w /Library/LaunchAgents/org.freedesktop.dbus-session.plist
+############################################################################
+
+--->  Cleaning dbus
+--->  Fetching archive for lcms
+--->  Attempting to fetch lcms-1.19_5.darwin_14.x86_64.tbz2 from http://packages.macports.org/lcms
+--->  Attempting to fetch lcms-1.19_5.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/lcms
+--->  Installing lcms @1.19_5
+--->  Activating lcms @1.19_5
+--->  Cleaning lcms
+--->  Fetching archive for libmng
+--->  Attempting to fetch libmng-1.0.10_3.darwin_14.x86_64.tbz2 from http://packages.macports.org/libmng
+--->  Attempting to fetch libmng-1.0.10_3.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/libmng
+--->  Installing libmng @1.0.10_3
+--->  Activating libmng @1.0.10_3
+--->  Cleaning libmng
+--->  Fetching archive for qt4-mac
+--->  Attempting to fetch qt4-mac-4.8.7_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/qt4-mac
+--->  Attempting to fetch qt4-mac-4.8.7_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/qt4-mac
+--->  Installing qt4-mac @4.8.7_0
+--->  Activating qt4-mac @4.8.7_0
+NOTE: Qt database plugins for mysql55, postgresql91, and sqlite2 are NOT installed by this port; they are installed by qt4-mac-*-plugin instead.
+--->  Cleaning qt4-mac
+--->  Fetching archive for sparsehash
+--->  Attempting to fetch sparsehash-2.0.2_1.darwin_14.x86_64.tbz2 from http://packages.macports.org/sparsehash
+--->  Attempting to fetch sparsehash-2.0.2_1.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/sparsehash
+--->  Installing sparsehash @2.0.2_1
+--->  Activating sparsehash @2.0.2_1
+--->  Cleaning sparsehash
+--->  Fetching archive for py27-shiboken
+--->  Attempting to fetch py27-shiboken-1.2.2_3.darwin_14.x86_64.tbz2 from http://packages.macports.org/py27-shiboken
+--->  Attempting to fetch py27-shiboken-1.2.2_3.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/py27-shiboken
+--->  Installing py27-shiboken @1.2.2_3
+--->  Activating py27-shiboken @1.2.2_3
+--->  Cleaning py27-shiboken
+--->  Fetching archive for py27-pyside
+--->  Attempting to fetch py27-pyside-1.2.2_1.darwin_14.x86_64.tbz2 from http://packages.macports.org/py27-pyside
+--->  Attempting to fetch py27-pyside-1.2.2_1.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/py27-pyside
+--->  Installing py27-pyside @1.2.2_1
+--->  Activating py27-pyside @1.2.2_1
+--->  Cleaning py27-pyside
+--->  Fetching archive for py27-backports
+--->  Attempting to fetch py27-backports-1.0_0.darwin_14.noarch.tbz2 from http://packages.macports.org/py27-backports
+--->  Attempting to fetch py27-backports-1.0_0.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/py27-backports
+--->  Installing py27-backports @1.0_0
+--->  Activating py27-backports @1.0_0
+--->  Cleaning py27-backports
+--->  Fetching archive for py27-backports-ssl_match_hostname
+--->  Attempting to fetch py27-backports-ssl_match_hostname-3.4.0.2_0.darwin_14.noarch.tbz2 from http://packages.macports.org/py27-backports-ssl_match_hostname
+--->  Attempting to fetch py27-backports-ssl_match_hostname-3.4.0.2_0.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/py27-backports-ssl_match_hostname
+--->  Installing py27-backports-ssl_match_hostname @3.4.0.2_0
+--->  Activating py27-backports-ssl_match_hostname @3.4.0.2_0
+--->  Cleaning py27-backports-ssl_match_hostname
+--->  Fetching archive for py27-certifi
+--->  Attempting to fetch py27-certifi-2015.04.28_0.darwin_14.noarch.tbz2 from http://packages.macports.org/py27-certifi
+--->  Attempting to fetch py27-certifi-2015.04.28_0.darwin_14.noarch.tbz2.rmd160 from http://packages.macports.org/py27-certifi
+--->  Installing py27-certifi @2015.04.28_0
+--->  Activating py27-certifi @2015.04.28_0
+--->  Cleaning py27-certifi
+--->  Fetching archive for py27-tornado
+--->  Attempting to fetch py27-tornado-4.2_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/py27-tornado
+--->  Attempting to fetch py27-tornado-4.2_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/py27-tornado
+--->  Installing py27-tornado @4.2_0
+--->  Activating py27-tornado @4.2_0
+--->  Cleaning py27-tornado
+--->  Fetching archive for py27-matplotlib
+--->  Attempting to fetch py27-matplotlib-1.4.3_0+cairo+pyside.darwin_14.x86_64.tbz2 from http://packages.macports.org/py27-matplotlib
+--->  Attempting to fetch py27-matplotlib-1.4.3_0+cairo+pyside.darwin_14.x86_64.tbz2 from http://lil.fr.packages.macports.org/py27-matplotlib
+--->  Attempting to fetch py27-matplotlib-1.4.3_0+cairo+pyside.darwin_14.x86_64.tbz2 from http://nue.de.packages.macports.org/macports/packages/py27-matplotlib
+--->  Fetching distfiles for py27-matplotlib
+--->  Attempting to fetch matplotlib-1.4.3.tar.gz from https://github.com/matplotlib/matplotlib/tarball/v1.4.3
+--->  Verifying checksums for py27-matplotlib
+--->  Extracting py27-matplotlib
+--->  Applying patches to py27-matplotlib
+--->  Configuring py27-matplotlib
+--->  Building py27-matplotlib
+--->  Staging py27-matplotlib into destroot
+--->  Installing py27-matplotlib @1.4.3_0+cairo+pyside
+--->  Activating py27-matplotlib @1.4.3_0+cairo+pyside
+
+The default backend is the interactive Mac OS X backend. Different backends can
+be specified using the ~/.matplotlib/matplotlibrc file. More details regarding
+backends can be found in the matplotlib FAQ:
+
+http://matplotlib.sourceforge.net/faq/installing_faq.html#what-is-a-backend
+
+--->  Cleaning py27-matplotlib
+--->  Fetching archive for py27-nibabel
+--->  Attempting to fetch py27-nibabel-2.0.0_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/py27-nibabel
+--->  Attempting to fetch py27-nibabel-2.0.0_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/py27-nibabel
+--->  Installing py27-nibabel @2.0.0_0
+--->  Activating py27-nibabel @2.0.0_0
+--->  Cleaning py27-nibabel
+--->  Fetching archive for py27-traits
+--->  Attempting to fetch py27-traits-4.5.0_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/py27-traits
+--->  Attempting to fetch py27-traits-4.5.0_0.darwin_14.x86_64.tbz2.rmd160 from http://packages.macports.org/py27-traits
+--->  Installing py27-traits @4.5.0_0
+--->  Activating py27-traits @4.5.0_0
+--->  Cleaning py27-traits
+--->  Fetching archive for py27-pyface
+--->  Attempting to fetch py27-pyface-4.5.0_0+pyside.darwin_14.noarch.tbz2 from http://packages.macports.org/py27-pyface
+--->  Attempting to fetch py27-pyface-4.5.0_0+pyside.darwin_14.noarch.tbz2 from http://lil.fr.packages.macports.org/py27-pyface
+--->  Attempting to fetch py27-pyface-4.5.0_0+pyside.darwin_14.noarch.tbz2 from http://nue.de.packages.macports.org/macports/packages/py27-pyface
+--->  Fetching distfiles for py27-pyface
+--->  Attempting to fetch pyface-4.5.0.tar.gz from https://github.com/enthought/pyface/tarball/4.5.0
+--->  Verifying checksums for py27-pyface
+--->  Extracting py27-pyface
+--->  Configuring py27-pyface
+--->  Building py27-pyface
+--->  Staging py27-pyface into destroot
+--->  Installing py27-pyface @4.5.0_0+pyside
+--->  Activating py27-pyface @4.5.0_0+pyside
+
+If multiple backends are installed, the toolkit backend may be set with
+environment variables ETS_TOOLKIT and QT_API, e.g., ETS_TOOLKIT=qt4,
+QT_API=pyqt.
+
+--->  Cleaning py27-pyface
+--->  Fetching archive for py27-traitsui
+--->  Attempting to fetch py27-traitsui-4.5.1_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/py27-traitsui
+--->  Attempting to fetch py27-traitsui-4.5.1_0.darwin_14.x86_64.tbz2 from http://lil.fr.packages.macports.org/py27-traitsui
+--->  Attempting to fetch py27-traitsui-4.5.1_0.darwin_14.x86_64.tbz2 from http://nue.de.packages.macports.org/macports/packages/py27-traitsui
+--->  Fetching distfiles for py27-traitsui
+--->  Attempting to fetch traitsui-4.5.1.tar.gz from https://github.com/enthought/traitsui/tarball/4.5.1
+--->  Verifying checksums for py27-traitsui
+--->  Extracting py27-traitsui
+--->  Configuring py27-traitsui
+--->  Building py27-traitsui
+--->  Staging py27-traitsui into destroot
+--->  Installing py27-traitsui @4.5.1_0
+--->  Activating py27-traitsui @4.5.1_0
+--->  Cleaning py27-traitsui
+--->  Fetching archive for melview
+--->  Attempting to fetch melview-1.0.1_0.darwin_14.x86_64.tbz2 from http://packages.macports.org/melview
+--->  Attempting to fetch melview-1.0.1_0.darwin_14.x86_64.tbz2 from http://lil.fr.packages.macports.org/melview
+--->  Attempting to fetch melview-1.0.1_0.darwin_14.x86_64.tbz2 from http://nue.de.packages.macports.org/macports/packages/melview
+--->  Fetching distfiles for melview
+--->  Attempting to fetch melview-1.0.1.tar.gz from http://users.fmrib.ox.ac.uk/~flitney/melview
+--->  Verifying checksums for melview
+--->  Extracting melview
+--->  Applying patches to melview
+--->  Configuring melview
+--->  Building melview
+--->  Staging melview into destroot
+--->  Installing melview @1.0.1_0
+--->  Activating melview @1.0.1_0
+--->  Cleaning melview
+--->  Updating database of binaries
+--->  Scanning binaries for linking errors
+--->  No broken files found.
+
+[04:46:30]-[stowler]-at-[Stephens-MacBook]-in-[~/ports]
+$

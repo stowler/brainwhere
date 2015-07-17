@@ -1,41 +1,64 @@
-setupNeuroimagingEnvironment.md
-==========
+Configure a Stand-Alone Neuroimaging Environment
+=================================================
 
-stowler@gmail.com
-updated: 20140730
+_This is a rough, evolving guide to installing the neuroimaging applications that appear in my scripts and documentation._
 
 
-My neuroimaging scripts and documentation refer to these open-source neuroimaging resources:
+Contents
+=================
 
-* neurodebian virtual machine
-* itksnap
-* fsl
-* afni
-* BXH/XCEDE tools (from FBIRN)
-* freesurfer
-* mricron
-* mricrogl
-* imagej/fiji
-* spm
+  * [Before and after installation](#before-and-after-installation)
+  * [Neurodebian Virtual Machine (VM)](#neurodebian-virtual-machine-vm)
+  * [ITK-SNAP](#itk-snap)
+  * [FSL](#fsl)
+  * [AFNI](#afni)
+  * [BXH/XCEDE FBIRN TOOLS](#bxhxcede-fbirn-tools)
+  * [FreeSurfer](#freesurfer)
+  * [MRIcron](#mricron)
+  * [MRIcroGL](#mricrogl)
+  * [ImageJ / FIJI](#imagej--fiji)
+  * [SPM (Mountain Lion)](#spm-mountain-lion)
 
-This document describes how to deploy these resources in the computing environments I currently use:
-
-* OS X Mavericks 10.9.4 + MacPorts
-* 64-bit Debian Wheezy 7.4.0 with Neurodebian repositories, as:
-    * custom wheezy deployments to physical CPUs, and
-    * Neurodebian-built VM (7.4.20140423_amd64) running under VirtualBox 4.3.14 r95030)
-
-I'm in the process of deprecating a third platform (Neurodebian on Ubuntu 12.04 on 64-bit processors), and will gradually remove its documentation.
 
 
 Before and after installation
 ======================
 Before following the instructions below make sure that you have functional installs of [this basic set of system utilities](http://j.mp/setupScripting).
 
+<!--
 After installing and testing the neuroimaging packages below you could also follow [these instructions](http://j.mp/brainwhereREADME) to install my personal repository of miscellaneous neuroimaging scripts.
+-->
 
+FSL CentOS 6 Virtual Machine
+=============================
 
-Neurodebian Virtual Machine (VM)
+FSL provides a virtual machine (VM) built on [CentOS 6](http://wiki.centos.org/Manuals/ReleaseNotes/CentOS6.6) and VMware. At the moment I'm using this VM to run HCP software that has been validated on CentOS 6, as well as recreate the environment of a collaborator whose institution mandates RHEL 6.
+
+I run this VM under VMware Fusion Professional 7.1.2 running on OS X Yosemite 10.10, but I imagine it will perform similarly well on any modern VMware host.
+
+1. Download the virtual machine from the [FSL downloads page](http://fsl.fmrib.ox.ac.uk/fsldownloads/fsldownloadmain.html) (see the `FSLVm6_64.zip` button under "Windows 7 
+Windows users should download the FSL VM for use with a virtualisation platform.")
+
+1. Install the VM by following or adapting [FSL's installation instructions](http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation/Windows).
+
+1. Change the timezone (TBD)
+
+1. Change the keyboard (TBD)
+
+1. Upgrade to the most recent version of CentOS 6:
+
+   ```bash
+   yum clean all
+   yum upgrade -y
+   ```
+
+1. [Update VMware tools](http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation/Windows#Updating_VMware_Tools) if the previous step generated significant upgrades.
+
+1. Configure special shared folders (TBD).
+
+1. Download FSL (TBD).
+
+Neurodebian Virtual Machine
 ===================================
 At the time of writing, the Neurodebian virtual machine (VM) is built on Debian stable 7.4.0 "wheezy". 
 In prepreation for installing applications and using the VM, first import the VM and update its guest additions:
