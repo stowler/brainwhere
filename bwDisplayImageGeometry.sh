@@ -41,9 +41,9 @@ fxnSetTempDir(){
    # EDITME: $tempParent is something that might change on a per-system, per-script, or per-experiment basis:
    hostname=`hostname -s`
    kernel=`uname -s`
-   if [ $hostname = "stowler-mbp" ]; then
-      tempParent="/Users/stowler/temp"
-   elif [ $kernel = "Linux" ] && [ -d /tmp ] && [ -w /tmp ]; then
+#   if [ $hostname = "stowler-mbp" ]; then
+#      tempParent="/Users/stowler/temp"
+   if [ $kernel = "Linux" ] && [ -d /tmp ] && [ -w /tmp ]; then
       tempParent="/tmp"
    elif [ $kernel = "Darwin" ] && [ -d /tmp ] && [ -w /tmp ]; then
       tempParent="/tmp"
@@ -196,11 +196,11 @@ set -- `getopt rn "$@"`
 while [ $# -gt 0 ]
 do
     case "$1" in
-      	   -r) headingsoff=1  ;;
-	   -n) headingsonly=1 ;;
-	   --)	shift; break  ;;
-	   -*) echo >&2 "usage: $0 [-r for data row only or -n for column names only] image ..."; exit 1 ;;
-	    *)	break ;; # terminate while loop
+      -r) headingsoff=1  ;;
+      -n) headingsonly=1 ;;
+      --) shift; break  ;;
+      -*) echo >&2 "usage: $0 [-r for data row only or -n for column names only] image ..."; exit 1 ;;
+       *) break ;; # terminate while loop
     esac
     shift
 done

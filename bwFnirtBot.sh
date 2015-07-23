@@ -92,7 +92,7 @@ fxnPrintUsage() {
 cat <<EOF
    bwFnirtBot.sh - automated all-way registration of T1 images, EPI images, and 1mmMNI152 images.
 
-   At minumum this script receives a whole-head T1 as input and uses FSL's
+   At minimum this script receives a whole-head T1 as input and uses FSL's
    flirt and fnirt to estimate and apply linear+nonlinear transformation
    (anat2mni), as well its inverse (mni2anat).
 
@@ -187,7 +187,7 @@ cat <<EOF
      -b s01_handheldBrainExtraction.nii.gz   \\
      -o ~/s01mniCoregCarefulBet              
 
-   Example 4: execute with the minium inputs required for func2anat/anat2func
+   Example 4: execute with the minimum inputs required for func2anat/anat2func
    and func2mni/mni2func transformations:
 
      bwFnirtBot.sh                         \\
