@@ -1,36 +1,59 @@
 Configure a Stand-Alone Neuroimaging Environment
 =================================================
 
-_This is a rough, evolving guide to installing the neuroimaging applications that appear in my scripts and documentation._
+_This is a rough and evolving guide to installing the neuroimaging applications that appear in my scripts and documentation._
 
 
 Contents
 =================
 
-  * [Before and after installation](#before-and-after-installation)
-  * [Neurodebian Virtual Machine (VM)](#neurodebian-virtual-machine-vm)
+  * [Dependencies](#dependencies)
+  * [VM: FSL CentOS 6](#vm-fsl-centos-6)
+  * [VM: Neurodebian](#vm-neurodebian)
   * [ITK-SNAP](#itk-snap)
+    * [Install the ITK-SNAP binary on OS X Mountain/Lion](#install-the-itk-snap-binary-on-os-x-mountainlion)
+    * [Install the ITK-SNAP binary on Ubuntu 12.04](#install-the-itk-snap-binary-on-ubuntu-1204)
   * [FSL](#fsl)
+    * [Install FSL on Mac OS X Mountain/Lion](#install-fsl-on-mac-os-x-mountainlion)
+    * [Install FSL on Ubuntu 12.04](#install-fsl-on-ubuntu-1204)
+    * [Install FSL on Debian 7.2.0 Wheezy Neurodebian VM](#install-fsl-on-debian-720-wheezy-neurodebian-vm)
+    * [Install and run FSL test suite ("FEEDS")](#install-and-run-fsl-test-suite-feeds)
+  * [FSL FIX](#fsl-fix)
+  * [FSL melview](#fsl-melview)
+  * [FSL ICA-AROMA](#fsl-ica-aroma)
+  * [FSLNets](#fslnets)
   * [AFNI](#afni)
+    * [Install AFNI on Mac OS X Mountain/Lion](#install-afni-on-mac-os-x-mountainlion)
+    * [Install AFNI on Neurodebian (Ubuntu 12.04 or the Debian 7.0 Wheezy Neurodebian VM)](#install-afni-on-neurodebian-ubuntu-1204-or-the-debian-70-wheezy-neurodebian-vm)
+    * [Checking and Setting environmental variable AFNI_ENFORCE_ASPECT](#checking-and-setting-environmental-variable-afni_enforce_aspect)
   * [BXH/XCEDE FBIRN TOOLS](#bxhxcede-fbirn-tools)
+    * [Install FBIRN BXH/XCEDE tools on Mac OS X Mountain/Lion](#install-fbirn-bxhxcede-tools-on-mac-os-x-mountainlion)
+    * [Install BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM](#install-bxhxcede-tools-on-debian-linux-70-wheezy-neurodebian-vm)
   * [FreeSurfer](#freesurfer)
+    * [Install FreeSurfer on Mac OS X Mountain/Lion](#install-freesurfer-on-mac-os-x-mountainlion)
+    * [Install FreeSurfer on Ubuntu 12.04](#install-freesurfer-on-ubuntu-1204)
   * [MRIcron](#mricron)
+    * [Install MRIcron on Mac OS X Mountain/Lion](#install-mricron-on-mac-os-x-mountainlion)
+    * [Install MRIcron on Neurodebian (Ubuntu or Debian)](#install-mricron-on-neurodebian-ubuntu-or-debian)
   * [MRIcroGL](#mricrogl)
+    * [Install MRIcroGL on Mac OS X Mountain/Lion](#install-mricrogl-on-mac-os-x-mountainlion)
   * [ImageJ / FIJI](#imagej--fiji)
-  * [SPM (Mountain Lion)](#spm-mountain-lion)
+    * [Install FIJI on Mac OS X Mountain/Lion](#install-fiji-on-mac-os-x-mountainlion)
+    * [Install ImageJ/FIJI on Ubuntu 12.04](#install-imagejfiji-on-ubuntu-1204)
+    * [Install ImageJ plugins](#install-imagej-plugins)
+  * [SPM](#spm)
 
+# Dependencies
 
-
-Before and after installation
-======================
 Before following the instructions below make sure that you have functional installs of [this basic set of system utilities](http://j.mp/setupScripting).
 
 <!--
 After installing and testing the neuroimaging packages below you could also follow [these instructions](http://j.mp/brainwhereREADME) to install my personal repository of miscellaneous neuroimaging scripts.
 -->
 
-FSL CentOS 6 Virtual Machine
-=============================
+# VM: FSL CentOS 6
+
+**UPDATED: 20150809**
 
 FSL provides a virtual machine (VM) built on [CentOS 6](http://wiki.centos.org/Manuals/ReleaseNotes/CentOS6.6) and VMware. At the moment I'm using this VM to run HCP software that has been validated on CentOS 6, as well as recreate the environment of a collaborator whose institution mandates RHEL 6.
 
@@ -58,8 +81,9 @@ Windows users should download the FSL VM for use with a virtualisation platform.
 
 1. Download FSL (TBD).
 
-Neurodebian Virtual Machine
-===================================
+# VM: Neurodebian 
+**UPDATED: TBD**
+
 At the time of writing, the Neurodebian virtual machine (VM) is built on Debian stable 7.4.0 "wheezy". 
 In prepreation for installing applications and using the VM, first import the VM and update its guest additions:
 
@@ -177,19 +201,17 @@ notice that the currently installed virtualbox guest additions are older than yo
 
 If everything is stable, the VM is now ready to receive [this basic set of system utilities](http://j.mp/setupScripting), followed by the neuroimaging apps listed below.  
 
-ITK-SNAP
-====================
+# ITK-SNAP
+**UPDATED: TBD**
 
-Install the ITK-SNAP binary on OS X Mountain/Lion:
------------------------------------------------------------------
+## Install the ITK-SNAP binary on OS X Mountain/Lion
 
 Download latest version from the [ITK-SNAP Downloads page](http://www.itksnap.org/pmwiki/pmwiki.php?n=Main.Downloads).
 * Choose "MacOS Binary (Intel, 64 bit, OSX 10.5+)"
 * Drag the resulting ITK-SNAP.app to /Applications folder
 
 
-Install the ITK-SNAP binary on Ubuntu 12.04:
------------------------------------------------------------------
+## Install the ITK-SNAP binary on Ubuntu 12.04
 
 I'm currently happy with the version in the neurodebian repos:
 
@@ -197,11 +219,11 @@ I'm currently happy with the version in the neurodebian repos:
 
 
 
-FSL
-==================
+# FSL
 
-Install FSL on Mac OS X Mountain/Lion:
-----------------------------------------------------------------
+## Install FSL on Mac OS X Mountain/Lion
+**UPDATED: TBD**
+
 
 Before installing FSL, freesurfer, or  AFNI on Mountain/Lion be double-sure you have installed [XQuartz](http://xquartz.macosforge.org), and logged out and then back in.
 
@@ -285,8 +307,9 @@ TEST: we should be able to open fslview.app from the commandline :
 
 
 
-Install FSL on Ubuntu 12.04:
------------------------------------------------------------------
+## Install FSL on Ubuntu 12.04
+**UPDATED: TBD**
+
 
 I am currently happy with the version in the neurodebian repos:
 
@@ -304,8 +327,9 @@ For instructions on how to configure those environmental variables, see the neur
 
 
 
-Install FSL on Debian 7.2.0 Wheezy Neurodebian VM:
-------------------------------------------------------------
+## Install FSL on Debian 7.2.0 Wheezy Neurodebian VM
+**UPDATED: TBD**
+
 
 I am currently using the version in the neurodebian repos, but during installation it needs some hand-holding to avoid installation of GPU-related components. I demonstrate installation during minutes 28:20 through 34:01 of [my screencast on neurodebian wheezy 3D support.](http://j.mp/neurodebianVM3D)
 
@@ -349,8 +373,9 @@ TEST: can the shell environment find the FSL binaries? The command `fslinfo` iss
 
 
 
-Install and run FSL test suite ("FEEDS"):
----------------------------------------------------------------
+## Install and run FSL test suite ("FEEDS")
+**UPDATED: TBD**
+
 
 Download [FEEDS from FSL (> 270 MB)](http://fsl.fmrib.ox.ac.uk/fsldownloads/), or neurodebian can download via command:
 
@@ -366,12 +391,35 @@ Extract and [run FEEDS](http://fsl.fmrib.ox.ac.uk/fsl/feeds/doc/) :
     cd feeds
     /usr/bin/time ./RUN all
 
+# FSL FIX
+**UPDATED: TBD**
 
-AFNI
-==========
+TBD
 
-Installing AFNI on Mac OS X Mountain/Lion:
-------------------------------------------------------------
+
+# FSL melview
+**UPDATED: TBD**
+
+TBD
+
+
+# FSL ICA-AROMA
+**UPDATED: TBD**
+
+TBD
+
+# FSLNets
+**UPDATED: TBD**
+
+TBD
+
+
+
+# AFNI
+
+## Install AFNI on Mac OS X Mountain/Lion
+**UPDATED: TBD**
+
 
 Before installing FSL, freesurfer, or  AFNI on Mountain/Lion be sure to install [XQuartz](http://xquartz.macosforge.org), and logout and then back in. 
 
@@ -430,8 +478,10 @@ TEST: Open a new terminal window and test your afni install by issuing the comma
 
 
 
-Installing AFNI on Neurodebian (Ubuntu 12.04 or the Debian 7.0 Wheezy Neurodebian VM):
-----------------------------------------------------------------
+## Install AFNI on Neurodebian (Ubuntu 12.04 or the Debian 7.0 Wheezy Neurodebian VM)
+**UPDATED: TBD**
+
+
 I'm currently happy with the version in the neurodebian repos. Install with:
 
     sudo apt-get install afni afni-atlases
@@ -509,8 +559,7 @@ The change only applies to the current terminal window, and only until it is clo
 
 
 
-Checking and Setting environmental variable AFNI_ENFORCE_ASPECT :
----------------------------------------------------------------
+## Check and Set environmental variable AFNI_ENFORCE_ASPECT
 
 In some environments the AFNI GUI allows you to accidentally distort image aspect ratio by resizing an image window. Not good, but avoidable:
 
@@ -529,14 +578,14 @@ To set AFNI_ENFORCE_ASPECT on a per-execution basis, can launch the afni GUI wit
 
 
 
-BXH/XCEDE FBIRN TOOLS
-=======================
+# FBIRN tools 
 
 
-Install FBIRN BXH/XCEDE tools on Mac OS X Mountain/Lion:
------------------------------------------------------------------
+## Install FBIRN tools on Mac OS X Mountain/Lion
+**UPDATED: TBD**
 
-As of May 2013, the shipping binaries of BXH/XCEDE tools includes imagemagick bugs on Mountain Lion. (NB: 20150108: also works on Yosemite 10.10.1)
+
+As of May 2013, the shipping binaries of FBIRN BXH/XCEDE tools includes imagemagick bugs on Mountain Lion. (NB: 20150108: also works on Yosemite 10.10.1)
 
 I wrote an installation script that [describes the problem](http://goo.gl/Nalzn) and provides a workaround via macports.
 
@@ -559,8 +608,9 @@ I wrote an installation script that [describes the problem](http://goo.gl/Nalzn)
       ```
 
 
-Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
------------------------------------------------------------------
+## Install FBIRN tools on Debian Linux 7.0 Wheezy Neurodebian VM
+**UPDATED: TBD**
+
 
 1. Install lsb if it isn't already installed:
 
@@ -644,16 +694,17 @@ Installing BXH/XCEDE tools on Debian Linux 7.0 Wheezy Neurodebian VM
     ls -l ${BXHDIR}/bin/montage 
     ```
 
-FreeSurfer
-===============
+# FreeSurfer
+
 (WARNINING: Stable 5.2 release WITHDRAWN awaiting upcoming version 5.3)
 
 If you haven't done so already, obtain a license, and copy the .license file to your 
 `$FREESURFER_HOME` directory per https://surfer.nmr.mgh.harvard.edu/registration.html
 
 
-Installing FreeSurfer on Mac OS X Mountain/Lion:
------------------------------------------------------------------
+## Install FreeSurfer on Mac OS X Mountain/Lion
+**UPDATED: TBD**
+
 
 1. Before installing freesurfer on Mountain/Lion be sure to install [XQuartz](http://xquartz.macosforge.org)
 and FSL (b/c FS's install will detect location of FSL).
@@ -765,8 +816,9 @@ and FSL (b/c FS's install will detect location of FSL).
 
 
 
-Installing FreeSurfer on Ubuntu 12.04 :
----------------------------------------------------------------
+## Install FreeSurfer on Ubuntu 12.04
+**UPDATED: TBD**
+
 
 1. [Download](http://surfer.nmr.mgh.harvard.edu/fswiki/DownloadAndInstall) the latest .tar.gz binaries from the Freesurfer Wiki.  This can also be done from the commandline instead of the webpage:
 
@@ -876,12 +928,12 @@ Installing FreeSurfer on Ubuntu 12.04 :
       ```
 
 
-MRIcron
-==============================
+# MRIcron
 
 
-Install MRIcron on Mac OS X Mountain/Lion:
---------------------------------------------------------------
+## Install MRIcron on Mac OS X Mountain/Lion
+**UPDATED: TBD**
+
 
 1. Download latest [MRIcron binary](http://www.nitrc.org/projects/mricron) (probably called "MRIcron [month]/[year] osx.zip")
 
@@ -902,8 +954,9 @@ Install MRIcron on Mac OS X Mountain/Lion:
     sudo mv ~/Downloads/osx/dcm2nii /usr/local/bin/
     ```
 
-Install MRIcron on Neurodebian (Ubuntu or Debian)
------------------------------------------------------------------
+## Install MRIcron on Neurodebian (Ubuntu or Debian)
+**UPDATED: TBD**
+
 
 I'm currently happy with the version in the neurodebian repos:
 
@@ -917,12 +970,12 @@ Remember that preferences are stored here if you would like to edit them:
 
 
 
-MRIcroGL
-===============
+# MRIcroGL
 
 
-Install MRIcroGL on Mac OS X Mountain/Lion:
------------------------------------------------------------------
+## Install MRIcroGL on Mac OS X Mountain/Lion
+**UPDATED: TBD**
+
 
 1. Download the [latest version](http://www.mccauslandcenter.sc.edu/mricrogl/).
 NB: pay attention to downloaded filename: if you already had osx.zip in your Downloads folder from mricrON, this mricrogl download may get called "osx(1).zip" etc.
@@ -942,11 +995,11 @@ NB: pay attention to downloaded filename: if you already had osx.zip in your Dow
 
 
 
-ImageJ / FIJI
-==================
+# ImageJ / FIJI
 
-Install FIJI on Mac OS X Mountain/Lion:
------------------------------------------------------------------
+## Install FIJI on Mac OS X Mountain/Lion
+**UPDATED: TBD**
+
 
 1. Download the [fiji for macosx dmg](http://fiji.sc/Downloads)
 
@@ -963,8 +1016,9 @@ Install FIJI on Mac OS X Mountain/Lion:
 3. Install imagej plugins (instructions below)
 
 
-Install ImageJ/FIJI on Ubuntu 12.04:
------------------------------------------------------------------
+## Install ImageJ/FIJI on Ubuntu 12.04
+**UPDATED: TBD**
+
 
 I'm currently happy with the version in the neurodebian repos:
 
@@ -973,8 +1027,9 @@ I'm currently happy with the version in the neurodebian repos:
 Then install imagej plugins (instructions below).
 
 
-Install ImageJ plugins:
------------------------------------------------------------------
+## Install ImageJ plugins
+**UPDATED: TBD**
+
 
 The location of the system-wide destination for imagej plugins differs by platform:
 
@@ -1025,8 +1080,9 @@ file and inspect its images interactively. It can also act as a DICOM receiver.
 
   
 
-SPM (Mountain Lion)
-=========================
+# SPM
+**UPDATED: TBD**
+
 
 1. Download the latest [SPM 8 package](http://www.fil.ion.ucl.ac.uk/spm/software/spm8/)
 
