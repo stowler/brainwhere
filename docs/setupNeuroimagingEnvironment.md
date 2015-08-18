@@ -380,7 +380,7 @@ cd feeds
 /usr/bin/time ./RUN all
 ```
 
-Check FEEDS output for errors, and compare run time with other platforms. "Real" or "elapsed" time is the number of wall-clock seconds that passed during execution:
+Check FEEDS output for errors, and compare run time with [other platforms](http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FEEDS/TimingResults). "Real" or "elapsed" time is the number of wall-clock seconds that passed during execution. Results from some of the platforms I use:
 
 ```
 2014 i7 rMBP @2.5 GHz, FEEDS 5.0.8: 1190.10 real  980.56 user 22.94 sys
