@@ -358,7 +358,7 @@ TEST: can the shell environment find the FSL binaries? The command `fslinfo` iss
 
 
 ## Install and run FSL test suite ("FEEDS")
-**UPDATED: TBD**
+**UPDATED: 20150818**
 
 
 Download [FEEDS from FSL (> 270 MB)](http://fsl.fmrib.ox.ac.uk/fsldownloads/), or neurodebian can download via command:
@@ -367,13 +367,26 @@ Download [FEEDS from FSL (> 270 MB)](http://fsl.fmrib.ox.ac.uk/fsldownloads/), o
 
 Extract and [run FEEDS](http://fsl.fmrib.ox.ac.uk/fsl/feeds/doc/) :
 
-    # (on neurodebian, this is all replaced by command fsl-selftest or /usr/bin/time fsl-selftest)
-    # 2014 i7 rMBP @2.5 GHz, FEEDS 5.0.8: 1190.10 real  980.56 user 22.94 sys
-    # 2010 i5 iMac @2.8 GHz, FEEDS 5.0.8: 1711.25 real 1497.34 user 24.42 sys
-    cd ~/Downloads       # (or the folder where you saved your download)
-    tar -zxvf fsl-*-feeds.tar.gz
-    cd feeds
-    /usr/bin/time ./RUN all
+```bash
+# (on neurodebian, this is all replaced by command fsl-selftest or /usr/bin/time fsl-selftest)
+cd ~/Downloads       # (or the folder where you saved your download)
+tar -zxvf fsl-*-feeds.tar.gz
+cd feeds
+
+# On some linux installs the user may need to remove
+# "DYLD_LIBRARY_PATH LD_LIBRARY_PATH" from line 398 in file "RUN"
+# (confirmed in FSL 5.0.7 and 5.0.8 running on neurodebian ubuntu 12.04 and 14.04)
+
+/usr/bin/time ./RUN all
+```
+
+Check FEEDS output for errors, and compare run time with other platforms. "Real" or "elapsed" time is the number of wall-clock seconds that passed during execution:
+
+```
+2014 i7 rMBP @2.5 GHz, FEEDS 5.0.8: 1190.10 real  980.56 user 22.94 sys
+2010 i5 iMac @2.8 GHz, FEEDS 5.0.8: 1711.25 real 1497.34 user 24.42 sys
+```
+
 
 # FSL FIX
 **UPDATED: TBD**
