@@ -361,24 +361,44 @@ TEST: can the shell environment find the FSL binaries? The command `fslinfo` iss
 **UPDATED: 20150818**
 
 
-Download [FEEDS from FSL (> 270 MB)](http://fsl.fmrib.ox.ac.uk/fsldownloads/), or neurodebian can download via command:
+Download FEEDS (> 270 MB) from the [FSL webpage](http://fsl.fmrib.ox.ac.uk/fsldownloads/). Neurodebian hosts can also download via command:
 
-    sudo apt-get install fsl-feeds
+    $ sudo apt-get install fsl-feeds
 
-Extract and [run FEEDS](http://fsl.fmrib.ox.ac.uk/fsl/feeds/doc/) :
+Extract FEEDS to /opt:
 
 ```bash
-# (on neurodebian, this is all replaced by command fsl-selftest or /usr/bin/time fsl-selftest)
-cd ~/Downloads       # (or the folder where you saved your download)
-tar -zxvf fsl-*-feeds.tar.gz
-cd feeds
+$ feedsVersion=5.0.8
+$ tar -zxvf fsl-${feedsVersion}-feeds.tar.gz
+$ sudo mv feeds /opt/feeds-${feedsVersion}
+$ sudo rm -f /opt/feeds
+$ sudo ln -s /opt/feeds-${feedsVersion} /opt/feeds
 
 # On some linux installs the user may need to remove
 # "DYLD_LIBRARY_PATH LD_LIBRARY_PATH" from line 398 in file "RUN"
 # (confirmed in FSL 5.0.7 and 5.0.8 running on neurodebian ubuntu 12.04 and 14.04)
 
-/usr/bin/time ./RUN all
+# prevent users from accidentally overwriting contents:
+$ sudo chown -R root:root /opt/feeds-${feedsVersion}
+$ echo "Do not run FEEDS from /opt. Instead: cp -R --dereference /opt/feeds /tmp/yourFeedsCopy" | sudo tee -a README-doNotRunFromOpt.txt
+
 ```
+
+[Run](http://fsl.fmrib.ox.ac.uk/fsl/feeds/doc/) FEEDS :
+
+```bash
+$ cp -R --dereference /opt/feeds /tmp/myFeedsCopy
+
+# On some linux installs the user may need to remove
+# "DYLD_LIBRARY_PATH LD_LIBRARY_PATH" from line 398 in file "RUN"
+# (confirmed in FSL 5.0.7 and 5.0.8 running on neurodebian ubuntu 12.04 and 14.04)
+
+$ cd /tmp/myFeedsCopy
+$ /usr/bin/time ./RUN all
+```
+<!--
+on neurodebian, this may be all replaced by command fsl-selftest or /usr/bin/time fsl-selftest)
+-->
 
 Check FEEDS output for errors, and compare run time with [other platforms](http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FEEDS/TimingResults). "Real" or "elapsed" time is the number of wall-clock seconds that passed during execution. Results from some of the platforms I use:
 
@@ -389,9 +409,108 @@ Check FEEDS output for errors, and compare run time with [other platforms](http:
 
 
 # FSL FIX
-**UPDATED: TBD**
+**UPDATED: 20150818**
 
-TBD
+FSL [FIX][] provides ICA-based classification of FMRI noise. At the time of writing the current release is 1.062 beta.
+
+[FIX]: http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FIX
+
+<!-- 
+Note solution when getting errors related to libgfortran:
+https://www.jiscmail.ac.uk/cgi-bin/webadmin?A2=fsl;ad743346.1402
+-->
+
+## Download and extract FIX
+
+The FIX [user guide][] has a link to [download FIX][]. For me the download usually completes within an hour, and I typically use wget:
+
+[user guide]: http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FIX/UserGuide
+[download FIX]: http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FIX/UserGuide#Downloading_and_Installing_FIX
+
+```bash
+$ wget http://www.fmrib.ox.ac.uk/~steve/ftp/fix.tar.gz
+
+# at time of writing the current version unarchives contents into new directory "fix1.06":
+$ tar -zxvf fix.tar.gz
+fixVersion=1.062
+$ sudo mv fix1.06 /opt/fix-${fixVersion}
+$ sudo rm -f /opt/fix
+$ sudo ln -s /opt/fix-${fixVersion} /opt/fix
+
+```
+
+
+## Configure environment for FIX
+
+Add the fix path to the system $PATH, for example by adding this line to `/etc/bash.bashrc`:
+```bash
+export PATH=/opt/fix:${PATH}
+```
+
+
+## Install R libraries for FIX 
+
+Install R packages listed in the FIX tarball's README. At the time of writing:
+
+```bash
+$ sudo R --no-save
+> install.packages("kernlab",      dependencies=TRUE, repos='http://cran.stat.ucla.edu')
+> install.packages("ROCR",         dependencies=TRUE, repos='http://cran.stat.ucla.edu')
+> install.packages("class",        dependencies=TRUE, repos='http://cran.stat.ucla.edu')
+> install.packages("party",        dependencies=TRUE, repos='http://cran.stat.ucla.edu')
+> install.packages("e1071",        dependencies=TRUE, repos='http://cran.stat.ucla.edu')
+> install.packages("randomForest", dependencies=TRUE, repos='http://cran.stat.ucla.edu')
+```
+
+
+## Edit FIX settings.sh
+
+Edit the FIX `settings.sh` file to reflect the host's Matlab configuration. I have only ever run FIX in the Matlab script mode (i.e., "mode 1"):
+
+```bash
+FSL_FIX_MATLAB_MODE=1 # Matlab script mode
+FSL_FIX_MATLAB_ROOT=/opt/MATLAB/R2015a
+```
+
+
+## Test FIX
+
+### 1. Generate a melodic .ica directory
+
+FSL's FEEDS package comes with a FMRI run and matched structural T1:
+
+```bash
+# paired per /opt/feeds/data/fmri.feat/design.fsf :
+/opt/feeds/data/fmri.nii.gz
+/opt/feeds/data/structural_brain.nii.gz
+```
+
+TBD: Load [this]() .fsf file into Melodic and use it to generate `/tmp/melFromFEEDS.ica`
+
+
+
+### 2. Confirm the names of pre-trained datasets
+
+```bash
+$ find /opt/fix/* | grep -i rdata
+/opt/fix/training_files/WhII_Standard.RData
+/opt/fix/training_files/Standard.RData
+/opt/fix/training_files/UKBiobank.RData
+/opt/fix/training_files/HCP_hp2000.RData
+/opt/fix/training_files/WhII_MB6.RData
+```
+
+### 3. Run FIX
+
+### 4. Inspect results
+
+
+
+## Install FSL FIX on Ubuntu
+**UPDATED: 20150818**
+
+
+
 
 
 # FSL melview
