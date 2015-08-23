@@ -488,6 +488,9 @@ FSL's FEEDS package comes with a sample FMRI run and matched structural T1:
 
 Run single-session melodic on those inputs by loading [this](https://github.com/stowler/brainwhere/blob/master/utilitiesAndData/testsForFSL/melodicTestForFix-fsl5.0.8-structBBR-mni2mmNonlinear.fsf) .fsf file into the melodic GUI. This will generate melodic output directory `/tmp/melFromFeeds-structBBR-mni2mmNonlinear.ica`.
 
+```
+wget https://raw.githubusercontent.com/stowler/brainwhere/master/utilitiesAndData/testsForFSL/melodicTestForFix-fsl5.0.8-structBBR-mni2mmNonlinear.fsf
+```
 
 
 ### 2. Confirm the names of pre-trained datasets
