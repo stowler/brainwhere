@@ -474,10 +474,11 @@ FSL_FIX_MATLAB_ROOT=/opt/MATLAB/R2015a
 
 
 ## Test FIX
+**UPDATED: 20150823**
 
 ### 1. Generate a melodic .ica directory
 
-FSL's FEEDS package comes with a FMRI run and matched structural T1:
+FSL's FEEDS package comes with a sample FMRI run and matched structural T1:
 
 ```bash
 # paired per /opt/feeds/data/fmri.feat/design.fsf :
@@ -485,7 +486,7 @@ FSL's FEEDS package comes with a FMRI run and matched structural T1:
 /opt/feeds/data/structural_brain.nii.gz
 ```
 
-TBD: Load [this]() .fsf file into Melodic and use it to generate `/tmp/melFromFEEDS.ica`
+Run single-session melodic on those inputs by loading [this](https://github.com/stowler/brainwhere/blob/master/utilitiesAndData/testsForFSL/melodicTestForFix-fsl5.0.8-structBBR-mni2mmNonlinear.fsf) .fsf file into the melodic GUI. This will generate melodic output directory `/tmp/melFromFeeds-structBBR-mni2mmNonlinear.ica`.
 
 
 
@@ -503,13 +504,6 @@ $ find /opt/fix/* | grep -i rdata
 ### 3. Run FIX
 
 ### 4. Inspect results
-
-
-
-## Install FSL FIX on Ubuntu
-**UPDATED: 20150818**
-
-
 
 
 
