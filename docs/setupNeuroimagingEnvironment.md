@@ -409,7 +409,7 @@ Check FEEDS output for errors, and compare run time with [other platforms](http:
 
 
 # FSL FIX
-**UPDATED: 20150818**
+**UPDATED: 20150823**
 
 FSL [FIX][] provides ICA-based classification of FMRI noise. At the time of writing the current release is 1.062 beta.
 
@@ -422,7 +422,7 @@ https://www.jiscmail.ac.uk/cgi-bin/webadmin?A2=fsl;ad743346.1402
 
 ## Download and extract FIX
 
-The FIX [user guide][] has a link to [download FIX][]. For me the download usually completes within an hour, and I typically use wget:
+The FIX [user guide][] has a link to [download FIX][]. From my Atlanta sites the download usually completes within an hour:
 
 [user guide]: http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FIX/UserGuide
 [download FIX]: http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FIX/UserGuide#Downloading_and_Installing_FIX
@@ -440,11 +440,24 @@ $ sudo ln -s /opt/fix-${fixVersion} /opt/fix
 ```
 
 
-## Configure environment for FIX
+## Configure the FIX environment
 
-Add the fix path to the system $PATH, for example by adding this line to `/etc/bash.bashrc`:
+Add the fix path to the system $PATH, for example by adding this line to a system initialization file:
 ```bash
-export PATH=/opt/fix:${PATH}
+# Choice of initialization file will vary depending on OS and config:
+#   /etc/bash.bashrc is a reasonable generic choice for linux
+#   /etc/bashrc is a reasonable generic choice for OS X
+#   /etc/profile.d/birc_custom.sh is where we put it on our local ubuntu 14.04 installs
+
+$ initFile=/etc/bash.bashrc
+$ echo "export PATH=/opt/fix:${PATH}" | sudo tee -a ${initFile}
+```
+
+Edit the fix `settings.sh` file to reflect the host's matlab configuration. I have only ever run FIX in the matlab script mode (i.e., "mode 1"):
+
+```bash
+FSL_FIX_MATLAB_MODE=1 # Matlab script mode
+FSL_FIX_MATLAB_ROOT=/opt/MATLAB/R2015a
 ```
 
 
@@ -463,22 +476,11 @@ $ sudo R --no-save
 ```
 
 
-## Edit FIX settings.sh
-
-Edit the FIX `settings.sh` file to reflect the host's Matlab configuration. I have only ever run FIX in the Matlab script mode (i.e., "mode 1"):
-
-```bash
-FSL_FIX_MATLAB_MODE=1 # Matlab script mode
-FSL_FIX_MATLAB_ROOT=/opt/MATLAB/R2015a
-```
-
-
 ## Test FIX
-**UPDATED: 20150823**
 
 ### 1. Generate a melodic .ica directory
 
-FSL's FEEDS package comes with a sample FMRI run and matched structural T1:
+FSL's FEEDS package includes a sample FMRI run and matching structural T1, each in their own native space and resolution:
 
 ```bash
 # paired per /opt/feeds/data/fmri.feat/design.fsf :
@@ -486,15 +488,56 @@ FSL's FEEDS package comes with a sample FMRI run and matched structural T1:
 /opt/feeds/data/structural_brain.nii.gz
 ```
 
-Run single-session melodic on those inputs by loading [this](https://github.com/stowler/brainwhere/blob/master/utilitiesAndData/testsForFSL/melodicTestForFix-fsl5.0.8-structBBR-mni2mmNonlinear.fsf) .fsf file into the melodic GUI. This will generate melodic output directory `/tmp/melFromFeeds-structBBR-mni2mmNonlinear.ica`.
+Run single-session melodic on those inputs by loading [this](https://github.com/stowler/brainwhere/blob/master/utilitiesAndData/testsForFSL/melodicTestForFix-fsl5.0.8-structBBR-mni2mmNonlinear.fsf) .fsf file into the melodic GUI. It should take about 20 minutes.
+
+NB: That `.fsf` file is configured with the melodic GUI's "Progress Watcher" turned off so that remote execution doesn't generate unnecessary network traffic by opening a remote web browser. Melodic's progress can be monitored by watching those log and html files in the shell, as I show below using [bwMelodicProgress.sh](https://github.com/stowler/brainwhere/blob/master/bwMelodicProgress.sh):
 
 ```
-wget https://raw.githubusercontent.com/stowler/brainwhere/master/utilitiesAndData/testsForFSL/melodicTestForFix-fsl5.0.8-structBBR-mni2mmNonlinear.fsf
+# Download the .fsf file:
+$ wget https://raw.githubusercontent.com/stowler/brainwhere/master/utilitiesAndData/testsForFSL/melodicTestForFix-fsl5.0.8-structBBR-mni2mmNonlinear.fsf
+
+# Confirm that the file paths in the .fsf file match your environment,
+# and edit the .fsf file if necessary:
+$ grep -E 'tmp|feeds|MNI152' melodicTestForFix-fsl5.0.8-structBBR-mni2mmNonlinear.fsf
+set fmri(outputdir) "/tmp/melFromFeeds-structBBR-mni2mmNonlinear.ica"
+set fmri(regstandard) "/usr/share/fsl/5.0/data/standard/MNI152_T1_2mm_brain"
+set feat_files(1) "/opt/feeds/data/fmri"
+set highres_files(1) "/opt/feeds/data/structural_brain"
+
+# Load .fsf file into the Melodic GUI, edit file paths if needed, and click "Go":
+$ Melodic melodicTestForFix-fsl5.0.8-structBBR-mni2mmNonlinear.fsf
+# ...or on Mac: 
+# Melodic_gui melodicTestForFix-fsl5.0.8-structBBR-mni2mmNonlinear.fsf
+
+# Monitor melodic's progress via the html files it generates:
+$ bwMelodicProgress.sh /tmp/melFromFeeds-structBBR-mni2mmNonlinear.ica
+
+Progress of the melodic creating output in /tmp/melFromFeeds-structBBR-mni2mmNonlinear.ica:
+drwxrwxr-x 6 stowler-local stowler-local 4096 Aug 23 12:39 /tmp/melFromFeeds-structBBR-mni2mmNonlinear.ica
+
+Melodic Started at Sun Aug 23 12:39:07 EDT 2015 :
+32M	/tmp/melFromFeeds-structBBR-mni2mmNonlinear.ica
+...but melodic not yet finished as of Sun Aug 23 12:39:51 EDT 2015. Will check again in 20 seconds...
+
+(...snip...)
+
+Melodic Started at Sun Aug 23 12:39:07 EDT 2015 :
+101M	/tmp/melFromFeeds-structBBR-mni2mmNonlinear.ica
+...but melodic not yet finished as of Sun Aug 23 13:02:32 EDT 2015. Will check again in 20 seconds...
+
+Finished at Sun Aug 23 13:02:52 EDT 2015
 ```
 
+Archive that MELODIC output to preserve state before applying FIX:
 
-### 2. Confirm the names of pre-trained datasets
+```bash
+$ mkdir /tmp/melFromFeeds-noFIX
+$ mv /tmp/melFromFeeds-structBBR-mni2mmNonlinear.ica /tmp/melFromFeeds-noFIX/
+```
 
+### 2. Confirm the names of available pre-trained datasets
+
+Your FIX command is going to include an argument that points to the existing trained-weights files will be used to classify the components that you just generated with melodic:
 ```bash
 $ find /opt/fix/* | grep -i rdata
 /opt/fix/training_files/WhII_Standard.RData
@@ -505,6 +548,38 @@ $ find /opt/fix/* | grep -i rdata
 ```
 
 ### 3. Run FIX
+
+Applying FIX to a single melodic output directory should take fewer than 10 minutes on most modern hardware:
+
+```bash
+# melodic directory to be copied as FIX input:
+$ melodicOut=/tmp/melFromFeeds-noFIX/melFromFeeds-structBBR-mni2mmNonlinear.ica
+$ fixInName="`basename ${melodicOut}`"
+
+# existing trained-weights file you confirmed above:
+$ fixWeightsFile=/opt/fix/training_files/Standard.RData
+$ fixWeightsName=`basename ${fixWeightsFile} | sed 's/\.RData//'`
+
+# FIX threshold:
+$ fixThresh=20
+
+# execution: either serial or parallel. Serial here since we're not yet looping across parameters
+execution=serial
+
+# parent directory where we'll put the .ica dir to be used for fix input and output:
+$ fixOutParent=/tmp/melFromFeeds-fixOut-${execution}-thresh${fixThresh}-weights${fixWeightsName}
+$ mkdir ${fixOutParent}
+
+# create a copy of the original non-fix ica output, to be used for fix input and output:
+$ cp -a ${melodicOut} ${fixOutParent}/
+$ fixOut="${fixOutParent}/${fixInName}"
+
+# run fix:
+$ /usr/bin/time fix ${fixOut} ${fixWeightsFile} ${fixThresh} -m
+```
+
+You might also want to repeat fix while varying the threshold or trained-weights parameters, as well as executing in serial and in parallel.
+
 
 ### 4. Inspect results
 
