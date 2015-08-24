@@ -549,37 +549,12 @@ $ find /opt/fix/* | grep -i rdata
 
 ### 3. Run FIX
 
-Applying FIX to a single melodic output directory should take fewer than 10 minutes on most modern hardware:
+Applying FIX to a single MELODIC output directory should take fewer than 10 minutes on most modern hardware. My script [testFix-singleSession.sh][] demonstrates one way to do that using the MELODIC output created above.
 
-```bash
-# melodic directory to be copied as FIX input:
-$ melodicOut=/tmp/melFromFeeds-noFIX/melFromFeeds-structBBR-mni2mmNonlinear.ica
-$ fixInName="`basename ${melodicOut}`"
+You may also want to vary the FIX threshold or trained-weights parameters across repeated executions, or execute multiple instanaces of FIX in parallel to confirm that parallel execution doesn't produce results that are different from serial execution. My script [testFix-parallel.gnu.sh][] demonstrates one way to do that using [GNU parallel](http://www.gnu.org/software/parallel/), and can be quickly adapted back to serial execution using the `-j1` argument to parallel.
 
-# existing trained-weights file you confirmed above:
-$ fixWeightsFile=/opt/fix/training_files/Standard.RData
-$ fixWeightsName=`basename ${fixWeightsFile} | sed 's/\.RData//'`
-
-# FIX threshold:
-$ fixThresh=20
-
-# execution: either serial or parallel. Serial here since we're not yet looping across parameters
-execution=serial
-
-# parent directory where we'll put the .ica dir to be used for fix input and output:
-$ fixOutParent=/tmp/melFromFeeds-fixOut-${execution}-thresh${fixThresh}-weights${fixWeightsName}
-$ mkdir ${fixOutParent}
-
-# create a copy of the original non-fix ica output, to be used for fix input and output:
-$ cp -a ${melodicOut} ${fixOutParent}/
-$ fixOut="${fixOutParent}/${fixInName}"
-
-# run fix:
-$ /usr/bin/time fix ${fixOut} ${fixWeightsFile} ${fixThresh} -m
-```
-
-You might also want to repeat fix while varying the threshold or trained-weights parameters, as well as executing in serial and in parallel.
-
+[testFix-singleSession.sh]: https://github.com/stowler/brainwhere/blob/master/utilitiesAndData/testsForFSL/testFix-singleSession.sh
+[testFix-parallel.gnu.sh]: https://github.com/stowler/brainwhere/blob/master/utilitiesAndData/testsForFSL/testFix-parallel.gnu.sh
 
 ### 4. Inspect results
 
