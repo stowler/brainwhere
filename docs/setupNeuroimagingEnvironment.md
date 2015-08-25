@@ -561,9 +561,68 @@ You may also want to vary the FIX threshold or trained-weights parameters across
 
 
 # FSL melview
-**UPDATED: TBD**
+**UPDATED: 20150825**
 
-TBD
+[Melview][] is FSL's visualization tool for classified ICA components. 
+
+[Melview]: http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Melview
+
+## Install melview
+
+These are my notes from installing melview on Ubuntu 14.04. (_TBD: add notes for other platforms._)
+
+### 1. install dependencies per the melview webpage
+```bash
+$ sudo apt-get install \
+python-configobj \
+python-enthoughtbase \
+python-matplotlib \
+python-nibabel \
+python-pyface \
+python-pyside \
+python-traits \
+python-traitsui
+```
+
+### 2. install secret dependency
+```bash
+$ sudo apt-get install python-setuptools
+```
+
+### 3. clone the melview git repo
+
+_Sometimes FMRIB downloads can be slow from my Atlanta location, so I always keep the melview repo up-to-date on my local hosts via [MR](https://github.com/stowler/stowlerGeneralComputing/blob/master/docs/setupVCSH.md#4-add-an-existing-non-vcsh-repo-to-mrconfig)._
+```bash
+$ git clone https://git.fmrib.ox.ac.uk/fsl/melview.git
+```
+
+### 4. run the melview installation script
+```bash
+$ cd melview
+$ sudo python ./setup.py install
+```
+
+### 5. confirm location of installed melview executables
+
+...and that they're not symlinks:
+```bash
+$ which melview | xargs ls -l
+-rwxr-xr-x 1 root root 301 Aug 25 15:00 /usr/local/bin/melview
+
+$ which mv2fix | xargs ls -l
+-rwxr-xr-x 1 root root 299 Aug 25 15:00 /usr/local/bin/mv2fix
+```
+
+### 6. launch melview and visualize data
+
+_TBD: maybe provide sample .ica directory with classifications._
+
+```bash
+$ melview &
+
+# click "Load classifications..." button in lower right of window and 
+# select a `fix4melview.txt` classification file.
+```
 
 
 # FSL ICA-AROMA
