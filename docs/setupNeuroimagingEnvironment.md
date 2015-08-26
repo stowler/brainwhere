@@ -840,7 +840,7 @@ I wrote an installation script that [describes the problem](http://goo.gl/Nalzn)
     sudo apt-get install lsb
     ```
 
-2. Manualy download most recent bxh/xcede release from nitrc: http://www.nitrc.org/projects/bxh_xcede_tools
+2. Manually download most recent bxh/xcede release from nitrc: http://www.nitrc.org/projects/bxh_xcede_tools
 
      ```
      $ ls -l ~/Downloads/bxh_xcede_tools-*.tgz
