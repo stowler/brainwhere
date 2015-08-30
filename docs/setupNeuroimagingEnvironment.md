@@ -205,8 +205,8 @@ I'm currently happy with the version in the neurodebian repos:
 
 # FSL
 
-## Install FSL on Mac OS X Mountain/Lion
-**UPDATED: TBD**
+## Install FSL on Mac OS X Yosemite
+**UPDATED: 20150829**
 
 
 Before installing FSL, freesurfer, or  AFNI on Mountain/Lion be double-sure you have installed [XQuartz](http://xquartz.macosforge.org), and logged out and then back in.
