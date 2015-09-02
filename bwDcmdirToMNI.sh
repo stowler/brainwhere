@@ -5,15 +5,15 @@
 # bwDicomdirToMniOrt
 
 
-# Take a folder full of dicom images and convert them to FSL-oriented NIFTI images via bxh files.
+# Take a directory full of dicom images and convert them to FSL-oriented NIFTI images via bxh files.
 # Leaves the bxh files as output in the event that you would like to run FBIRN QC.
 #
-# TBD: test to make sure only one DICOM series in the folder. And nothing else.
+# TBD: test to make sure only one DICOM series in the directory. And nothing else.
 
-# Input folder full of DICOMS from a single series:
+# Input directory full of DICOMS from a single series:
 # e.g.,  /data/project/participant/AX_FLAIR
-# (the basename of this folder will be used to name output NIFIT and BXH files)
-inputFolder=$1
+# (the basename of this directory will be used to name output NIFIT and BXH files)
+dicomDir=$1
 
 # participant and session identifier to be pre-pended to the names of output NIFITS and BXH files
 # e.g., p0001s01
@@ -26,11 +26,11 @@ outputDir=$3
 #################
 # process the arguments
 ################
-# Get series name from the name of the input folder.
-# e.g., AX_FLAIR from the DICOM folder /data/project/participant/AX_FLAIR/
-seriesName=`basename ${inputFolder}`
+# Get series name from the name of the input directory. 
+# e.g., AX_FLAIR from the DICOM directory /data/project/participant/AX_FLAIR/
+seriesName=`basename ${dicomDir}`
 # We're going to name our output files based on 1) the name of that input
-# folder and 2) the user-supplied participantSessionID:
+# directory and 2) the user-supplied participantSessionID:
 # e.g., pMH001s001.AX_FLAIR
 outputName="${participantSessionID}.${seriesName}"
 # create the output directory
@@ -54,9 +54,9 @@ echo "Converting one series' folder of DICOMs to MNI-oriented NIFTI"
 echo "(series ${outputName} )"
 echo "###############################################################"
 echo ""
-echo "INPUT FOLDER CONTAINING DICOMS: ${inputFolder}"
+echo "INPUT FOLDER CONTAINING DICOMS: ${dicomDir}"
 echo -n "FOLDER FILE COUNT: "
-ls -1 ${inputFolder} | wc -l
+ls -1 ${dicomDir} | wc -l
 # should you want an interative mode: 
 # echo "If that's the expected DICOM count for the series, hit "
 # echo -n "Enter to continue. (or CTRL-C to quit)"
@@ -64,7 +64,7 @@ ls -1 ${inputFolder} | wc -l
 echo ""
 echo ""
 echo "Creating .bxh metafile for series ${outputName}  ..."
-dicom2bxh ${inputFolder}/* ${outputDir}/${outputName}.ortOrig.bxh
+dicom2bxh ${dicomDir}/* ${outputDir}/${outputName}.ortOrig.bxh
 ls -lh ${outputDir}/${outputName}.ortOrig.bxh
 echo "...done."
 
