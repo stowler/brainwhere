@@ -205,89 +205,124 @@ I'm currently happy with the version in the neurodebian repos:
 
 # FSL
 
-## Install FSL on Mac OS X Yosemite
-**UPDATED: 20150829**
+## Install FSL on Mac OS X
+**UPDATED: 20150830**
+_These notes are current for OS X Yosemite 10.10.5 installs, but they should apply to OS X versions as least as far back as OS X Lion._
 
 
 Before installing FSL, freesurfer, or  AFNI on Mountain/Lion be double-sure you have installed [XQuartz](http://xquartz.macosforge.org), and logged out and then back in.
 
+There are [multiple ways](http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation/MacOsX) to install FSL on OS X. I sometimes get mixed results with FSL's recommended `fslinstaller.py`, but typically just use it anyway and then fix whatever didn't work.
 
-Google "FSL install" and [follow instructions](http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FslInstallation/MacOsX#Downloading_the_install_file_without_installing_the_software)
+First run FSL's installer script in  "download only" mode (about 1-hr):
 
+```bash
+$ cd ~/Downloads
+$ python fslinstaller.py -o
+```
 
-There are multiple ways to install (as of May 2013). I get mixed results with the recommended fslinstaller.py, but I typically use it and then just fix whatever didn't work.
+After the download has completed, launch the FSL installation:
 
-1. Run FSL's installer script in  "download only" mode (about 1-hr):
+```bash
+$ fslDownload=fsl-5.0.8-macosx.tar.gz
+$ fslDestDir="/usr/local"
+$ fslMD5=`md5 ${fslDownload} | awk '{ print $NF}'` 
+$ echo $fslMD5
+$ python fslinstaller.py -d ${fslDestDir} -f ${fslDownload} -C ${fslMD5}
 
-    ```
-    cd ~/Downloads
-    python fslinstaller.py -o
-    ```
+--- FSL Installer - Version 2.0.19 ---
+[Warning] Some operations of the installer require administative rights, for example installing into the default folder of /usr/local. If your account is an 'Administrator' (you have 'sudo' rights) then you will be prompted for your administrator password when necessary.
+[OK] FSL install file verified.
+[Warning] Unsupported OS (apple darwin 14.5). This version of the OS has not been fully tested.
+Password:
+Installing FSL software...
+[OK] FSL software installed.
+Setting up FSL software...
+[OK] User profile updated with FSL settings, you will need to log out and back in to use the FSL tools.
+```
 
-2. Calculate the md5 sum of the downloaded file and use it to launch installation:
+After the script terminates, figure out where it added the FSL environmental setup lines. They're likely in your personal `~/.bash_profile`, but they could also be in your `~/.profile` or the system-wide `/etc/bashrc`:
 
-    ```
-    fslDownload=fsl-5.0.2.2-macosx.tar.gz
-    fslDestDir="/usr/local"
-    fslMD5=`md5 ${fslDownload} | awk '{ print $NF}'` 
-    python fslinstaller.py -d ${fslDestDir} -f ${fslDownload} -C ${fslMD5}
-    ```
+```bash
+$ tail -n 5 ~/.bash_profile
 
-3. After the install completes, confirm that the file `/etc/bashrc` received a block of FSL environmental variables. If not, the install program may have added it to your personal `~/.profile` or `~/.bash_profile` instead. For system-wide installation remove the FSL variables from those personal files, and append to `/etc/bashrc` by doing this:
+# FSL Setup
+FSLDIR=/usr/local/fsl
+PATH=${FSLDIR}/bin:${PATH}
+export FSLDIR PATH
+. ${FSLDIR}/etc/fslconf/fsl.sh
+``` 
 
-    First cache your sudo credentials via this command (ignoring the output):
+You may want those environmental setup lines to live somewhere other than where the FSL installer put them. For example, `/etc/bashrc` for system-wide installation on a multi-user OS X system. Or, in the case of my own single-user installations, I like to move these lines to `~/.extra_local` in order to keep `~/.bash_profile` generalizable and multi-platform. 
 
-    ```
-    sudo tail /var/log/auth.log
-    ```
+You could launch a text editor and manually swap those setup lines into your target initialization file, or you could do so with a few lines of script that also make it easy to leave a love note about who changed what when:
 
-    ...then immediately copy this block of lines and paste it into the terminal:
+First specify the initialization file that is going to receive the FSL setup lines:
+```bash
+$ targetInitFile=/etc/bashrc
+```
 
-    ```
-    #    WARNING: note the \${escapedVariables} below, which
-    #    are escaped for heredoc (http://goo.gl/j3HMJ). 
-    #    Un-escape them if manually typing into a text editor.
-    #    Otherwise, just paste these lines to your bash prompt
-    #    (up to and including "EOF" line):
-    #
-    editDate=`/bin/date +%Y%m%d`
-    editTime=$(date +%k%M)
-    sudo tee -a /etc/bashrc >/dev/null <<EOF
-    #------------------------------------------
-    # on ${editDate} at ${editTime}, user $USER 
-    # added some FSL setup:
-    FSLDIR=/usr/local/fsl
-    PATH=\${FSLDIR}/bin:\${PATH}
-    export FSLDIR PATH
-    . \${FSLDIR}/etc/fslconf/fsl.sh
-    #------------------------------------------
-    EOF
-    #
-    cat /etc/bashrc 
-    ```
+Then use this command to cache your sudo credentials:
 
-    Either log out and back in again, or issue this terminal command:
-    ```
-     . /etc/bashrc
-    ```
+```bash
+$ sudo -v
+```
 
-TEST: did $FSLDIR get exported correctly? This should return "/usr/local/fsl" (no quotes) :
+Then immediately paste this entire block of lines into the terminal (no editing necessary):
 
-     echo $FSLDIR
+```bash
+# Get the curent date and time:
+editDate=`/bin/date +%Y%m%d`
+editTime=$(date +%k%M)
+# This appends everything between these EOM makers to your $targetInitFile:
+#
+#    WARNING: note the \${escapedVariables} below, which
+#    are escaped for heredoc (http://goo.gl/j3HMJ). 
+#    Un-escape them if manually typing into a text editor.
+#    Otherwise, just paste these lines at your bash prompt:
+#
+sudo tee -a ${targetInitFile} >/dev/null <<EOM
+#------------------------------------------
+# on ${editDate} at ${editTime}, user $USER 
+# added some FSL setup:
+FSLDIR=/usr/local/fsl
+PATH=\${FSLDIR}/bin:\${PATH}
+export FSLDIR PATH
+. \${FSLDIR}/etc/fslconf/fsl.sh
+#------------------------------------------
+EOM
+echo ""
+tail -n 8 ${targetInitFile}
 
-TEST: Does fslview exist in /Applications?
+```
 
-    ls /Applications
-    # ...if not create a shortcut like this:
-    sudo ln -s /usr/local/fsl/bin/fslview.app /Applications/fslview.app
+The lines that were actually appended to your initializtion file should have been printed to the terminal by that final `tail` command. If they look sensible to you, delete the setup lines from the original FSL install command, and either log out and back in again, or issue this terminal command:
+```bash
+$ . ${targetInitFile}
+```
 
-TEST: we should be able to open /Applications/fslview.app from the commandline:
+TEST: did `$FSLDIR` get exported correctly? This command should return the location of your FSL install:
+```bash
+$ echo $FSLDIR
+/usr/local/fsl
+```
 
-     open /Applications/fslview.app
+TEST: Does `fslview` exist in `/Applications`?
+```bash
+$ ls /Applications
+# ...if not create a shortcut like this:
+$ sudo ln -s /usr/local/fsl/bin/fslview.app /Applications/fslview.app
+```
 
-TEST: we should be able to open fslview.app from the commandline :
+TEST: you should be able to open `/Applications/fslview.app` from the commandline:
+```bash
+$ open /Applications/fslview.app
+```
 
-     fslview ${FSLDIR}/data/standard/MNI152_T1_2mm_LR-masked.nii.gz
+TEST: you should be able to open `fslview.app` with file arguments from the commandline :
+```bash
+$ fslview ${FSLDIR}/data/standard/MNI152_T1_2mm_LR-masked.nii.gz &
+```
 
 
 
@@ -325,7 +360,7 @@ For system-wide installation, confirm that the file `/etc/bash.bashrc` received 
 
 First cache your sudo credentials via this command (ignoring the output):
  
-    sudo tail /var/log/auth.log
+    sudo -v
 
 ...then immediately copy this block of lines and paste it into the terminal:
 
@@ -358,7 +393,7 @@ TEST: can the shell environment find the FSL binaries? The command `fslinfo` iss
 
 
 ## Install and run FSL test suite ("FEEDS")
-**UPDATED: 20150818**
+**UPDATED: 20150830**
 
 
 Download FEEDS (> 270 MB) from the [FSL webpage](http://fsl.fmrib.ox.ac.uk/fsldownloads/). Neurodebian hosts can also download via command:
@@ -387,7 +422,10 @@ $ echo "Do not run FEEDS from /opt. Instead: cp -R --dereference /opt/feeds /tmp
 [Run](http://fsl.fmrib.ox.ac.uk/fsl/feeds/doc/) FEEDS :
 
 ```bash
+# in linux:
 $ cp -R --dereference /opt/feeds /tmp/myFeedsCopy
+# in OS X:
+$ cp -R -H            /opt/feeds /tmp/myFeedsCopy
 
 # On some linux installs the user may need to remove
 # "DYLD_LIBRARY_PATH LD_LIBRARY_PATH" from line 398 in file "RUN"
@@ -639,70 +677,108 @@ TBD
 
 # AFNI
 
-## Install AFNI on Mac OS X Mountain/Lion
-**UPDATED: TBD**
-
+## Install AFNI on Mac OS X
+**UPDATED: 20150830**
+_These notes are current for OS X Yosemite 10.10.5 installs, but they should also apply to OS X versions as least as far back as OS X Lion._
 
 Before installing FSL, freesurfer, or  AFNI on Mountain/Lion be sure to install [XQuartz](http://xquartz.macosforge.org), and logout and then back in. 
 
 AFNI also requires netpbm:
+```bash
+$ sudo port install netpbm
+```
 
-    sudo port install netpbm
+Download latest AFNI binaries for Mac, unzip, and move to a reasonable location: 
+```bash
+$ cd ~/Downloads
+$ curl -O http://afni.nimh.nih.gov/pub/dist/tgz/macosx_10.8_gcc.tgz
+$ cd /tmp
+$ tar -zxvf ~/Downloads/macosx_10.8_gcc.tgz
 
-Then download latest AFNI for Mac, unzip, and move to a reasonable location: 
+# get the afni compile date while also confirming there aren't any 
+# critical failures that will prevent afni execution:
+$ export DYLD_FALLBACK_LIBRARY_PATH="/tmp/macosx_10.8_gcc"
+$ /tmp/macosx_10.8_gcc/afni --ver
+Precompiled binary macosx_10.8_gcc: Aug 27 2015 (Version AFNI_2011_12_21_1014)
 
-    cd ~/Downloads
-    curl -O http://afni.nimh.nih.gov/pub/dist/tgz/macosx_10.8_gcc.tgz
-    tar -zxvf macosx_10.8_gcc.tgz
-    sudo mv macosx_10.8_gcc /usr/local/abin
+$ afniPrecompiledPlatform="macosx_10.8_gcc"    #from the afni --version output above
+$ afniCompileDate="20150827"                   #from the afni --version output above
+$ sudo mv /tmp/macosx_10.8_gcc /opt/abin-${afniCompileDate}-precompiled.${afniPrecompiledPlatform}
+$ sudo rm -f /opt/abin     # removes existing symlink
+$ sudo ln -s /opt/abin-${afniCompileDate}-precompiled.${afniPrecompiledPlatform} /opt/abin
+$ ls -al /opt              # confirming that the naming and linking worked as expected
+```
 
-Add AFNI's new location to the path in `/etc/bashrc` by first caching your sudo credentials via this command (ignoring the output):
- 
-    sudo tail /var/log/auth.log
 
-...then immediately copy this block of lines and paste it into the terminal:
+Add AFNI's setup commands and `$PATH` entry to your environment. The initialization file that you choose for this will depend on your local configuration. For example, you might choose `/etc/bashrc` for system-wide installation on a multi-user OS X system. Or, in the case of my own single-user installations, I like to add these lines to `~/.extra_local` in order to keep `~/.bash_profile` generalizable and multi-platform. 
 
-    #    WARNING: note the \${escapedVariables} below, which
-    #    are escaped for heredoc (http://goo.gl/j3HMJ). 
-    #    Un-escape them if manually typing into a text editor.
-    #    Otherwise, just paste these lines to your bash prompt
-    #    (up to and including "EOF" line):
-    #
-    editDate=`/bin/date +%Y%m%d`
-    editTime=$(date +%k%M)
-    sudo tee -a /etc/bashrc >/dev/null <<EOF
-    #------------------------------------------
-    # on ${editDate} at ${editTime}, user $USER  
-    # added some AFNI environmental variables:
-    export PATH=/usr/local/abin:\${PATH}
-    export AFNI_ENFORCE_ASPECT=YES
-    echo ""
-    echo "----------- active afni version and variables: -----------"
-    afni -ver
-    echo -n "The command 'afni' will launch: "
-    which afni
-    echo -n "The command '3dinfo' will launch: "
-    which 3dinfo
-    echo "AFNI environmental variables, if any exist:"
-    env | grep AFNI
-    echo "----------------------------------------------------------"
-    echo ""
-    #------------------------------------------
-    EOF
-    #
-    cat /etc/bashrc
+You could launch a text editor and manually add these setup lines to your target initialization file, or you could do so with a few lines of script that also make it easy to leave a love note about who changed what when:
 
-Either log out and back in again, or issue this terminal command:
+First specify the initialization file that is going to receive the AFNI setup lines:
+```bash
+$ targetInitFile=/etc/bashrc
+```
 
-    . /etc/bashrc 
+Then use this command to cache your sudo credentials:
+```bash
+$ sudo -v
+```
 
-TEST: Open a new terminal window and test your afni install by issuing the command "afni" (no quotes) to open GUI. Confirm whether AFNI_ENFORCE_ASPECT is working effectively (see below)
+Then immediately copy this block of lines and paste it into the terminal:
+```bash
+# Get the current date and time:
+editDate=`/bin/date +%Y%m%d`
+editTime=$(date +%k%M)
+# This appends everything between these EOM markers to your $targetInitFile:
+#
+#    WARNING: note the \${escapedVariables} below, which
+#    are escaped for heredoc (http://goo.gl/j3HMJ). 
+#    Un-escape them if manually typing into a text editor.
+#    Otherwise, just paste these lines at your bash prompt:
+#
+sudo tee -a ${targetInitFile} >/dev/null <<EOM
+#------------------------------------------
+# on ${editDate} at ${editTime}, user $USER  
+# added some AFNI environmental variables:
+export PATH=/opt/abin:\${PATH}
+export AFNI_ENFORCE_ASPECT=YES
+export DYLD_FALLBACK_LIBRARY_PATH=/opt/abin
+echo ""
+echo "----------- active afni version and variables: -----------"
+afni -ver
+echo -n "The command 'afni' will launch: "
+which afni
+echo -n "The command '3dinfo' will launch: "
+which 3dinfo
+echo "AFNI environmental variables, if any exist:"
+env | grep AFNI
+echo "----------------------------------------------------------"
+echo ""
+#------------------------------------------
+EOM
+echo ""
+tail -n 18 ${targetInitFile}
+
+```
+
+The lines that were actually appended to your initializtion file should have been printed to the terminal by that final `tail` command. If they look sensible to you, log out and back in again, or issue this terminal command:
+```bash
+$ . ${targetInitFile}
+```
+
+TEST: does afni accurately detect its environment, and is there any evidence that you might want to do some additional configuration?
+```bash
+$ afni_system_check.py -check_all
+```
+
+TEST: Open a new terminal window and test your afni install by issuing the command "afni" (no quotes) to open GUI. Confirm whether `AFNI_ENFORCE_ASPECT` is working effectively (see below)
 
 
 
 ## Install AFNI on Neurodebian (Ubuntu 12.04 or the Debian 7.0 Wheezy Neurodebian VM)
 **UPDATED: TBD**
 
+_TBD: include advice on openmp and libgomp: http://afni.nimh.nih.gov/afni/community/board/read.php?1,148200,148215#msg-148215_
 
 I'm currently happy with the version in the neurodebian repos. Install with:
 
@@ -713,7 +789,7 @@ You may be instructed to source an AFNI setup script from `/etc/bash.bashrc` .
 I recommend doing so as follows, so that every new terminal window contains a message about 
 what version of AFNI is active. First cache your sudo credentials via this command (ignoring the output):
 
-   sudo tail /var/log/auth.log
+   sudo -v
 
 ...then immediately copy this block of lines and paste into the terminal:
 
@@ -803,15 +879,12 @@ To set AFNI_ENFORCE_ASPECT on a per-execution basis, can launch the afni GUI wit
 # FBIRN tools 
 
 
-## Install FBIRN tools on Mac OS X Mountain/Lion
-**UPDATED: TBD**
+## Install FBIRN tools on Mac OS X
+**UPDATED: 20150830**
+_These notes are current for OS X Yosemite 10.10.5 installs, but they should also apply to OS X versions as least as far back as OS X Lion._
 
+Manually download the most recent bhx/xcede release from nitrc: http://www.nitrc.org/projects/bxh_xcede_tools
 
-As of May 2013, the shipping binaries of FBIRN BXH/XCEDE tools includes imagemagick bugs on Mountain Lion. (NB: 20150108: also works on Yosemite 10.10.1)
-
-I wrote an installation script that [describes the problem](http://goo.gl/Nalzn) and provides a workaround via macports.
-
-1. Follow the steps in [my workaround install script](http://goo.gl/9Rd6V), then confirm the changes to /etc/bashrc:
 
       ```
       cat /etc/bashrc
@@ -834,20 +907,20 @@ I wrote an installation script that [describes the problem](http://goo.gl/Nalzn)
 **UPDATED: TBD**
 
 
-1. Install lsb if it isn't already installed:
+Install lsb if it isn't already installed:
 
     ```
     sudo apt-get install lsb
     ```
 
-2. Manually download most recent bxh/xcede release from nitrc: http://www.nitrc.org/projects/bxh_xcede_tools
+Manually download most recent bxh/xcede release from nitrc: http://www.nitrc.org/projects/bxh_xcede_tools
 
      ```
      $ ls -l ~/Downloads/bxh_xcede_tools-*.tgz
      bxh_xcede_tools-1.10.7-lsb31.i386.tgz
      ```
      
-3. Unpack and install bxh/xcede:
+Unpack and install bxh/xcede:
 
      ```
      # ...first declare the bxh version and architecture as they appear in the download filename:
@@ -862,59 +935,83 @@ I wrote an installation script that [describes the problem](http://goo.gl/Nalzn)
      sudo ln -s /opt/bxh_xcede_tools-${bxhVersion}-${bxhArch} /opt/bxh
      ```
      
-4. For system-wide access, configure the environment via `/etc/bash.bashrc`.  First cache your sudo credentials via this command (ignoring the output):
+Configure your environment for convenient access to the bxh tools, including your `$PATH`.  The initialization file that you choose for this will depend on your local configuration. For example, you might choose `/etc/bashrc` for system-wide installation on a multi-user OS X system. Or, in the case of my own single-user installations, I like to add these lines to `~/.extra_local` in order to keep `~/.bash_profile` generalizable and multi-platform.
 
-        sudo tail /var/log/auth.log
+You could launch a text editor and manually add these setup lines to your target initialization file, or you could do so with a few lines of script that also make it easy to leave a love note about who changed what when:
 
-    ...then immediately copy this block of lines and paste it into the terminal:
+First specify the initialization file that is going to receive the FBIRN setup lines:
+```bash
+$ targetInitFile=/etc/bashrc
+```
 
+Then use this command to cache your sudo credentials:
+```bash
+$ sudo -v
+```
 
-       #    WARNING: note the \${escapedVariables} below, which
-       #    are escaped for heredoc (http://goo.gl/j3HMJ). 
-       #    Un-escape them if manually typing into a text editor.
-       #    Otherwise, just paste these lines to your bash prompt
-       #    (up to and including "EOF" line):
-       #
-       editDate=`/bin/date +%Y%m%d`
-       editTime=$(date +%k%M)
-       sudo tee -a /etc/bash.bashrc >/dev/null <<EOF
-       #-------------------------------------------
-       # on ${editDate} at ${editTime}, user $USER 
-       # added some BXH/XCEDE environment statements:
-       BXHDIR=/opt/bxh
-       PATH=\${BXHDIR}/bin:\${PATH}
-       export BXHDIR PATH
-       #------------------------------------------
-       EOF
-       #
-       cat /etc/bash.bashrc
+Then immediately copy this block of lines and paste it into the terminal:
+```bash
+# Get the current date and time:
+editDate=`/bin/date +%Y%m%d`
+editTime=$(date +%k%M)
+# This appends everything between these EOM markers to your $targetInitFile:
+#
+#    WARNING: note the \${escapedVariables} below, which
+#    are escaped for heredoc (http://goo.gl/j3HMJ). 
+#    Un-escape them if manually typing into a text editor.
+#    Otherwise, just paste these lines to your bash prompt:
+#
+sudo tee -a ${targetInitFile} >/dev/null <<EOM
+#-------------------------------------------
+# on ${editDate} at ${editTime}, user $USER 
+# added some FBIRN BXH/XCEDE environment statements:
+BXHDIR=/opt/bxh
+PATH=\${BXHDIR}/bin:\${PATH}
+export BXHDIR PATH
+#------------------------------------------
+EOM
+echo ""
+tail -n 7 ${targetInitFile}
 
+```
 
-5. Either log out and back in again, or issue this terminal command:
+The lines that were actually appended to your initialization file should have been printed to the terminal by that final `tail` command. If they look sensible to you, log out and back in again, or issue this terminal command:
+```bash
+$ . ${targetInitFile}
+```
 
-     ```
-     . /etc/bash.bashrc
-     ```
-     
-6. TEST: did `$BXHDIR` get exported correctly? This should return a listing of bxh programs :
+TEST: did `$BXHDIR` get exported correctly? This should return a listing of bxh programs :
 
-      ```
-      ls ${BXHDIR}/bin
-      ```
+```
+$ ls ${BXHDIR}/bin
+```
       
-7. TEST: does the command `bxhabsorb` (no arguments) produce its help message? If not, and instead there is a system message about command not found, there may be a problem with the lsb package.
+TEST: does the command `bxhabsorb` (no arguments) produce its help message? If not, and instead there is a system message about command not found and you are on a linux host, there may be a problem with the `lsb` package.
 
+### Fix imagemagick problems on Mac OS X
 
-8. Because the `convert` and `montage` imagemagick programs included with the bxh download often produce font errors, replace them wtih the system-wide convert and montage programs:
+Since at least May 2013 (Lion-era), the shipping binaries of FBIRN BXH/XCEDE tools includes imagemagick bugs on OS X. They continue to require a work-around at the time of writing (August 2015, Yosemite 10.10.5).
 
-    ```
-    sudo mv ${BXHDIR}/bin/convert ${BXHDIR}/bin/orig_convert
-    sudo mv ${BXHDIR}/bin/montage ${BXHDIR}/bin/orig_montage
-    sudo ln -s /usr/bin/convert ${BXHDIR}/bin/convert
-    sudo ln -s /usr/bin/montage ${BXHDIR}/bin/montage
-    ls -l ${BXHDIR}/bin/convert
-    ls -l ${BXHDIR}/bin/montage 
-    ```
+Because the `convert` and `montage` imagemagick programs included with the bxh download often produce font errors, Replace bxh's `convert` and `montage` binaries with working versions from macports:
+
+```bash
+$ sudo mv ${BXHDIR}/bin/convert ${BXHDIR}/bin/orig_convert
+$ sudo mv ${BXHDIR}/bin/montage ${BXHDIR}/bin/orig_montage
+
+# confirm location of system-wide macports versions:
+$ which convert montage | xargs ls -al
+-rwxr-xr-x  1 root  admin  25580 Aug 29 10:23 /opt/local/bin/convert
+-rwxr-xr-x  1 root  admin  25580 Aug 29 10:23 /opt/local/bin/montage
+
+$ sudo ln -s /opt/local/bin/convert ${BXHDIR}/bin/convert
+$ sudo ln -s /opt/local/bin/montage ${BXHDIR}/bin/montage
+$ ls -l ${BXHDIR}/bin/convert  ${BXHDIR}/bin/montage
+```
+
+I wrote an installation script that [describes the problem](http://goo.gl/Nalzn) and provides a workaround via macports.
+
+1. Follow the steps in [my workaround install script](http://goo.gl/9Rd6V), then confirm the changes to /etc/bashrc:
+
 
 # FreeSurfer
 
@@ -967,7 +1064,7 @@ and FSL (b/c FS's install will detect location of FSL).
 5. Add post-install config to `/etc/bashrc` per the bash section of the freesurfer [documentation](http://surfer.nmr.mgh.harvard.edu/fswiki/SetupConfiguration). First cache your sudo credentials via this command (ignoring the output):
 
     ```
-    sudo tail /var/log/auth.log
+    sudo -v
     ```
     ...then immediately copy this block of lines and paste into the terminal:
 
