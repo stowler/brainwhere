@@ -65,9 +65,14 @@ tree -L 1 "${dicomDirSession}"
 echo "(processing ${parallelDicomDirs} DICOM dirs in parallel via GNU parallel"
 echo "###############################################################"
 
+# because it's going to be recreated by bwDicomToFslNifti-oneSeries.sh
+# TBD: is this really a good idea?
 rm -fr ${niftiDirSession}
 
 ls -d ${dicomDirSession}/* | parallel --jobs ${parallelDicomDirs} --tag --line-buffer bwDicomToFslNifti-oneSeries.sh {} ${participantSessionID} ${niftiDirSession}
+
+mkdir ${niftiDirSession}/bxh+orig
+mv ${niftiDirSession}/*ortOrig* ${niftiDirSession}/bxh+orig/
 
 echo ""
 echo ""
